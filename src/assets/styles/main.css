@@ -1,0 +1,24 @@
+.signatureCanvas {
+  border-bottom: 0.1em solid #000;
+  background: #fff;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  width: 40em;
+  height: 10em;
+}
+main {
+  color: #000;
+  font-family: 'Ubuntu', sans;
+  min-width: 286px;
+}
+body {
+  background: #f1f3f7;
+  -webkit-overflow-scrolling: touch;
+}
+.clickable {
+  cursor: pointer;
+  z-index: 15;
+}
+.clickable:hover {
+  color: #84af9c;
+}

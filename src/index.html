@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <title>Signature Recognition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <!-- 1. Load libraries -->
+    <!--
+    <script src="angular2/bundles/angular2-polyfills.js"></script>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Intl.~locale.en"></script>
+
+    <script src="systemjs/dist/system.src.js"></script>
+
+    <script src="rxjs/bundles/Rx.js"></script>
+    <script src="angular2/bundles/angular2.dev.js"></script>
+    <script src="angular2/bundles/http.dev.js"></script>
+    <script src="angular2/bundles/router.dev.js"></script>
+    -->
+    <script src="es6-shim/es6-shim.min.js"></script>
+    <script src="zone.js/dist/zone.js"></script>
+    <script src="reflect-metadata/Reflect.js"></script>
+    <script src="systemjs/dist/system.src.js"></script>
+
+
+    <base href="/">
+    <!-- 2. Configure SystemJS -->
+    <script src="systemjs.config.js"></script>
+    <script>
+      System.import('app').catch(function(err){ console.error(err); });
+    </script>
+
+    <link href="bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!--<link href='https://fonts.googleapis.com/css?family=Ubuntu:400,300,500,700' rel='stylesheet' type='text/css'>-->
+    <!--<link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>-->
+    <!--<link href='https://fonts.googleapis.com/css?family=Rock+Salt' rel='stylesheet' type='text/css'> -->
+    <!-- font-family: 'Rock Salt', cursive; -->
+    <link href="assets/styles/main.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/img/logo/favicon.png">
+  </head>
+  <!-- 3. Display the application -->
+  <body>
+    <sample>Loading...</sample>
+  </body>
+</html>

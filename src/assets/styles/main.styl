@@ -1,0 +1,20 @@
+@require 'variables'
+
+@require "signature"
+
+main
+  color black
+  font-family 'Ubuntu', sans
+  min-width 286px
+
+body
+  background color_light
+  -webkit-overflow-scrolling touch
+
+
+.clickable
+  cursor pointer
+  z-index 15
+
+  &:hover
+    color color_primary
