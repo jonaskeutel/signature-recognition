@@ -9,185 +9,129 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var CanvasDrawer = (function () {
+    function CanvasDrawer(el) {
+        this.currentTouch = [];
+        this.canvas = el;
+        console.log(el);
+        el.nativeElement.width = el.nativeElement.scrollWidth;
+    }
+    CanvasDrawer.prototype.touchStart = function (canvas, event) {
+        event.preventDefault();
+        var context = this.canvas.nativeElement.getContext("2d");
+        var touches = event.changedTouches;
+        for (var i = 0; i < touches.length; i++) {
+            var x = touches[i].pageX - event.srcElement.offsetLeft;
+            var y = touches[i].pageY - canvas.offsetTop;
+            console.log(touches[i].identifier);
+            this.currentTouch.push({ id: touches[i].identifier, x: x, y: y });
+            context.beginPath();
+            context.arc(x, y, this.thickness(touches[i].force, 2), 0, 2 * Math.PI, false); // a circle at the start
+            context.fillStyle = 'blue';
+            context.fill();
+        }
+    };
+    CanvasDrawer.prototype.touchMove = function (canvas, event) {
+        event.preventDefault();
+        var context = this.canvas.nativeElement.getContext("2d");
+        var touches = event.changedTouches;
+        // console.log(event)
+        for (var i = 0; i < touches.length; i++) {
+            var x = touches[i].pageX - event.srcElement.offsetLeft;
+            var y = touches[i].pageY - canvas.offsetTop;
+            var ind = -1;
+            var touch = this.currentTouch.filter(function (t, index) {
+                ind = index;
+                if (t.id == touches[i].identifier) {
+                    return true;
+                }
+                return false;
+            });
+            console.log(touch.length);
+            // context.beginPath();
+            // context.arc(x, y, 4 * touches[i].force, 0, 2 * Math.PI, false);  // a circle at the start
+            // context.fillStyle = 'blue';
+            // context.fill();
+            if (touch.length == 1) {
+                context.beginPath();
+                // log("context.moveTo(" + ongoingTouches[idx].pageX + ", " + ongoingTouches[idx].pageY + ");");
+                context.moveTo(touch[0].x, touch[0].y);
+                // log("context.lineTo(" + touches[i].pageX + ", " + touches[i].pageY + ");");
+                context.lineTo(x, y);
+                context.lineWidth = this.thickness(touches[i].force, null);
+                context.strokeStyle = 'blue';
+                context.stroke();
+                this.currentTouch.splice(ind, 1);
+                this.currentTouch.push({ id: touches[i].identifier, x: x, y: y });
+            }
+        }
+    };
+    CanvasDrawer.prototype.thickness = function (force, thickness) { thickness = thickness ? thickness : 3; return thickness * force * force; };
+    CanvasDrawer.prototype.touchEnd = function (canvas, event) {
+        event.preventDefault();
+        var touches = event.changedTouches;
+        // console.log(event)
+        for (var i = 0; i < touches.length; i++) {
+            var ind = -1;
+            var touch = this.currentTouch.filter(function (t, index) {
+                ind = index;
+                if (t.id == touches[i].identifier) {
+                    return true;
+                }
+                return false;
+            });
+            if (ind > -1)
+                this.currentTouch.splice(ind, 1);
+        }
+    };
+    __decorate([
+        core_1.HostListener('touchstart', ['$event.target', '$event']), 
+        __metadata('design:type', Function), 
+        __metadata('design:paramtypes', [Object, Object]), 
+        __metadata('design:returntype', void 0)
+    ], CanvasDrawer.prototype, "touchStart", null);
+    __decorate([
+        core_1.HostListener('touchmove', ['$event.target', '$event']), 
+        __metadata('design:type', Function), 
+        __metadata('design:paramtypes', [Object, Object]), 
+        __metadata('design:returntype', void 0)
+    ], CanvasDrawer.prototype, "touchMove", null);
+    __decorate([
+        core_1.HostListener('touchend', ['$event.target', '$event']), 
+        __metadata('design:type', Function), 
+        __metadata('design:paramtypes', [Object, Object]), 
+        __metadata('design:returntype', void 0)
+    ], CanvasDrawer.prototype, "touchEnd", null);
+    CanvasDrawer = __decorate([
+        core_1.Directive({ selector: 'canvas[drawable]' }), 
+        __metadata('design:paramtypes', [core_1.ElementRef])
+    ], CanvasDrawer);
+    return CanvasDrawer;
+}());
 var SignatureComponent = (function () {
     function SignatureComponent() {
     }
     SignatureComponent.prototype.ngOnInit = function () {
-        init();
     };
+    SignatureComponent.prototype.ngAfterViewInit = function () {
+    };
+    SignatureComponent.prototype.touchstart = function () {
+        console.log("Touchstart");
+    };
+    __decorate([
+        core_1.ViewChild("signatureCanvas"), 
+        __metadata('design:type', core_1.ElementRef)
+    ], SignatureComponent.prototype, "signatureCanvas", void 0);
     SignatureComponent = __decorate([
         core_1.Component({
             selector: 'signature',
             providers: [],
-            template: "\n    <h1>Signature</h1>\n    <canvas class=\"signatureCanvas\">\n      Your browser does not support canvas element.\n    </canvas>\n  "
+            directives: [CanvasDrawer],
+            template: "\n    <h1>Signature</h1>\n    <div class=\"canvas-wrapper\">\n      <canvas #signatureCanvas class=\"signatureCanvas\" drawable>\n        Your browser does not support canvas element.\n      </canvas>\n    </div>\n  "
         }), 
         __metadata('design:paramtypes', [])
     ], SignatureComponent);
     return SignatureComponent;
 }());
 exports.SignatureComponent = SignatureComponent;
-var gyroData = [];
-var accelerometerData = [];
-var forceData = [];
-var ongoingTouches = new Array();
-var numStrokes = 0;
-var recording = false;
-function clearCanvas() {
-    var el = document.getElementsByTagName("canvas")[0];
-    var context = el.getContext("2d");
-    context.clearRect(0, 0, canvas.width, canvas.height);
-}
-function handleStart(evt) {
-    recording = true;
-    if (numStrokes == 0) {
-        gyroData = [];
-        accelerometerData = [];
-        forceData = [];
-    }
-    numStrokes++;
-    evt.preventDefault();
-    // log("touchstart.");
-    var el = document.getElementsByTagName("canvas")[0];
-    var ctx = el.getContext("2d");
-    var touches = evt.changedTouches;
-    for (var i = 0; i < touches.length; i++) {
-        // log("touchstart:" + i + "...");
-        ongoingTouches.push(copyTouch(touches[i]));
-        var color = colorForTouch(touches[i]);
-        ctx.beginPath();
-        ctx.arc(touches[i].pageX, touches[i].pageY, 4, 0, 2 * Math.PI, false); // a circle at the start
-        ctx.fillStyle = color;
-        ctx.fill();
-    }
-}
-function handleMove(evt) {
-    evt.preventDefault();
-    var el = document.getElementsByTagName("canvas")[0];
-    var ctx = el.getContext("2d");
-    var touches = evt.changedTouches;
-    for (var i = 0; i < 1; i++) {
-        var color = colorForTouch(touches[i]);
-        var idx = ongoingTouchIndexById(touches[i].identifier);
-        // console.log(touches[i]);
-        // log(touches[i].force);
-        if (recording) {
-            forceData.push(touches[i].force);
-            var f = document.getElementById('force');
-            f.innerHTML = "Force: <br>" + touches[i].force.toString().substring(0, 5);
-        }
-        if (idx >= 0) {
-            // log("continuing touch "+idx);
-            ctx.beginPath();
-            // log("ctx.moveTo(" + ongoingTouches[idx].pageX + ", " + ongoingTouches[idx].pageY + ");");
-            ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
-            // log("ctx.lineTo(" + touches[i].pageX + ", " + touches[i].pageY + ");");
-            ctx.lineTo(touches[i].pageX, touches[i].pageY);
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = color;
-            ctx.stroke();
-            ongoingTouches.splice(idx, 1, copyTouch(touches[i])); // swap in the new touch record
-        }
-        else {
-        }
-    }
-}
-function handleEnd(evt) {
-    evt.preventDefault();
-    // log("touchend");
-    var el = document.getElementsByTagName("canvas")[0];
-    var ctx = el.getContext("2d");
-    var touches = evt.changedTouches;
-    for (var i = 0; i < touches.length; i++) {
-        var color = colorForTouch(touches[i]);
-        var idx = ongoingTouchIndexById(touches[i].identifier);
-        if (idx >= 0) {
-            ctx.lineWidth = 4;
-            ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
-            ctx.lineTo(touches[i].pageX, touches[i].pageY);
-            ctx.fillRect(touches[i].pageX - 4, touches[i].pageY - 4, 8, 8); // and a square at the end
-            ongoingTouches.splice(idx, 1); // remove it; we're done
-        }
-        else {
-        }
-    }
-    setTimeout(function () {
-        numStrokes--;
-        if (numStrokes == 0) {
-            recording = false;
-            var body = JSON.stringify(accelerometerData);
-            var subject = Date.now().toString();
-            document.getElementById('subject').value = subject;
-            document.getElementById('data').value = JSON.stringify(forceData) + "###" + JSON.stringify(gyroData) + "###" + JSON.stringify(accelerometerData);
-        }
-    }, 1000);
-}
-function handleCancel(evt) {
-    evt.preventDefault();
-    // log("touchcancel.");
-    var touches = evt.changedTouches;
-    for (var i = 0; i < touches.length; i++) {
-        ongoingTouches.splice(i, 1); // remove it; we're done
-    }
-}
-function colorForTouch(touch) {
-    var r = touch.identifier % 16;
-    var g = Math.floor(touch.identifier / 3) % 16;
-    var b = Math.floor(touch.identifier / 7) % 16;
-    r = r.toString(16); // make it a hex digit
-    g = g.toString(16); // make it a hex digit
-    b = b.toString(16); // make it a hex digit
-    var color = "#" + r + g + b;
-    // log("color for touch with identifier " + touch.identifier + " = " + color);
-    return color;
-}
-function copyTouch(touch) {
-    return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
-}
-function ongoingTouchIndexById(idToFind) {
-    for (var i = 0; i < ongoingTouches.length; i++) {
-        var id = ongoingTouches[i].identifier;
-        if (id == idToFind) {
-            return i;
-        }
-    }
-    return -1; // not found
-}
-function log(msg) {
-    var p = document.getElementById('log');
-    p.innerHTML = msg + "\n"; // + p.innerHTML;
-}
-function init() {
-    var el = document.getElementsByTagName("canvas")[0];
-    el.addEventListener("touchstart", handleStart, false);
-    el.addEventListener("touchend", handleEnd, false);
-    el.addEventListener("touchcancel", handleCancel, false);
-    el.addEventListener("touchmove", handleMove, false);
-    // log("initialized.");
-    el.width = window.innerWidth * 0.9;
-    el.height = window.innerHeight * 0.5;
-    window.addEventListener('deviceorientation', function (event) {
-        if (recording) {
-            gyroData.push({
-                'a': event.alpha,
-                'b': event.beta,
-                'c': event.gamma });
-        }
-        document.getElementById("gyro").innerHTML = "Gyro: <br>" + event.alpha.toString().substring(0, 5) + ' <br> ' + event.beta.toString().substring(0, 5) + ' <br> ' + event.gamma.toString().substring(0, 5);
-    });
-    window.addEventListener("devicemotion", function (event) {
-        if (recording) {
-            accelerometerData.push({
-                'a': event.rotationRate.alpha,
-                'b': event.rotationRate.beta,
-                'c': event.rotationRate.gamma });
-        }
-        document.getElementById("accelerometer").innerHTML = "Accelerometer: <br>" + Math.sqrt(event.rotationRate.alpha * event.rotationRate.alpha + event.rotationRate.beta * event.rotationRate.beta + event.rotationRate.gamma * event.rotationRate.gamma).toString().substring(0, 5);
-        // document.getElementById("accelerometer").innerHTML =
-        //   event.rotationRate.alpha + ' <br> ' +
-        //   event.rotationRate.beta + ' <br> ' +
-        //   event.rotationRate.gamma
-    }, true);
-}
 //# sourceMappingURL=signature.component.js.map
