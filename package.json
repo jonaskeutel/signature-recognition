@@ -2,6 +2,9 @@
   "name": "artiverse-platform",
   "version": "1.0.0",
   "description": "An online Platform that connects artists and followers",
+  "engines": {
+    "node": "4.2.6"
+  },
   "main": "index.js",
   "scripts": {
     "tsc": "tsc -p src -w",
