@@ -13,11 +13,13 @@ var CanvasDrawer = (function () {
     function CanvasDrawer(el) {
         this.currentTouch = [];
         this.touchesOverTime = [];
+        this.numStrokes = 0;
         this.canvas = el;
         console.log(el);
         el.nativeElement.width = el.nativeElement.scrollWidth;
     }
     CanvasDrawer.prototype.touchStart = function (canvas, event) {
+        this.numStrokes++;
         event.preventDefault();
         var context = this.canvas.nativeElement.getContext("2d");
         var touches = event.changedTouches;
@@ -32,7 +34,7 @@ var CanvasDrawer = (function () {
                 y: y,
                 pressure: force
             });
-            console.log(touches[i]);
+            //   console.log(touches[i])
             //   console.log(touches[i].identifier)
             this.currentTouch.push({ id: touches[i].identifier, x: x, y: y });
             context.beginPath();
@@ -80,7 +82,6 @@ var CanvasDrawer = (function () {
                 context.stroke();
                 this.currentTouch.splice(ind, 1);
                 this.currentTouch.push({ id: touches[i].identifier, x: x, y: y });
-                console.log(this.currentTouch, this.currentTouch.length);
             }
         }
     };
@@ -102,7 +103,17 @@ var CanvasDrawer = (function () {
             if (ind > -1)
                 this.currentTouch.splice(ind, 1);
         }
-        console.log(this.currentTouch);
+        this.numStrokes--;
+        var thing = this;
+        setTimeout(function () {
+            console.log(thing.numStrokes);
+            if (thing.numStrokes === 0) {
+                // TODO @Markus: save arrays
+                thing.touchesOverTime = [];
+                var context = thing.canvas.nativeElement.getContext("2d");
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }, 1000);
     };
     __decorate([
         core_1.HostListener('touchstart', ['$event.target', '$event']), 

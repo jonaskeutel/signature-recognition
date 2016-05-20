@@ -6,6 +6,7 @@ class CanvasDrawer {
   private canvas: ElementRef;
   private currentTouch = [];
   private touchesOverTime = [];
+  private numStrokes = 0;
 
   constructor(el: ElementRef) {
        this.canvas = el;
@@ -15,6 +16,7 @@ class CanvasDrawer {
 
   @HostListener('touchstart', ['$event.target', '$event'])
   touchStart(canvas, event) {
+    this.numStrokes++;
     event.preventDefault()
     let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
 
@@ -31,7 +33,7 @@ class CanvasDrawer {
         y: y,
         pressure: force
       });
-      console.log(touches[i])
+    //   console.log(touches[i])
     //   console.log(touches[i].identifier)
       this.currentTouch.push( { id: touches[i].identifier, x: x, y: y })
 
@@ -89,7 +91,6 @@ class CanvasDrawer {
 
         this.currentTouch.splice(ind, 1)
         this.currentTouch.push( { id: touches[i].identifier, x: x, y: y })
-        console.log(this.currentTouch, this.currentTouch.length);
       }
 
       }
@@ -121,7 +122,17 @@ class CanvasDrawer {
         this.currentTouch.splice(ind, 1)
 
     }
-    console.log(this.currentTouch);
+    this.numStrokes--;
+    var  thing = this;
+    setTimeout(function(){
+        console.log(thing.numStrokes);
+        if (thing.numStrokes === 0) {
+            // TODO @Markus: save arrays
+            thing.touchesOverTime = [];
+            let context:CanvasRenderingContext2D = thing.canvas.nativeElement.getContext("2d");
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }, 1000);
   }
 
 }
