@@ -9,9 +9,14 @@ const user = require( dbPath + '/user.js')
 module.exports = {
   init: global.init,
   
-  //User related DB-Action
-  getUser: user.get, // @Param (email) -> user
-  
+  // User-related
+  newUser: user.insert, 	// pass user object
+  getUser: user.get, 		// find by id
+  getAllUser: user.getAll,
+
+  // Signature-related
+  newSignature: signature.insert,	// pass signature object
+  checkSignature: signature.check 	// pass signature object
 }
 
 

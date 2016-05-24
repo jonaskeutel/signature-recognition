@@ -1,7 +1,7 @@
 'use strict'
 
-const data    = require(__dirname + "/data.js")
-const sample  = require(__dirname + "/routes/sample.js")
+const user  = require(__dirname + "/routes/user.js")
+const signature  = require(__dirname + "/routes/signature.js")
 
 module.exports = function(app) {
 
@@ -16,6 +16,16 @@ module.exports = function(app) {
   //
   //   })
 
-  app.route('/api/data')
-    .get(sample.route)
+  app.route('/api/user')
+    .post(user.newUser)
+    .get(user.getUser)
+
+  app.route('/api/allUser')
+    .get(user.getAllUser)
+
+  app.route('/api/newSignature')
+    .post(signature.newSignature)
+
+  app.route('/api/checkSignature')
+    .post(signature.checkSignature)
 }
