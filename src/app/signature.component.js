@@ -158,7 +158,7 @@ var SignatureComponent = (function () {
             selector: 'signature',
             providers: [],
             directives: [CanvasDrawer],
-            template: "\n    <h1>Signature</h1>\n    <div class=\"canvas-wrapper\">\n      <canvas #signatureCanvas class=\"signatureCanvas\" drawable>\n        Your browser does not support canvas element.\n      </canvas>\n    </div>\n  "
+            template: "\n    <div class=\"canvas-wrapper\">\n      <canvas #signatureCanvas class=\"signatureCanvas\" drawable>\n        Your browser does not support canvas element.\n      </canvas>\n    </div>\n  "
         }), 
         __metadata('design:paramtypes', [])
     ], SignatureComponent);

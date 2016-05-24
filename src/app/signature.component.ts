@@ -142,7 +142,6 @@ class CanvasDrawer {
   providers: [],
   directives: [CanvasDrawer],
   template: `
-    <h1>Signature</h1>
     <div class="canvas-wrapper">
       <canvas #signatureCanvas class="signatureCanvas" drawable>
         Your browser does not support canvas element.

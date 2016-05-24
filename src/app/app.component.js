@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var router_1 = require('@angular/router');
 var sample_service_1 = require('./services/sample.service');
 var signature_component_1 = require('./signature.component');
 var AppComponent = (function () {
@@ -23,9 +24,13 @@ var AppComponent = (function () {
         core_1.Component({
             selector: 'sample',
             providers: [sample_service_1.SampleService],
-            directives: [signature_component_1.SignatureComponent],
-            template: "\n        <main>\n          <signature></signature>\n        </main>\n    "
-        }), 
+            directives: [signature_component_1.SignatureComponent, router_1.ROUTER_DIRECTIVES],
+            template: "\n        <main>\n          <signature></signature>\n          <router-outlet></router-outlet>\n        </main>\n    "
+        }),
+        router_1.Routes([
+            { path: '/', component: signature_component_1.SignatureComponent },
+            { path: '/registration', component: signature_component_1.SignatureComponent }
+        ]), 
         __metadata('design:paramtypes', [sample_service_1.SampleService])
     ], AppComponent);
     return AppComponent;

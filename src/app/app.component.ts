@@ -1,6 +1,6 @@
 'use strict'
 import {Component, OnInit} from '@angular/core';
-// import {RouteConfig, Router, ROUTER_DIRECTIVES} from '@angular/router';
+import {Routes, Router, ROUTER_DIRECTIVES} from '@angular/router';
 import {HTTP_PROVIDERS} from '@angular/http';
 import {SampleService} from './services/sample.service';
 
@@ -11,17 +11,18 @@ import {SignatureComponent} from './signature.component';
 @Component({
     selector: 'sample',
     providers: [ SampleService],
-    directives: [SignatureComponent],
+    directives: [SignatureComponent, ROUTER_DIRECTIVES],
     template:`
         <main>
           <signature></signature>
+          <router-outlet></router-outlet>
         </main>
     `
 })
-// @RouteConfig([
-//   {path:'/', name: 'Home', component: SampleComponent},
-//   {path:'/profile/:profileid', name: 'Profile', component: SampleComponent}
-// ])
+@Routes([
+  {path:'/', component: SignatureComponent},
+  {path:'/registration', component: SignatureComponent}
+])
 
 export class AppComponent implements OnInit {
 
