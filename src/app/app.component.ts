@@ -7,7 +7,7 @@ import {SampleService} from './services/sample.service';
 import {OverviewComponent} from './overview.component';
 import {RegistrationComponent} from './registration.component';
 
-
+import {SignatureComponent} from './signature.component';
 
 @Component({
     selector: 'sample',

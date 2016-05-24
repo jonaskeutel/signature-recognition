@@ -1,5 +1,5 @@
 'use strict'
-import {Directive, HostListener, Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef} from '@angular/core';
+import {Directive, HostListener, Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChild, ElementRef} from '@angular/core';
 
 @Directive({selector: 'canvas[drawable]'})
 class CanvasDrawer {
@@ -10,8 +10,13 @@ class CanvasDrawer {
 
   constructor(el: ElementRef) {
        this.canvas = el;
-       console.log(el)
-       el.nativeElement.width = el.nativeElement.scrollWidth
+       console.log("Construced")
+      //  console.log(JSON.parse(JSON.stringify(el.nativeElement)) )
+      console.log(el,  el.nativeElement.clientWidth)
+      setTimeout(function(){
+        el.nativeElement.width = el.nativeElement.clientWidth
+      },200)
+      
   }
 
   @HostListener('touchstart', ['$event.target', '$event'])
@@ -97,7 +102,7 @@ class CanvasDrawer {
 
   }
 
-  thickness(force, thickness){return 3; thickness = thickness? thickness : 3; return thickness * force * force}
+  thickness(force, thickness){thickness = thickness? thickness : 3; return thickness * force * force}
 
   @HostListener('touchend', ['$event.target', '$event'])
   touchEnd(canvas, event) {
@@ -130,7 +135,7 @@ class CanvasDrawer {
             // TODO @Markus: save arrays
             thing.touchesOverTime = [];
             let context:CanvasRenderingContext2D = thing.canvas.nativeElement.getContext("2d");
-            context.clearRect(0, 0, canvas.width, canvas.height);
+            // context.clearRect(0, 0, canvas.width, canvas.height);
         }
     }, 1000);
   }
@@ -151,7 +156,7 @@ class CanvasDrawer {
   `
 })
 
-export class SignatureComponent implements OnInit{
+export class SignatureComponent implements OnInit, AfterViewInit{
 
   @ViewChild("signatureCanvas") signatureCanvas: ElementRef;
 
@@ -159,7 +164,6 @@ export class SignatureComponent implements OnInit{
   }
 
   ngAfterViewInit(){
-
   }
 
   touchstart(){

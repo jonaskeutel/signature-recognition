@@ -15,8 +15,12 @@ var CanvasDrawer = (function () {
         this.touchesOverTime = [];
         this.numStrokes = 0;
         this.canvas = el;
-        console.log(el);
-        el.nativeElement.width = el.nativeElement.scrollWidth;
+        console.log("Construced");
+        //  console.log(JSON.parse(JSON.stringify(el.nativeElement)) )
+        console.log(el, el.nativeElement.clientWidth);
+        setTimeout(function () {
+            el.nativeElement.width = el.nativeElement.clientWidth;
+        }, 200);
     }
     CanvasDrawer.prototype.touchStart = function (canvas, event) {
         this.numStrokes++;
@@ -85,7 +89,7 @@ var CanvasDrawer = (function () {
             }
         }
     };
-    CanvasDrawer.prototype.thickness = function (force, thickness) { return 3; thickness = thickness ? thickness : 3; return thickness * force * force; };
+    CanvasDrawer.prototype.thickness = function (force, thickness) { thickness = thickness ? thickness : 3; return thickness * force * force; };
     CanvasDrawer.prototype.touchEnd = function (canvas, event) {
         console.log(this.touchesOverTime);
         event.preventDefault();
@@ -111,7 +115,6 @@ var CanvasDrawer = (function () {
                 // TODO @Markus: save arrays
                 thing.touchesOverTime = [];
                 var context = thing.canvas.nativeElement.getContext("2d");
-                context.clearRect(0, 0, canvas.width, canvas.height);
             }
         }, 1000);
     };
