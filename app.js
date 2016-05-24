@@ -7,9 +7,9 @@ var stylus        = require('stylus'),
     path          = require('path'),
     q             = require('q'),
     port          = 7070,
-    cookieParser = require('cookie-parser')
+    cookieParser  = require('cookie-parser')
 
-// const dbInit      = require(__dirname + '/private/scripts/rethinkdb_init.js')
+const dbInit      = require(__dirname + '/private/database/pg/global.js')
 
 // --- app configuration
 app.use(cookieParser());
@@ -20,9 +20,9 @@ app.use(stylus.middleware(path.join(__dirname, 'styles')))
 app.use( express.static(__dirname + '/src') )
 app.use( express.static(__dirname + '/node_modules') )
 
-//Database initialization
-// dbInit.init()
-//   .catch(function(err){console.log(err)})
+// Database initialization
+dbInit.init()
+  .catch(function(err){console.log(err)})
 
 
 // --- route initialization

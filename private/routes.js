@@ -23,9 +23,9 @@ module.exports = function(app) {
   app.route('/api/allUser')
     .get(user.getAllUser)
 
-  app.route('/api/newSignature')
-    .post(signature.newSignature)
+  // app.route('/api/newSignature')
+  //   .post(signature.newSignature)
 
-  app.route('/api/checkSignature')
-    .post(signature.checkSignature)
+  // app.route('/api/checkSignature')
+  //   .post(signature.checkSignature)
 }

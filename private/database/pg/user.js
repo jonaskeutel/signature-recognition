@@ -7,19 +7,15 @@ module.exports = {
   insert: insertUser
 }
 
-function getUser(email, includeRevokedPackages){
-  const deferred = q.defer()
-  
-  global.instance.query(`SELECT * FROM ${global.tables.user}  WHERE email=?` , email ,function(err, result){
-    if(err){
-      console.log(err)
-      deferred.reject(err)
-    }else{
-      deferred.resolve(result)
-    }
-  })
-
-  return deferred.promise
+function getUser(id, callback){
+  let result = []
+  global.instance.query('SELECT * FROM testUser;')
+    .on('row', function(row) {
+      result.push(row)
+    })
+    .on('end', function() {
+      callback(result)
+    })
 }
 
 function insertUser(user){

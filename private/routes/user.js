@@ -1,3 +1,4 @@
+'use strict'
 const db  = require(__dirname + "/../database/dbinterface.js")
 
 module.exports = {
@@ -26,11 +27,15 @@ function newUser(req, res){
 }
 
 function getUser(req, res){
-  if(!req.body.id) {
-        return res.send({"status": "error", "message": "missing a parameter"})
-    } else {
-    	return res.json(db.getUser(req.body.id))
-    }
+  // if(!req.body.id) {
+  //       return res.send({"status": "error", "message": "missing a parameter"})
+  //   } else {
+  //   	return res.json(db.getUser(req.body.id))
+  //   }
+  db.getUser(1, function(result) {
+    console.log("UNPARSED: " + JSON.stringify(result))
+    return res.json(JSON.stringify(result))
+  })
 }
 
 function getAllUser(req, res){

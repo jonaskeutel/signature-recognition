@@ -1,5 +1,5 @@
 'use strict'
-const dbPath = './mysql'
+const dbPath = './pg'
 // const dbPath = __dirname + '/rethinkdb'
 
 //import necessary modules
@@ -15,8 +15,8 @@ module.exports = {
   getAllUser: user.getAll,
 
   // Signature-related
-  newSignature: signature.insert,	// pass signature object
-  checkSignature: signature.check 	// pass signature object
+  // newSignature: signature.insert,	// pass signature object
+  // checkSignature: signature.check 	// pass signature object
 }
 
 
