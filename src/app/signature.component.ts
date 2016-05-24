@@ -36,7 +36,7 @@ class CanvasDrawer {
     //   console.log(touches[i])
     //   console.log(touches[i].identifier)
       this.currentTouch.push( { id: touches[i].identifier, x: x, y: y })
-
+   
       context.beginPath();
       context.arc(x, y, this.thickness(touches[i].force, 2), 0, 2 * Math.PI, false);  // a circle at the start
       context.fillStyle = 'blue';
@@ -97,7 +97,7 @@ class CanvasDrawer {
 
   }
 
-  thickness(force, thickness){thickness = thickness? thickness : 3; return thickness * force * force}
+  thickness(force, thickness){return 3; thickness = thickness? thickness : 3; return thickness * force * force}
 
   @HostListener('touchend', ['$event.target', '$event'])
   touchEnd(canvas, event) {
@@ -125,7 +125,7 @@ class CanvasDrawer {
     this.numStrokes--;
     var  thing = this;
     setTimeout(function(){
-        console.log(thing.numStrokes);
+        // console.log(thing.numStrokes);
         if (thing.numStrokes === 0) {
             // TODO @Markus: save arrays
             thing.touchesOverTime = [];
@@ -146,6 +146,7 @@ class CanvasDrawer {
       <canvas #signatureCanvas class="signatureCanvas" drawable>
         Your browser does not support canvas element.
       </canvas>
+      
     </div>
   `
 })

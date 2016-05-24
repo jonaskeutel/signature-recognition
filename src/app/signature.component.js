@@ -85,7 +85,7 @@ var CanvasDrawer = (function () {
             }
         }
     };
-    CanvasDrawer.prototype.thickness = function (force, thickness) { thickness = thickness ? thickness : 3; return thickness * force * force; };
+    CanvasDrawer.prototype.thickness = function (force, thickness) { return 3; thickness = thickness ? thickness : 3; return thickness * force * force; };
     CanvasDrawer.prototype.touchEnd = function (canvas, event) {
         console.log(this.touchesOverTime);
         event.preventDefault();
@@ -106,7 +106,7 @@ var CanvasDrawer = (function () {
         this.numStrokes--;
         var thing = this;
         setTimeout(function () {
-            console.log(thing.numStrokes);
+            // console.log(thing.numStrokes);
             if (thing.numStrokes === 0) {
                 // TODO @Markus: save arrays
                 thing.touchesOverTime = [];
@@ -158,7 +158,7 @@ var SignatureComponent = (function () {
             selector: 'signature',
             providers: [],
             directives: [CanvasDrawer],
-            template: "\n    <div class=\"canvas-wrapper\">\n      <canvas #signatureCanvas class=\"signatureCanvas\" drawable>\n        Your browser does not support canvas element.\n      </canvas>\n    </div>\n  "
+            template: "\n    <div class=\"canvas-wrapper\">\n      <canvas #signatureCanvas class=\"signatureCanvas\" drawable>\n        Your browser does not support canvas element.\n      </canvas>\n      \n    </div>\n  "
         }), 
         __metadata('design:paramtypes', [])
     ], SignatureComponent);

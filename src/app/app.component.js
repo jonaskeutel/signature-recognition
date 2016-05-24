@@ -11,27 +11,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 var sample_service_1 = require('./services/sample.service');
-var signature_component_1 = require('./signature.component');
+var overview_component_1 = require('./overview.component');
+var registration_component_1 = require('./registration.component');
 var AppComponent = (function () {
-    function AppComponent(
-        // private _router:Router,
-        sample) {
+    function AppComponent(_router, sample) {
+        this._router = _router;
         this.sample = sample;
     }
     AppComponent.prototype.ngOnInit = function () {
+        // this._router.navigate(['/registration']);
     };
     AppComponent = __decorate([
         core_1.Component({
             selector: 'sample',
             providers: [sample_service_1.SampleService],
-            directives: [signature_component_1.SignatureComponent, router_1.ROUTER_DIRECTIVES],
-            template: "\n        <main>\n          <signature></signature>\n          <router-outlet></router-outlet>\n        </main>\n    "
+            directives: [registration_component_1.RegistrationComponent, overview_component_1.OverviewComponent, router_1.ROUTER_DIRECTIVES],
+            template: "\n        <main>\n          <router-outlet></router-outlet>\n        </main>\n    "
         }),
         router_1.Routes([
-            { path: '/', component: signature_component_1.SignatureComponent },
-            { path: '/registration', component: signature_component_1.SignatureComponent }
+            { path: '/registration', component: overview_component_1.OverviewComponent },
+            { path: '/', component: registration_component_1.RegistrationComponent }
         ]), 
-        __metadata('design:paramtypes', [sample_service_1.SampleService])
+        __metadata('design:paramtypes', [router_1.Router, sample_service_1.SampleService])
     ], AppComponent);
     return AppComponent;
 }());
