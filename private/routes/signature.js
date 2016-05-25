@@ -1,42 +1,35 @@
 const db  = require(__dirname + "/../database/dbinterface.js")
 
 module.exports = {
-  newUser: newUser
+  newSignature: newSignature,
+  getSignature: getSignature
 }
 
-function newUser(req, res){
+function newSignature(req, res){
   if(!req.body.name || !req.body.age || !req.body.gender || !req.body.hand) {
         return res.json({"status": "error", "message": "missing a parameter"})
     } else {
-    	var newUser = {
+    	var newSignature = {
     		name: req.body.name,
     		age: req.body.age,
     		gender: req.body.gender,
     		hand: req.body.hand
     	}
-    	db.newUser(newUser, function(err) {
+    	db.newSignature(newSignature, function(err) {
     		if (err) {
-    			return res.json({"status": "error", "message": "user not created"})
+    			return res.json({"status": "error", "message": "signature not created"})
     		}
-    		return res.json({"status": "success", "message": "user successfully created"})
+    		return res.json({"status": "success", "message": "signature successfully created"})
     	})
     }
 }
 
-function getUser(req, res){
-  if(!req.body.id) {
-        return res.send({"status": "error", "message": "missing a parameter"})
-    } else {
-    	return res.json(//db.getUser(req.body.id))
-    	{
-    		name: 'Dome',
-    		age: 23,
-    		gender: 'm',
-    		hand: 'r'
-    	})
-    }
-}
-
-function getAllUser(req, res){
-    return res.json(db.getAllUser)
+function getSignature(req, res){
+  if(!req.query.id) {
+    return res.send({"status": "error", "message": "missing parameter 'id'"})
+  } else {
+    db.getSignature(req.query.id, function(result) {
+      return res.json(result)
+    })
+  }
 }

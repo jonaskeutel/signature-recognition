@@ -6,7 +6,8 @@ const q   = require('q')
 
 //Tables
 let tables = {
-  user: 'testUser'
+  user: 'testUser',
+  signature: 'signature'
 }
 
 module.exports = {
@@ -17,7 +18,7 @@ module.exports = {
 
 function connect(){
   var deferred = q.defer()
-  console.log('trying to connect..')
+  console.log('Trying to connect...')
   db.defaults.ssl = true
   db.connect(config.url, function(err, client) {
     if (err) {
@@ -48,7 +49,7 @@ function setupDatabase () {
   return connect()
 
     .then( () => {
-      console.log("Connected to Database")
+      console.log("Database set up!")
     })
     .catch( err => {
       console.log("Database Error: ", err)

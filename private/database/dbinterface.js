@@ -5,6 +5,7 @@ const dbPath = './pg'
 //import necessary modules
 const global = require( dbPath + '/global.js')
 const user = require( dbPath + '/user.js')
+const signature = require( dbPath + '/signature.js')
 
 module.exports = {
   init: global.init,
@@ -12,11 +13,11 @@ module.exports = {
   // User-related
   newUser: user.insert, 	// pass user object
   getUser: user.get, 		// find by id
-  getAllUser: user.getAll,
+  getAllUser: user.all,
 
   // Signature-related
-  // newSignature: signature.insert,	// pass signature object
-  // checkSignature: signature.check 	// pass signature object
+  newSignature: signature.insert,	// pass signature object
+  getSignature: signature.get	// pass signature object
 }
 
 
