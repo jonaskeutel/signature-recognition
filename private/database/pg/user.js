@@ -8,35 +8,48 @@ module.exports = {
   all: all
 }
 
-function insert(user, callback){
+function insert(user){
+  const deferred = q.defer()
+
   global.instance.query("INSERT INTO " + global.tables.user + " (name, age, gender, hand) VALUES ($1, $2, $3, $4) RETURNING id", user, function(err, result){
     if (err) {
       console.log('DB error (user - insert):', err)
+      deferred.reject(err)
     } else {
       console.log('user inserted with id: ' + result.rows[0].id);
-      callback(err, result.rows[0].id)
+      deferred.resolve()
     }
   })
+
+  return deferred.promise
 }
 
-function get(id, callback){
-  let result = []
+function get(id) {
+  const deferred = q.defer()
+
   global.instance.query('SELECT * FROM ' + global.tables.user + ' WHERE id=' + id, function(err, result){
     if (err) {
       console.log('DB error (user - get):', err)
+      deferred.reject(err)
     } else {
-      callback(result.rows)
+      deferred.resolve(result.rows)
     }
   })
+
+  return deferred.promise
 }
 
-function all(callback){
-  let result = []
+function all(callback) {
+  const deferred = q.defer()
+
   global.instance.query('SELECT * FROM '+ global.tables.user, function(err, result){
     if (err) {
       console.log('DB error (user- all):', err)
+      deferred.reject(err)
     } else {
-      callback(result.rows)
+      deferred.resolve(result.rows)
     }
   })
+
+  return deferred.promise
 }

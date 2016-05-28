@@ -16,7 +16,7 @@ module.exports = {
   tables: tables
 }
 
-function connect(){
+function connect() {
   var deferred = q.defer()
   console.log('Trying to connect...')
   db.defaults.ssl = true

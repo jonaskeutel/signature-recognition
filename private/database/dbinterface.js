@@ -16,7 +16,7 @@ module.exports = {
 
   // Signature-related
   newSignature: signature.insert,	// pass signature object
-  getSignature: signature.get	// pass signature object
+  getSignatures: signature.get		// pass signature object
 }
 
 

@@ -7,24 +7,33 @@ module.exports = {
   get: get
 }
 
-function insert(signature, callback){
+function insert(signature) {
+  const deferred = q.defer()
+
   global.instance.query("INSERT INTO " + global.tables.signature + " (personID , x, y, force, acceleration, gyroscope, duration) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING personID", signature, function(err, result){
     if (err) {
       console.log('DB error (signature - insert):', err)
+      deferred.reject(err)
     } else {
-      console.log('signature inserted for user: ' + result.rows[0].personID);
-      callback(err)
+      console.log('signature inserted for user: ' + result.rows[0].personid);
+      deferred.resolve()
     }
   })
+
+  return deferred.promise
 }
 
-function get(personID, callback){
-  let result = []
+function get(personID) {
+  const deferred = q.defer()
+
   global.instance.query('SELECT * FROM ' + global.tables.signature + ' WHERE personID=' + personID, function(err, result){
     if (err) {
       console.log('DB error (signature - get):', err)
+      deferred.reject(err)
     } else {
-      callback(result.rows)
+      deferred.resolve(result.rows)
     }
   })
+
+  return deferred.promise
 }
