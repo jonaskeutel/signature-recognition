@@ -1,6 +1,5 @@
 'use strict'
 const dbPath = './pg'
-// const dbPath = __dirname + '/rethinkdb'
 
 //import necessary modules
 const global = require( dbPath + '/global.js')

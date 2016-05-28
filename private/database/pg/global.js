@@ -6,7 +6,7 @@ const q   = require('q')
 
 //Tables
 let tables = {
-  user: 'testUser',
+  user: 'person',
   signature: 'signature'
 }
 
@@ -52,7 +52,7 @@ function setupDatabase () {
       console.log("Database set up!")
     })
     .catch( err => {
-      console.log("Database Error: ", err)
+      console.log("DB setup error: ", err)
     })
 }
 
