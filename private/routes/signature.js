@@ -1,5 +1,6 @@
 'use strict'
 const db  = require(__dirname + "/../database/dbinterface.js")
+const evaluation = require(__dirname + "/../evaluation/dtw.js")
 
 module.exports = {
   newSignature: newSignature,
@@ -49,27 +50,31 @@ function checkSignature(req, res) {
         return res.json({"status": "error", "message": "missing a parameter"})
     } else {
       db.getSignatures(req.body.personID)
-        .then(function(result) {
-          // do sth
-          if (true) {
-            var newSignature = [
-              req.body.personID,
-              req.body.x,
-              req.body.y,
-              req.body.force,
-              req.body.acceleration,
-              req.body.gyroscope,
-              req.body.duration
-            ]
-            db.newSignature(newSignature)
-              .then(function() {
-                return res.json({"status": "success", "message": "signature successfully created"})
-              }, function(err) {
-                return res.json({"status": "error", "message": "signature not created"})
-              })
-          }
+        .then(function(savedSignatures) {
+          evaluation.compare(req.body, savedSignatures).done(function(result) {
+            if (result) {
+              var newSignature = [
+                req.body.personID,
+                req.body.x,
+                req.body.y,
+                req.body.force,
+                req.body.acceleration,
+                req.body.gyroscope,
+                req.body.duration
+              ]
+              db.newSignature(newSignature)
+                .then(function() {
+                  return res.json({"status": "success", "message": "signature check successful and new signature successfully created"})
+                }, function(err) {
+                  return res.json({"status": "error", "message": "signature check successful, but new signature not created"})
+                })
+            } else {
+              return res.json({"status": "error", "message": "signature check not successful"})
+            }
+          })
         }, function(err) {
           return res.json({"status": "error", "message": "DB error getSignatures"})
         })
     }
 }
+
