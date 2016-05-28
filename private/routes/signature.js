@@ -6,15 +6,19 @@ module.exports = {
 }
 
 function newSignature(req, res){
-  if(!req.body.name || !req.body.age || !req.body.gender || !req.body.hand) {
+  if(!req.body.personID || !req.body.x || !req.body.y || !req.body.force ||
+    !req.body.acceleration || !req.body.gyroscope || !req.body.duration) {
         return res.json({"status": "error", "message": "missing a parameter"})
     } else {
-    	var newSignature = {
-    		name: req.body.name,
-    		age: req.body.age,
-    		gender: req.body.gender,
-    		hand: req.body.hand
-    	}
+    	var newSignature = [
+    		req.body.personID,
+    		req.body.x,
+    		req.body.y,
+        req.body.force,
+        req.body.acceleration,
+        req.body.gyroscope,
+    		req.body.duration
+    	]
     	db.newSignature(newSignature, function(err) {
     		if (err) {
     			return res.json({"status": "error", "message": "signature not created"})
@@ -25,10 +29,10 @@ function newSignature(req, res){
 }
 
 function getSignature(req, res){
-  if(!req.query.id) {
-    return res.send({"status": "error", "message": "missing parameter 'id'"})
+  if(!req.query.personID) {
+    return res.json({"status": "error", "message": "missing parameter 'personID'"})
   } else {
-    db.getSignature(req.query.id, function(result) {
+    db.getSignature(req.query.personID, function(result) {
       return res.json(result)
     })
   }
