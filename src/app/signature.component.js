@@ -9,11 +9,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var normalizedTouches = [];
 var CanvasDrawer = (function () {
     function CanvasDrawer(el) {
         this.currentTouch = [];
         this.touchesOverTime = [];
         this.numStrokes = 0;
+        this.startTime = null;
+        this.lastBegin = Date.now();
+        this.lastEnd = Date.now();
+        this.normalizedTouches = [];
         this.canvas = el;
         console.log("Construced");
         //  console.log(JSON.parse(JSON.stringify(el.nativeElement)) )
@@ -23,6 +28,7 @@ var CanvasDrawer = (function () {
         }, 200);
     }
     CanvasDrawer.prototype.touchStart = function (canvas, event) {
+        this.lastBegin = Date.now();
         this.numStrokes++;
         event.preventDefault();
         var context = this.canvas.nativeElement.getContext("2d");
@@ -32,12 +38,12 @@ var CanvasDrawer = (function () {
             var x = touches[i].pageX - event.srcElement.offsetLeft;
             var y = touches[i].pageY - canvas.offsetTop;
             var force = touches[i].force;
-            this.touchesOverTime.push({
+            this.addTouchPoint({
                 timestamp: Date.now(),
                 x: x,
                 y: y,
                 pressure: force
-            });
+            }, Date.now());
             //   console.log(touches[i])
             //   console.log(touches[i].identifier)
             this.currentTouch.push({ id: touches[i].identifier, x: x, y: y });
@@ -57,12 +63,12 @@ var CanvasDrawer = (function () {
             var y = touches[i].pageY - canvas.offsetTop;
             var force = touches[i].force;
             var ind = -1;
-            this.touchesOverTime.push({
+            this.addTouchPoint({
                 timestamp: Date.now(),
                 x: x,
                 y: y,
                 pressure: force
-            });
+            }, Date.now());
             var touch = this.currentTouch.filter(function (t, index) {
                 ind = index;
                 if (t.id == touches[i].identifier) {
@@ -91,7 +97,7 @@ var CanvasDrawer = (function () {
     };
     CanvasDrawer.prototype.thickness = function (force, thickness) { thickness = thickness ? thickness : 3; return thickness * force * force; };
     CanvasDrawer.prototype.touchEnd = function (canvas, event) {
-        console.log(this.touchesOverTime);
+        this.lastEnd = Date.now();
         event.preventDefault();
         var touches = event.changedTouches;
         // console.log(event)
@@ -109,14 +115,71 @@ var CanvasDrawer = (function () {
         }
         this.numStrokes--;
         var thing = this;
-        setTimeout(function () {
-            // console.log(thing.numStrokes);
-            if (thing.numStrokes === 0) {
-                // TODO @Markus: save arrays
-                thing.touchesOverTime = [];
-                var context = thing.canvas.nativeElement.getContext("2d");
+        this.normalizeTouches();
+        // setTimeout(function(){
+        //     // console.log(thing.numStrokes);
+        //     if (thing.numStrokes === 0) {
+        //         // TODO @Markus: save arrays
+        //         thing.touchesOverTime = [];
+        //         let context:CanvasRenderingContext2D = thing.canvas.nativeElement.getContext("2d");
+        //         // context.clearRect(0, 0, canvas.width, canvas.height);
+        //     }
+        // }, 1000);
+        // console.log(this.touchesOverTime)
+    };
+    CanvasDrawer.prototype.addTouchPoint = function (touchpoint, timestamp) {
+        //Interval in ms
+        this.touchesOverTime.push(touchpoint);
+        // let interval = 10;
+        // let timeDifference = timestamp - this.startTime
+        // if(!this.startTime)
+        //   this.startTime = timestamp
+        // else{
+        //   if(timeDifference == interval){
+        //   }else if(timeDifference > interval){
+        //     for(var i=0; i<Math.floor(timeDifference/interval); i++){
+        //       this.touchesOverTime.push(null)
+        //     }
+        //   }
+        // }
+    };
+    CanvasDrawer.prototype.normalizeTouches = function () {
+        var touches = this.touchesOverTime;
+        var normalized = [];
+        var last = {};
+        var lastStamp = -1;
+        //Interval in ms
+        var interval = 10;
+        var offset = 0;
+        if (this.normalizedTouches.length > 0) {
+            var pause = Math.floor((touches[0].timestamp - this.normalizedTouches[this.normalizedTouches.length - 1].timestamp) / interval);
+            for (var i = 0; i < pause; i++) {
+                this.normalizedTouches.push(null);
             }
-        }, 1000);
+        }
+        while (touches.length > 0) {
+            if (normalized.length == 0) {
+                normalized.push(touches[0]);
+                lastStamp = touches[0].timestamp;
+                last = touches[0];
+                touches.shift();
+            }
+            else {
+                if (touches[0].timestamp - lastStamp > interval + offset) {
+                    normalized.push(last);
+                    offset += interval;
+                }
+                else if (touches[0].timestamp - lastStamp <= interval + offset) {
+                    offset = 0;
+                    normalized.push(touches[0]);
+                    lastStamp = touches[0].timestamp;
+                    last = touches[0];
+                    touches.shift();
+                }
+            }
+        }
+        this.normalizedTouches = this.normalizedTouches.concat(normalized);
+        normalizedTouches = this.normalizedTouches;
     };
     __decorate([
         core_1.HostListener('touchstart', ['$event.target', '$event']), 
@@ -137,7 +200,9 @@ var CanvasDrawer = (function () {
         __metadata('design:returntype', void 0)
     ], CanvasDrawer.prototype, "touchEnd", null);
     CanvasDrawer = __decorate([
-        core_1.Directive({ selector: 'canvas[drawable]' }), 
+        core_1.Directive({
+            selector: 'canvas[drawable]'
+        }), 
         __metadata('design:paramtypes', [core_1.ElementRef])
     ], CanvasDrawer);
     return CanvasDrawer;
@@ -145,9 +210,12 @@ var CanvasDrawer = (function () {
 var SignatureComponent = (function () {
     function SignatureComponent() {
     }
-    SignatureComponent.prototype.ngOnInit = function () {
-    };
+    // ngOnInit(){
+    // }
     SignatureComponent.prototype.ngAfterViewInit = function () {
+        // setInterval( () => {
+        //   console.log(normalizedTouches)
+        // }, 2000)
     };
     SignatureComponent.prototype.touchstart = function () {
         console.log("Touchstart");
@@ -161,6 +229,7 @@ var SignatureComponent = (function () {
             selector: 'signature',
             providers: [],
             directives: [CanvasDrawer],
+            inputs: ['touches'],
             template: "\n    <div class=\"canvas-wrapper\">\n      <canvas #signatureCanvas class=\"signatureCanvas\" drawable>\n        Your browser does not support canvas element.\n      </canvas>\n      \n    </div>\n  "
         }), 
         __metadata('design:paramtypes', [])

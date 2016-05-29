@@ -48,7 +48,7 @@ import {SignatureComponent} from './signature.component';
           <button class="btn btn-primary" (click)="next()">Next</button>
           <button class="btn btn-primary" (click)="clear()" [ngClass]="{'hidden': step==1}">Clear</button>
         </div>
-        <signature *ngIf="step > 1"></signature>
+        <signature *ngIf="step > 1" [touches]="touches1"></signature>
       </div>
     </div>
   `
@@ -59,6 +59,7 @@ export class RegistrationComponent implements OnInit{
   public age:number;
   public gender:string = 'm';
   public hand:string = 'r';
+  public touches1 = [4];
   
   public step:number = 1;
   
@@ -69,6 +70,7 @@ export class RegistrationComponent implements OnInit{
   next(){
     this.step++
     console.log(this.name, this.age)
+    console.log(this.touches1)
   }
   
   clear(){

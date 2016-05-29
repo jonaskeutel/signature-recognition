@@ -1,12 +1,20 @@
 'use strict'
 import {Directive, HostListener, Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChild, ElementRef} from '@angular/core';
 
-@Directive({selector: 'canvas[drawable]'})
+var normalizedTouches = []
+
+@Directive({
+  selector: 'canvas[drawable]'
+})
 class CanvasDrawer {
   private canvas: ElementRef;
   private currentTouch = [];
   private touchesOverTime = [];
   private numStrokes = 0;
+  private startTime = null;
+  private lastBegin = Date.now()
+  private lastEnd = Date.now()
+  public normalizedTouches = []
 
   constructor(el: ElementRef) {
        this.canvas = el;
@@ -21,6 +29,7 @@ class CanvasDrawer {
 
   @HostListener('touchstart', ['$event.target', '$event'])
   touchStart(canvas, event) {
+    this.lastBegin = Date.now()
     this.numStrokes++;
     event.preventDefault()
     let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
@@ -32,12 +41,12 @@ class CanvasDrawer {
       var x = touches[i].pageX - event.srcElement.offsetLeft
       var y = touches[i].pageY - canvas.offsetTop
       var force = touches[i].force;
-      this.touchesOverTime.push({
+      this.addTouchPoint({
         timestamp: Date.now(),
         x: x,
         y: y,
         pressure: force
-      });
+      }, Date.now() )
     //   console.log(touches[i])
     //   console.log(touches[i].identifier)
       this.currentTouch.push( { id: touches[i].identifier, x: x, y: y })
@@ -65,12 +74,12 @@ class CanvasDrawer {
       var y = touches[i].pageY - canvas.offsetTop
       var force = touches[i].force;
       var ind = -1
-      this.touchesOverTime.push({
+      this.addTouchPoint({
         timestamp: Date.now(),
         x: x,
         y: y,
         pressure: force
-      });
+      }, Date.now());
       var touch = this.currentTouch.filter(function(t, index){
         ind = index
         if(t.id == touches[i].identifier){
@@ -106,7 +115,7 @@ class CanvasDrawer {
 
   @HostListener('touchend', ['$event.target', '$event'])
   touchEnd(canvas, event) {
-    console.log(this.touchesOverTime);
+    this.lastEnd = Date.now()
     event.preventDefault()
     var touches = event.changedTouches;
 
@@ -129,23 +138,86 @@ class CanvasDrawer {
     }
     this.numStrokes--;
     var  thing = this;
-    setTimeout(function(){
-        // console.log(thing.numStrokes);
-        if (thing.numStrokes === 0) {
-            // TODO @Markus: save arrays
-            thing.touchesOverTime = [];
-            let context:CanvasRenderingContext2D = thing.canvas.nativeElement.getContext("2d");
-            // context.clearRect(0, 0, canvas.width, canvas.height);
-        }
-    }, 1000);
+    this.normalizeTouches()
+    // setTimeout(function(){
+    //     // console.log(thing.numStrokes);
+    //     if (thing.numStrokes === 0) {
+    //         // TODO @Markus: save arrays
+    //         thing.touchesOverTime = [];
+    //         let context:CanvasRenderingContext2D = thing.canvas.nativeElement.getContext("2d");
+    //         // context.clearRect(0, 0, canvas.width, canvas.height);
+    //     }
+    // }, 1000);
+    // console.log(this.touchesOverTime)
+  }
+  
+  addTouchPoint(touchpoint, timestamp){
+    //Interval in ms
+    this.touchesOverTime.push(touchpoint);
+    // let interval = 10;
+    // let timeDifference = timestamp - this.startTime
+    
+    // if(!this.startTime)
+    //   this.startTime = timestamp
+    // else{
+    //   if(timeDifference == interval){
+        
+    //   }else if(timeDifference > interval){
+    //     for(var i=0; i<Math.floor(timeDifference/interval); i++){
+    //       this.touchesOverTime.push(null)
+    //     }
+    //   }
+    // }
   }
 
+  normalizeTouches(){
+    var touches = this.touchesOverTime
+    var normalized = []
+    var last = {}
+    var lastStamp = -1
+    //Interval in ms
+    var interval = 10
+    var offset = 0
+    
+    if(this.normalizedTouches.length > 0){
+      var pause = Math.floor( (touches[0].timestamp - this.normalizedTouches[this.normalizedTouches.length-1].timestamp ) / interval )
+      for(var i=0; i < pause; i++){
+        this.normalizedTouches.push(null)
+      }
+    }
+    
+    while(touches.length > 0){
+      if( normalized.length == 0 ){
+        normalized.push(touches[0])
+        lastStamp = touches[0].timestamp
+        last = touches[0]
+        touches.shift()
+      }else{
+        
+        if(touches[0].timestamp - lastStamp > interval + offset ){
+          normalized.push( last )  
+          offset += interval
+        }else if(touches[0].timestamp - lastStamp <= interval + offset ){
+          offset = 0
+          normalized.push( touches[0] )
+          lastStamp = touches[0].timestamp
+          last = touches[0]
+          touches.shift()
+        }
+        
+      }
+      
+    }
+    this.normalizedTouches = this.normalizedTouches.concat(normalized)
+    normalizedTouches = this.normalizedTouches
+  }
 }
 
 @Component({
   selector: 'signature',
   providers: [],
   directives: [CanvasDrawer],
+  inputs: ['touches'],
   template: `
     <div class="canvas-wrapper">
       <canvas #signatureCanvas class="signatureCanvas" drawable>
@@ -157,13 +229,21 @@ class CanvasDrawer {
 })
 
 export class SignatureComponent implements OnInit, AfterViewInit{
+  public touches;
 
   @ViewChild("signatureCanvas") signatureCanvas: ElementRef;
 
-  ngOnInit(){
-  }
+  constructor(
+    ){
+    }
+
+  // ngOnInit(){
+  // }
 
   ngAfterViewInit(){
+    // setInterval( () => {
+    //   console.log(normalizedTouches)
+    // }, 2000)
   }
 
   touchstart(){
