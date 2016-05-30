@@ -17,7 +17,7 @@ function insert(user){
       deferred.reject(err)
     } else {
       console.log('user inserted with id: ' + result.rows[0].id);
-      deferred.resolve()
+      deferred.resolve(result.rows[0].id)
     }
   })
 

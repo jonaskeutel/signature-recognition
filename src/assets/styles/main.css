@@ -52,12 +52,38 @@
 #user-registration .form-buttons > button .hidden {
   opacity: 0;
 }
-#overview {
-  display: flex;
+#user-overview {
+  display: block;
+  width: 100%;
+  text-align: center;
 }
-#overview h1 {
+#user-overview h1 {
   margin: auto;
   display: inline-flex;
+}
+#user-overview .new-button {
+  margin: 2em 0;
+}
+#user-overview .new-button:hover {
+  cursor: pointer;
+}
+#user-overview .persons .person {
+  padding: 1em;
+  display: inline-block;
+  width: 30%;
+}
+#user-overview .persons .person:hover {
+  background: #292929;
+  cursor: pointer;
+  border-radius: 1rem;
+}
+#user-overview .persons .person .person-image {
+  border-radius: 100%;
+  margin-bottom: 1em;
+}
+#user-overview .persons .person .person-image >img {
+  height: 10rem;
+  width: 10rem;
 }
 main {
   color: #000;

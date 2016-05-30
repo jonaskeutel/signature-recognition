@@ -20,8 +20,8 @@ import {SignatureComponent} from './signature.component';
     `
 })
 @Routes([
-  {path:'/registration', component: OverviewComponent},
-  {path:'/', component: RegistrationComponent}
+  {path:'/', component: OverviewComponent},
+  {path:'/registration', component: RegistrationComponent}
 ])
 
 export class AppComponent implements OnInit {

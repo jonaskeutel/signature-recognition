@@ -1,12 +1,15 @@
 'use strict'
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, Input, Output, EventEmitter, ViewChild} from '@angular/core';
+import {Routes, Router, ROUTER_DIRECTIVES} from '@angular/router';
 
 import {SignatureComponent} from './signature.component';
+import {ApiService} from './services/api.service';
 
 @Component({
   selector: 'registration-component',
   providers: [],
-  directives: [SignatureComponent],
+  directives: [SignatureComponent, ROUTER_DIRECTIVES],
+  providers: [ApiService],
   template: `
     <div id="user-registration">
       <div class="header">
@@ -48,29 +51,51 @@ import {SignatureComponent} from './signature.component';
           <button class="btn btn-primary" (click)="next()">Next</button>
           <button class="btn btn-primary" (click)="clear()" [ngClass]="{'hidden': step==1}">Clear</button>
         </div>
-        <signature *ngIf="step > 1" [touches]="touches1"></signature>
+        <signature *ngIf="step > 1 && step < 6"></signature>
+        <div *ngIf="step > 2">Nochmal wiederholen</div>
       </div>
     </div>
   `
 })
 
 export class RegistrationComponent implements OnInit{
-  public name:string;
-  public age:number;
+  public name:string = '';
+  public age:number = 18;
   public gender:string = 'm';
   public hand:string = 'r';
-  public touches1 = [4];
+  public touchData = {sth: "jaoksdkh"};
   
   public step:number = 1;
+  
+  @ViewChild(SignatureComponent)
+  private signatureComponent:SignatureComponent;
+  
+  constructor(
+    private _api:ApiService,
+    private _router:Router
+  ){}
   
   ngOnInit(){
     
   }
   
   next(){
+    if(this.step == 1){
+      this._api.register({
+        name: this.name,
+        age: this.age,
+        gender: this.gender,
+        hand: this.hand
+      })
+    }else if(this.step > 1){
+      this._api.addSignature(this.signatureComponent.getTouches())
+      this.signatureComponent.clear()
+    }
+    
     this.step++
-    console.log(this.name, this.age)
-    console.log(this.touches1)
+    if(this.step == 6){
+      this._router.navigate(['/']);
+    }
   }
   
   clear(){

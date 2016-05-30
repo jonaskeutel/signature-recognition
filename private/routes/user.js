@@ -8,6 +8,7 @@ module.exports = {
 }
 
 function newUser(req, res) {
+  console.log(req.body)
   if(!req.body.name || !req.body.age || !req.body.gender || !req.body.hand) {
     return res.json({"status": "error", "message": "missing a parameter"})
   } else {
@@ -18,8 +19,8 @@ function newUser(req, res) {
   		req.body.hand
   	]
     db.newUser(newUser)
-      .then(function() {
-        return res.json({"status": "success", "message": "user successfully created"})
+      .then(function(userId) {
+        return res.json({"status": "success", "message": "user successfully created", "id": userId})
       }, function(err) {
         return res.json({"status": "error", "message": "user not created"})
       })

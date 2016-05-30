@@ -121,27 +121,32 @@ var CanvasDrawer = (function () {
         //     if (thing.numStrokes === 0) {
         //         // TODO @Markus: save arrays
         //         thing.touchesOverTime = [];
-        //         let context:CanvasRenderingContext2D = thing.canvas.nativeElement.getContext("2d");
-        //         // context.clearRect(0, 0, canvas.width, canvas.height);
+        //         
         //     }
         // }, 1000);
         // console.log(this.touchesOverTime)
     };
     CanvasDrawer.prototype.addTouchPoint = function (touchpoint, timestamp) {
-        //Interval in ms
         this.touchesOverTime.push(touchpoint);
-        // let interval = 10;
-        // let timeDifference = timestamp - this.startTime
-        // if(!this.startTime)
-        //   this.startTime = timestamp
-        // else{
-        //   if(timeDifference == interval){
-        //   }else if(timeDifference > interval){
-        //     for(var i=0; i<Math.floor(timeDifference/interval); i++){
-        //       this.touchesOverTime.push(null)
-        //     }
-        //   }
-        // }
+    };
+    CanvasDrawer.prototype.clear = function () {
+        var context = this.canvas.nativeElement.getContext("2d");
+        context.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+    };
+    CanvasDrawer.prototype.redraw = function () {
+        var _this = this;
+        setInterval(function () {
+            if (_this.normalizedTouches.length > 0) {
+                if (_this.normalizedTouches[0]) {
+                    var context = _this.canvas.nativeElement.getContext("2d");
+                    context.beginPath();
+                    context.arc(_this.normalizedTouches[0].x, _this.normalizedTouches[0].y, _this.thickness(_this.normalizedTouches[0].pressure), 0, 2 * Math.PI, false); // a circle at the start
+                    context.fillStyle = 'blue';
+                    context.fill();
+                }
+                _this.normalizedTouches.shift();
+            }
+        }, 10);
     };
     CanvasDrawer.prototype.normalizeTouches = function () {
         var touches = this.touchesOverTime;
@@ -210,26 +215,30 @@ var CanvasDrawer = (function () {
 var SignatureComponent = (function () {
     function SignatureComponent() {
     }
-    // ngOnInit(){
-    // }
-    SignatureComponent.prototype.ngAfterViewInit = function () {
-        // setInterval( () => {
-        //   console.log(normalizedTouches)
-        // }, 2000)
+    SignatureComponent.prototype.ngOnInit = function () {
     };
-    SignatureComponent.prototype.touchstart = function () {
-        console.log("Touchstart");
+    SignatureComponent.prototype.ngAfterViewInit = function () {
+    };
+    SignatureComponent.prototype.clear = function () {
+        // this.drawable.normalizedTouches = []
+        this.drawable.clear();
+    };
+    SignatureComponent.prototype.getTouches = function () {
+        return this.drawable.normalizedTouches;
     };
     __decorate([
         core_1.ViewChild("signatureCanvas"), 
         __metadata('design:type', core_1.ElementRef)
     ], SignatureComponent.prototype, "signatureCanvas", void 0);
+    __decorate([
+        core_1.ViewChild(CanvasDrawer), 
+        __metadata('design:type', CanvasDrawer)
+    ], SignatureComponent.prototype, "drawable", void 0);
     SignatureComponent = __decorate([
         core_1.Component({
             selector: 'signature',
             providers: [],
             directives: [CanvasDrawer],
-            inputs: ['touches'],
             template: "\n    <div class=\"canvas-wrapper\">\n      <canvas #signatureCanvas class=\"signatureCanvas\" drawable>\n        Your browser does not support canvas element.\n      </canvas>\n      \n    </div>\n  "
         }), 
         __metadata('design:paramtypes', [])

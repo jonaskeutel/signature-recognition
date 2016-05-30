@@ -29,8 +29,8 @@ var AppComponent = (function () {
             template: "\n        <main>\n          <router-outlet></router-outlet>\n        </main>\n    "
         }),
         router_1.Routes([
-            { path: '/registration', component: overview_component_1.OverviewComponent },
-            { path: '/', component: registration_component_1.RegistrationComponent }
+            { path: '/', component: overview_component_1.OverviewComponent },
+            { path: '/registration', component: registration_component_1.RegistrationComponent }
         ]), 
         __metadata('design:paramtypes', [router_1.Router, sample_service_1.SampleService])
     ], AppComponent);

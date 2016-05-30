@@ -144,30 +144,36 @@ class CanvasDrawer {
     //     if (thing.numStrokes === 0) {
     //         // TODO @Markus: save arrays
     //         thing.touchesOverTime = [];
-    //         let context:CanvasRenderingContext2D = thing.canvas.nativeElement.getContext("2d");
-    //         // context.clearRect(0, 0, canvas.width, canvas.height);
+    //         
     //     }
     // }, 1000);
     // console.log(this.touchesOverTime)
   }
   
   addTouchPoint(touchpoint, timestamp){
-    //Interval in ms
     this.touchesOverTime.push(touchpoint);
-    // let interval = 10;
-    // let timeDifference = timestamp - this.startTime
-    
-    // if(!this.startTime)
-    //   this.startTime = timestamp
-    // else{
-    //   if(timeDifference == interval){
-        
-    //   }else if(timeDifference > interval){
-    //     for(var i=0; i<Math.floor(timeDifference/interval); i++){
-    //       this.touchesOverTime.push(null)
-    //     }
-    //   }
-    // }
+  }
+
+  clear(){
+    let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
+    context.clearRect(0, 0, this.canvas.nativeElement.width , this.canvas.nativeElement.height);
+  }
+  
+  redraw(){
+    setInterval( () => {
+      if(this.normalizedTouches.length > 0){
+        if(this.normalizedTouches[0]){
+           let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
+   
+            context.beginPath();
+            context.arc(this.normalizedTouches[0].x, this.normalizedTouches[0].y, this.thickness(this.normalizedTouches[0].pressure) , 0, 2 * Math.PI, false);  // a circle at the start
+            context.fillStyle = 'blue';
+            context.fill();
+        }
+        this.normalizedTouches.shift()
+      }
+      
+    }, 10)
   }
 
   normalizeTouches(){
@@ -217,7 +223,6 @@ class CanvasDrawer {
   selector: 'signature',
   providers: [],
   directives: [CanvasDrawer],
-  inputs: ['touches'],
   template: `
     <div class="canvas-wrapper">
       <canvas #signatureCanvas class="signatureCanvas" drawable>
@@ -232,22 +237,25 @@ export class SignatureComponent implements OnInit, AfterViewInit{
   public touches;
 
   @ViewChild("signatureCanvas") signatureCanvas: ElementRef;
+  @ViewChild(CanvasDrawer)
+  private drawable:CanvasDrawer;
+  
+  constructor(){}
 
-  constructor(
-    ){
-    }
-
-  // ngOnInit(){
-  // }
+ ngOnInit(){
+   
+ }
 
   ngAfterViewInit(){
-    // setInterval( () => {
-    //   console.log(normalizedTouches)
-    // }, 2000)
   }
 
-  touchstart(){
-    console.log("Touchstart")
+  clear(){
+    // this.drawable.normalizedTouches = []
+    this.drawable.clear()
+  }
+  
+  getTouches(){
+    return this.drawable.normalizedTouches
   }
 
 }
