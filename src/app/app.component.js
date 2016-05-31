@@ -13,6 +13,7 @@ var router_1 = require('@angular/router');
 var sample_service_1 = require('./services/sample.service');
 var overview_component_1 = require('./overview.component');
 var registration_component_1 = require('./registration.component');
+var comparison_component_1 = require('./comparison.component');
 var AppComponent = (function () {
     function AppComponent(_router, sample) {
         this._router = _router;
@@ -30,7 +31,8 @@ var AppComponent = (function () {
         }),
         router_1.Routes([
             { path: '/', component: overview_component_1.OverviewComponent },
-            { path: '/registration', component: registration_component_1.RegistrationComponent }
+            { path: '/registration', component: registration_component_1.RegistrationComponent },
+            { path: '/compare', component: comparison_component_1.ComparisonComponent }
         ]), 
         __metadata('design:paramtypes', [router_1.Router, sample_service_1.SampleService])
     ], AppComponent);

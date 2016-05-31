@@ -21,7 +21,9 @@ function compare(newSignature, savedSignatures) {
   		savedY.push(savedSignatures[i].y)
   	};
 
+    console.log("comparing x...")
   	var xResult = compareValues(newSignature.x, savedX)
+    console.log("comparing y...")
   	var yResult = compareValues(newSignature.y, savedY)
 
   	var combinedScore = combineScores(xResult, yResult)
@@ -42,7 +44,8 @@ function compare(newSignature, savedSignatures) {
 function compareValues(newValues, savedValues) {
 	var score = 0;
 	for (var i = 0; i < savedValues.length; i++) {
-		var result = dtw.compute(JSON.parse(newValues), JSON.parse(savedValues[i]))
+		var result = dtw.compute(JSON.parse(newValues), JSON.parse(savedValues[i])) / JSON.parse(newValues).length;
+        console.log(result)
 		// console.log('x' + i + ': ' + result)
 		score = score + result
 	}

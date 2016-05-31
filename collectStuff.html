@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Signature Recognition</title>
+	<script type="text/javascript">
+		var INTERVALL = 10; //ms
+		var startTimestamp = undefined;
+        var endTimestamp = undefined;
+		var force = [];
+		var x = [];
+		var y = [];
+		var acceleration = [];
+		var gyro = [];
+		var recording = false;
+        var numStrokes = 0;
+        var duration = 0; //ms
+
+		function init() {
+	        window.addEventListener("devicemotion", function(event) {
+	          if (recording) {
+	          	var index = getIndexForTimestamp(Date.now());
+	          	var entry = {
+	              'a': event.rotationRate.alpha,
+	              'b': event.rotationRate.beta,
+	              'c': event.rotationRate.gamma
+                };
+                addEntryToArrayAtIndex(entry, acceleration, index);
+	          }
+        	}, true);
+
+        	window.addEventListener("deviceorientation", function(event) {
+	          if (recording) {
+	          	var index = getIndexForTimestamp(Date.now());
+	          	var entry = {
+	              'a': event.rotationRate.alpha,
+	              'b': event.rotationRate.beta,
+	              'c': event.rotationRate.gamma
+                };
+  	          	addEntryToArrayAtIndex(entry, gyro, index);
+	          }
+        	}, true);
+
+            window.addEventListener("touchmove", function(event) {
+		        if (recording) {
+			        var index = getIndexForTimestamp(Date.now());
+			        var touch = event.changedTouches[0];
+			        addEntryToArrayAtIndex(touch.force, force, index);
+			        addEntryToArrayAtIndex(touch.pageX, x, index);
+			        addEntryToArrayAtIndex(touch.pageY, y, index);
+		        }
+		    });
+
+            window.addEventListener("touchstart", function(event) {
+          		console.log("touchstart");
+                numStrokes++;
+                if (!recording) {
+                    startRecording();
+                }
+		        var touch = event.changedTouches[0];
+		        addEntryToArrayAtIndex(touch.force, force, 0);
+		        addEntryToArrayAtIndex(touch.pageX, x, 0);
+		        addEntryToArrayAtIndex(touch.pageY, y, 0);
+		    });
+
+            window.addEventListener("touchend", function(event) {
+          		console.log("touchend");
+                numStrokes--;
+                endTimestamp = Date.now();
+                setTimeout(function(){
+                  if (numStrokes === 0) {
+                    stopRecording();
+                  }
+                }, 1000);
+		    });
+
+		}
+
+		function addEntryToArrayAtIndex(entry, array, index) {
+			// console.log("trying to add " + entry + " to " + array + " at " + index);
+			if (array[index]) {
+				return;
+			}
+
+			for (var i = array.length; i < index; i++) {
+				array[i] = null;
+			}
+			array[index] = entry;
+		}
+
+		function getIndexForTimestamp(timestamp) {
+			var diff = timestamp - startTimestamp;
+			var index = Math.floor(diff / INTERVALL);
+			return index;
+		}
+
+        function deleteLastSecondFromAll() {
+            var index = getIndexForTimestamp(endTimestamp);
+            x = x.slice(0, index);
+            y = y.slice(0, index);
+            acceleration = acceleration.slice(0, index);
+            gyro = gyro.slice(0, index);
+            force = force.slice(0, index);
+        }
+
+		function startRecording() {
+			startTimestamp = Date.now();
+			recording = true;
+		}
+
+        function stopRecording() {
+            recording = false;
+            deleteLastSecondFromAll();
+            var duration = endTimestamp - startTimestamp;
+            console.log(duration);
+            // TODO: Save arrays in backend, compare, evaluate, display result...
+            console.log("x: ", x);
+            console.log("y: ", y);
+            console.log("force: ", force);
+            console.log("acceleration: ", acceleration);
+            console.log("gyro: ", gyro);
+
+            startTimestamp = undefined;
+        }
+
+
+	</script>
+</head>
+<body onLoad="init()">
+
+</body>
+</html>

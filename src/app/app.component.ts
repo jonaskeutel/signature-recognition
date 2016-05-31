@@ -6,6 +6,7 @@ import {SampleService} from './services/sample.service';
 
 import {OverviewComponent} from './overview.component';
 import {RegistrationComponent} from './registration.component';
+import {ComparisonComponent} from './comparison.component';
 
 import {SignatureComponent} from './signature.component';
 
@@ -21,7 +22,8 @@ import {SignatureComponent} from './signature.component';
 })
 @Routes([
   {path:'/', component: OverviewComponent},
-  {path:'/registration', component: RegistrationComponent}
+  {path:'/registration', component: RegistrationComponent},
+  {path: '/compare', component: ComparisonComponent}
 ])
 
 export class AppComponent implements OnInit {

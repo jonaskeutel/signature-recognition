@@ -7,7 +7,6 @@ import {ApiService} from './services/api.service';
 
 @Component({
   selector: 'registration-component',
-  providers: [],
   directives: [SignatureComponent, ROUTER_DIRECTIVES],
   providers: [ApiService],
   template: `
@@ -15,7 +14,7 @@ import {ApiService} from './services/api.service';
       <div class="header">
         <h1>Registration</h1>
       </div>
-    
+
       <div id="personal-information">
         <div class="input-form" [ngClass]="{'close': step != 1}">
           <div class="input-group">
@@ -64,21 +63,21 @@ export class RegistrationComponent implements OnInit{
   public gender:string = 'm';
   public hand:string = 'r';
   public touchData = {sth: "jaoksdkh"};
-  
+
   public step:number = 1;
-  
+
   @ViewChild(SignatureComponent)
   private signatureComponent:SignatureComponent;
-  
+
   constructor(
     private _api:ApiService,
     private _router:Router
   ){}
-  
+
   ngOnInit(){
-    
+
   }
-  
+
   next(){
     if(this.step == 1){
       this._api.register({
@@ -91,13 +90,13 @@ export class RegistrationComponent implements OnInit{
       this._api.addSignature(this.signatureComponent.getTouches())
       this.signatureComponent.clear()
     }
-    
+
     this.step++
     if(this.step == 6){
       this._router.navigate(['/']);
     }
   }
-  
+
   clear(){
     console.log("clear canvas")
   }

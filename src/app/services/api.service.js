@@ -55,6 +55,25 @@ var ApiService = (function () {
                 .subscribe(function (data) { return resolve(JSON.parse(data._body)); }, function (err) { return console.log(err); }, function () { });
         });
     };
+    ApiService.prototype.checkSignature = function (signature) {
+        var _this = this;
+        var headers = new http_1.Headers();
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        var data = {
+            personID: this.userId,
+            x: signature.map(function (elem) { return elem ? elem.x : null; }),
+            y: signature.map(function (elem) { return elem ? elem.y : null; }),
+            force: signature.map(function (elem) { return elem ? elem.pressure : null; }),
+            acceleration: [],
+            gyroscope: [],
+            duration: signature.length * 10
+        };
+        return new Promise(function (resolve, reject) {
+            _this._http.post('/api/signature/check', _this.objectToString(data), { headers: headers })
+                .subscribe(function (data) { return console.log(data); }, function (err) { return console.log(err); }, function () { return console.log('Authentication Complete'); });
+            resolve();
+        });
+    };
     ApiService.prototype.objectToString = function (body) {
         var converted = "";
         for (var i = 0; i < Object.keys(body).length; i++) {

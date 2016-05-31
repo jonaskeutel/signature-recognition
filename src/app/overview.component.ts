@@ -13,7 +13,7 @@ import {ApiService} from './services/api.service';
         <button class="btn btn-primary new-button" (click)="newUser()" >New</button>
       </div>
       <div class="persons">
-        <div class="person" ng-click="console.log('sdsad')" *ngFor="let person of persons">
+        <div class="person" (click)="compare(person.id)" *ngFor="let person of persons">
           <div class="person-image">
             <img src="assets/img/graphics/avatar_male.png" *ngIf="person.gender == 'm'">
             <img src="assets/img/graphics/avatar_female.png" *ngIf="person.gender == 'f'">
@@ -34,7 +34,7 @@ export class OverviewComponent implements OnInit{
     private _router:Router,
     private _api:ApiService
   ){
-    
+
   }
 
   ngOnInit(){
@@ -42,7 +42,7 @@ export class OverviewComponent implements OnInit{
       .then( users => {
         console.log(users)
         this.persons = users
-      }) 
+      })
   }
 
   newUser(){
@@ -50,7 +50,7 @@ export class OverviewComponent implements OnInit{
   }
 
   compare(id){
-    console.log('compare')
+    console.log('compare with ' + id)
     this._router.navigate(['/compare']);
   }
 }

@@ -45,11 +45,11 @@ function getSignatures(req, res) {
 }
 
 function checkSignature(req, res) {
-  if(!req.body.personID || !req.body.x || !req.body.y || !req.body.force ||
+  if(!req.body.personid || !req.body.x || !req.body.y || !req.body.force ||
     !req.body.acceleration || !req.body.gyroscope || !req.body.duration) {
         return res.json({"status": "error", "message": "missing a parameter"})
     } else {
-      db.getSignatures(req.body.personID)
+      db.getSignatures(req.body.personid)
         .then(function(savedSignatures) {
           evaluation.compare(req.body, savedSignatures).done(function(result) {
             if (result) {
@@ -78,4 +78,3 @@ function checkSignature(req, res) {
         })
     }
 }
-
