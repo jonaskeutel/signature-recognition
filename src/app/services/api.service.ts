@@ -64,6 +64,31 @@ export class ApiService {
     });
   }
 
+  checkSignature(signature:Array){
+    var headers = new Headers();
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+    
+    var data = {
+      personID: this.userId,
+      x: signature.map((elem) => { return elem ? elem.x : null }),
+      y: signature.map((elem) => { return elem ? elem.y : null }),
+      force: signature.map((elem) => { return elem ? elem.pressure : null }),
+      acceleration: [],
+      gyroscope: [],
+      duration: signature.length * 10
+    }
+           
+    return new Promise((resolve, reject) => {
+      this._http.post('/api/signature/check', this.objectToString(data),  {headers: headers} )
+            .subscribe(
+              data => console.log(data),
+              err => console.log(err),
+              () => console.log('Authentication Complete')
+            );
+      resolve()
+    });
+  }
+
   objectToString(body:Object){
     var converted:string = ""
     

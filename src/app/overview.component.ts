@@ -13,7 +13,7 @@ import {ApiService} from './services/api.service';
         <button class="btn btn-primary new-button" (click)="newUser()" >New</button>
       </div>
       <div class="persons">
-        <div class="person" *ngFor="let person of persons">
+        <div class="person" ng-click="console.log('sdsad')" *ngFor="let person of persons">
           <div class="person-image">
             <img src="assets/img/graphics/avatar_male.png" *ngIf="person.gender == 'm'">
             <img src="assets/img/graphics/avatar_female.png" *ngIf="person.gender == 'f'">
@@ -47,5 +47,10 @@ export class OverviewComponent implements OnInit{
 
   newUser(){
     this._router.navigate(['/registration']);
+  }
+
+  compare(id){
+    console.log('compare')
+    this._router.navigate(['/compare']);
   }
 }

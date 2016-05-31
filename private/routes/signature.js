@@ -53,21 +53,22 @@ function checkSignature(req, res) {
         .then(function(savedSignatures) {
           evaluation.compare(req.body, savedSignatures).done(function(result) {
             if (result) {
-              var newSignature = [
-                req.body.personID,
-                req.body.x,
-                req.body.y,
-                req.body.force,
-                req.body.acceleration,
-                req.body.gyroscope,
-                req.body.duration
-              ]
-              db.newSignature(newSignature)
-                .then(function() {
-                  return res.json({"status": "success", "message": "signature check successful and new signature successfully created"})
-                }, function(err) {
-                  return res.json({"status": "error", "message": "signature check successful, but new signature not created"})
-                })
+              return res.json(result)
+              // var newSignature = [
+              //   req.body.personID,
+              //   req.body.x,
+              //   req.body.y,
+              //   req.body.force,
+              //   req.body.acceleration,
+              //   req.body.gyroscope,
+              //   req.body.duration
+              // ]
+              // db.newSignature(newSignature)
+              //   .then(function() {
+              //     return res.json({"status": "success", "message": "signature check successful and new signature successfully created"})
+              //   }, function(err) {
+              //     return res.json({"status": "error", "message": "signature check successful, but new signature not created"})
+              //   })
             } else {
               return res.json({"status": "error", "message": "signature check not successful"})
             }

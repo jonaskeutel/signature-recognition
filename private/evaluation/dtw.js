@@ -1,5 +1,6 @@
 'use strict'
 const q = require('q')
+const SCORE_THRESHOLD = 0.2
 
 module.exports = {
 	compare: compare
@@ -12,57 +13,43 @@ var result = [false, false]
 function compare(newSignature, savedSignatures) {
   	const deferred = q.defer()
 
-	compareX(newSignature, savedSignatures)
-		.then(function() {
-			result[0] = true
-		}, function() {
-			deferred.resolve(false)
-		})
-	compareY(newSignature, savedSignatures)
-		.then(function() {
-			result[1] = true
-		}, function() {
-			deferred.resolve(false)
-		})
-	setTimeout(function(){ 
-		if (result[0] == true && result[1] == true) {
-			deferred.resolve(true)
-		}
-	}, 1000)
+  	var savedX = []
+  	var savedY = []
+
+  	for (var i = savedSignatures.length - 1; i >= 0; i--) {
+  		savedX.push(savedSignatures[i].x)
+  		savedY.push(savedSignatures[i].y)
+  	};
+
+  	var xResult = compareValues(newSignature.x, savedX)
+  	var yResult = compareValues(newSignature.y, savedY)
+
+  	var combinedScore = combineScores(xResult, yResult)
+  	var success = combinedScore < SCORE_THRESHOLD ? true : false;
+  	deferred.resolve( {
+  		success: success,
+  		combinedScore: combinedScore,
+  		x: xResult,
+  		y: yResult,
+  		acceleration: null,
+  		gyroscope: null,
+  		force: null,
+  	})
 
 	return deferred.promise
 }
 
-function compareX(newSignature, savedSignatures, callback) {
-	const deferred = q.defer()
-
-	var x = 0;
-	for (var i = 0; i < savedSignatures.length; i++) {
-		var result = dtw.compute(JSON.parse(newSignature.x), JSON.parse(savedSignatures[i].x))
+function compareValues(newValues, savedValues) {
+	var score = 0;
+	for (var i = 0; i < savedValues.length; i++) {
+		var result = dtw.compute(JSON.parse(newValues), JSON.parse(savedValues[i]))
 		// console.log('x' + i + ': ' + result)
-		x = x + result
+		score = score + result
 	}
-	if (x/savedSignatures.length > 10) {
-		deferred.reject()
-	}
-	deferred.resolve()
 
-	return deferred.promise
+	return score/savedValues.length
 }
 
-function compareY(newSignature, savedSignatures, callback) {
-	const deferred = q.defer()
-
-	var y = 0;
-	for (var i = 0; i < savedSignatures.length; i++) {
-		var result = dtw.compute(JSON.parse(newSignature.y), JSON.parse(savedSignatures[i].y))
-		// console.log('y' + i + ': ' + result)
-		y = y + result
-	}
-	if (y/savedSignatures.length > 10) {
-		deferred.reject()
-	}
-	deferred.resolve()
-
-	return deferred.promise
+function combineScores(xScore, yScore) {
+	return (xScore + yScore)/2
 }
