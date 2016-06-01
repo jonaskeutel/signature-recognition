@@ -29,5 +29,6 @@ dbInit.init()
 require('./private/routes.js')(app)
 
 // --- server and https setup
-app.listen(port)
+// app.listen(port)
+app.listen(process.env.PORT || port);
 console.log("Listens on Port " + port)
