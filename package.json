@@ -14,15 +14,6 @@
     "start": "concurrent \"npm run tsc:w\" \"npm run stylusCompile:watch\" \"node app.js\"",
     "dev": "node app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Sittenstrolch/artiverse.git"
-  },
-  "author": "Markus Petrykowski",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Sittenstrolch/artiverse/issues"
-  },
   "homepage": "lunch.time",
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",
