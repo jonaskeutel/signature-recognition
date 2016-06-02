@@ -65,11 +65,11 @@ export class ApiService {
   }
 
   checkSignature(signature:Array){
-    var headers = new Headers();
+    var headers = new Headers()
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
     var data = {
-      personID: this.userId,
+      personid: this.userId,
       x: signature.map((elem) => { return elem ? elem.x : null }),
       y: signature.map((elem) => { return elem ? elem.y : null }),
       force: signature.map((elem) => { return elem ? elem.pressure : null }),

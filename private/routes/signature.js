@@ -49,7 +49,7 @@ function checkSignature(req, res) {
     !req.body.acceleration || !req.body.gyroscope || !req.body.duration) {
         return res.json({"status": "error", "message": "missing a parameter"})
     } else {
-      db.getSignatures(req.body.personid)
+      db.getSignatures(23) //req.body.personid
         .then(function(savedSignatures) {
           evaluation.compare(req.body, savedSignatures).done(function(result) {
             if (result) {
