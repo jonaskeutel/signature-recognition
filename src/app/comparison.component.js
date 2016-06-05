@@ -24,6 +24,7 @@ var ComparisonComponent = (function () {
     };
     ComparisonComponent.prototype.clear = function () {
         console.log("clear canvas");
+        this.signatureComponent.clear();
     };
     __decorate([
         core_1.ViewChild(signature_component_1.SignatureComponent), 

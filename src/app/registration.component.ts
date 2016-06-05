@@ -99,6 +99,7 @@ export class RegistrationComponent implements OnInit{
 
   clear(){
     console.log("clear canvas")
+    this.signatureComponent.clear()
   }
 
 }
