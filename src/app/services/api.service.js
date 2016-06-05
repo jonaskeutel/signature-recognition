@@ -55,6 +55,13 @@ var ApiService = (function () {
                 .subscribe(function (data) { return resolve(JSON.parse(data._body)); }, function (err) { return console.log(err); }, function () { });
         });
     };
+    ApiService.prototype.getSignature = function (userid) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this._http.get('/api/signature/' + userid)
+                .subscribe(function (data) { return resolve(JSON.parse(data._body)); }, function (err) { return console.log(err); }, function () { });
+        });
+    };
     ApiService.prototype.checkSignature = function (signature) {
         var _this = this;
         var headers = new http_1.Headers();

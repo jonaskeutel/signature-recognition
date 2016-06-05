@@ -1,6 +1,6 @@
 'use strict'
 import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
-import {Routes, Router, ROUTER_DIRECTIVES} from '@angular/router';
+import {Routes, Router, ROUTER_DIRECTIVES, RouteSegment} from '@angular/router';
 import {ApiService} from './services/api.service';
 
 @Component({
@@ -29,6 +29,7 @@ import {ApiService} from './services/api.service';
 
 export class OverviewComponent implements OnInit{
   public persons:Object;
+  public currSegment: RouteSegment;
 
   constructor(
     private _router:Router,
@@ -51,6 +52,6 @@ export class OverviewComponent implements OnInit{
 
   compare(id){
     console.log('compare with ' + id)
-    this._router.navigate(['/compare']);
+    this._router.navigate([`./userdetail/${id}`], this.currSegment);
   }
 }

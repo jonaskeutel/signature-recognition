@@ -29,7 +29,7 @@ var OverviewComponent = (function () {
     };
     OverviewComponent.prototype.compare = function (id) {
         console.log('compare with ' + id);
-        this._router.navigate(['/compare']);
+        this._router.navigate([("./userdetail/" + id)], this.currSegment);
     };
     OverviewComponent = __decorate([
         core_1.Component({

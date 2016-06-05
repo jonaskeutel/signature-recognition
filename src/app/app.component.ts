@@ -23,7 +23,7 @@ import {SignatureComponent} from './signature.component';
 @Routes([
   {path:'/', component: OverviewComponent},
   {path:'/registration', component: RegistrationComponent},
-  {path: '/compare', component: ComparisonComponent}
+  {path: '/userdetail/:userid', component: ComparisonComponent}
 ])
 
 export class AppComponent implements OnInit {

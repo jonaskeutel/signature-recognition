@@ -32,7 +32,7 @@ var AppComponent = (function () {
         router_1.Routes([
             { path: '/', component: overview_component_1.OverviewComponent },
             { path: '/registration', component: registration_component_1.RegistrationComponent },
-            { path: '/compare', component: comparison_component_1.ComparisonComponent }
+            { path: '/userdetail/:userid', component: comparison_component_1.ComparisonComponent }
         ]), 
         __metadata('design:paramtypes', [router_1.Router, sample_service_1.SampleService])
     ], AppComponent);

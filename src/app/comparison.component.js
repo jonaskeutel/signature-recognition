@@ -19,12 +19,37 @@ var ComparisonComponent = (function () {
     }
     ComparisonComponent.prototype.ngOnInit = function () {
     };
+    ComparisonComponent.prototype.routerOnActivate = function (curr) {
+        var userid = curr.getParam('userid');
+        this._api.getSignature(userid)
+            .then(function (signatures) {
+            console.log(signatures);
+        });
+    };
     ComparisonComponent.prototype.compare = function () {
         this._api.checkSignature(this.signatureComponent.getTouches()); //TODO: also pass ID?
     };
     ComparisonComponent.prototype.clear = function () {
         console.log("clear canvas");
         this.signatureComponent.clear();
+    };
+    ComparisonComponent.prototype.convertSignatureData = function (signature) {
+        signature.x = JSON.parse(signature.x);
+        signature.y = JSON.parse(signature.y);
+        signature.force = JSON.parse(signature.force);
+        var dataPoints = signature.x.length;
+        var width = Math.max.apply(Math, signature.x) - Math.min.apply(Math, signature.x);
+        var height = Math.max.apply(Math, signature.y) - Math.min.apply(Math, signature.y);
+        var converted = [];
+        for (var i = 0; i < dataPoints; i++) {
+            converted.push({
+                x: signature.x[i],
+                y: signature.y[i],
+                pressure: signature.force[i]
+            });
+        }
+    };
+    ComparisonComponent.prototype.normalizeSignature = function (signature) {
     };
     __decorate([
         core_1.ViewChild(signature_component_1.SignatureComponent), 
@@ -35,7 +60,7 @@ var ComparisonComponent = (function () {
             selector: 'comparison-component',
             directives: [signature_component_1.SignatureComponent, router_1.ROUTER_DIRECTIVES],
             providers: [api_service_1.ApiService],
-            template: "\n    <div id=\"signature-comparison\">\n      <div class=\"header\">\n        <h1>Comparison</h1>\n      </div>\n\n      <div id=\"personal-information\">\n        <div class=\" form-buttons\">\n          <button class=\"btn btn-primary\" (click)=\"compare()\">Compare</button>\n          <button class=\"btn btn-primary\" (click)=\"clear()\">Clear</button>\n        </div>\n        <signature></signature>\n      </div>\n    </div>\n  "
+            template: "\n    <div id=\"signature-comparison\">\n      <div class=\"header\">\n        <h1>Comparison</h1>\n      </div>\n\n      <div id=\"personal-information\">\n        <div class=\" form-buttons\">\n          <button class=\"btn btn-primary\" (click)=\"compare()\">Compare</button>\n          <button class=\"btn btn-primary\" (click)=\"clear()\">Clear</button>\n        </div>\n        <signature></signature>\n      </div>\n    </div>\n    <div class=\"existing-signatures\">\n      \n      \n    \n    </div>\n  "
         }), 
         __metadata('design:paramtypes', [api_service_1.ApiService, router_1.Router])
     ], ComparisonComponent);

@@ -32,10 +32,10 @@ function newSignature(req, res) {
 }
 
 function getSignatures(req, res) {
-  if(!req.query.personID) {
+  if(!req.userid) {
     return res.json({"status": "error", "message": "missing parameter 'personID'"})
   } else {
-    db.getSignatures(req.query.personID)
+    db.getSignatures(req.userid)
       .then(function(result) {
         return res.json(result)
       }, function(err) {
