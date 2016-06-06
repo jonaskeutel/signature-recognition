@@ -1,6 +1,6 @@
 'use strict'
 const q = require('q')
-const SCORE_THRESHOLD = 100
+const SCORE_THRESHOLD = 200
 const LENGTH = 1000
 
 module.exports = {
@@ -63,7 +63,7 @@ function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitu
 }
 
 function combineScores(xScore, yScore, forceScore) {
-	return (xScore * 0.1 + yScore * 0.5 + forceScore)
+	return (xScore * 0.1 + yScore * 0.2 + forceScore) / 3
 }
 
 function normalize(array, normalizeLength, normalizeMagnitude) {
