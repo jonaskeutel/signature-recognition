@@ -60,7 +60,7 @@ var ApiService = (function () {
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
         var data = {
-            personID: this.userId,
+            personid: this.userId,
             x: signature.map(function (elem) { return elem ? elem.x : null; }),
             y: signature.map(function (elem) { return elem ? elem.y : null; }),
             force: signature.map(function (elem) { return elem ? elem.pressure : null; }),
@@ -83,7 +83,7 @@ var ApiService = (function () {
             if (i < Object.keys(body).length - 1)
                 converted += '&';
         }
-        console.log(converted);
+        // console.log(converted)
         return converted;
     };
     ApiService = __decorate([

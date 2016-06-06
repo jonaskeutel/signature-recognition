@@ -45,6 +45,7 @@ function getSignatures(req, res) {
 }
 
 function checkSignature(req, res) {
+  console.log(req.body)
   if(!req.body.personid || !req.body.x || !req.body.y || !req.body.force ||
     !req.body.acceleration || !req.body.gyroscope || !req.body.duration) {
         return res.json({"status": "error", "message": "missing a parameter"})

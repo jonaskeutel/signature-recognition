@@ -101,7 +101,7 @@ export class ApiService {
       if( i < Object.keys(body).length-1 )
         converted += '&'
     }
-    console.log(converted)
+    // console.log(converted)
     return converted
   }
 
