@@ -69,7 +69,7 @@ export class ApiService {
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
     var data = {
-      personid: this.userId,
+      personid: 23,
       x: signature.map((elem) => { return elem ? elem.x : null }),
       y: signature.map((elem) => { return elem ? elem.y : null }),
       force: signature.map((elem) => { return elem ? elem.pressure : null }),
