@@ -1,6 +1,6 @@
 'use strict'
 const db  = require(__dirname + "/../database/dbinterface.js")
-const evaluation = require(__dirname + "/../evaluation/dtw.js")
+const evaluation = require(__dirname + "/../evaluation/evaluation.js")
 
 module.exports = {
   newSignature: newSignature,

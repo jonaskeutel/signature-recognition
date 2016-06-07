@@ -1,5 +1,4 @@
 'use strict'
-const q = require('q')
 const SCORE_THRESHOLD = 200
 const LENGTH = 1000
 
@@ -9,11 +8,8 @@ module.exports = {
 
 var DTW = require('dtw')
 var dtw = new DTW()
-var result = [false, false]
 
-function compare(newSignature, savedSignatures) {
-  	const deferred = q.defer()
-
+function compare(newSignature, savedSignatures, callback) {
   	var savedX = []
   	var savedY = []
     var savedForce = []
@@ -34,7 +30,7 @@ function compare(newSignature, savedSignatures) {
 
   	var combinedScore = combineScores(xResult, yResult, forceResult)
   	var success = combinedScore < SCORE_THRESHOLD ? true : false;
-  	deferred.resolve( {
+  	result = {
   		success: success,
   		combinedScore: combinedScore,
   		x: xResult,
@@ -42,9 +38,9 @@ function compare(newSignature, savedSignatures) {
   		acceleration: null,
   		gyroscope: null,
   		force: forceResult,
-  	})
+  	}
 
-	return deferred.promise
+		callback(result)
 }
 
 function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitude) {
