@@ -95,7 +95,7 @@ var CanvasDrawer = (function () {
             }
         }
     };
-    CanvasDrawer.prototype.thickness = function (force, thickness) { thickness = thickness ? thickness : 3; return thickness * force * force; };
+    CanvasDrawer.prototype.thickness = function (force, thickness) { thickness = thickness ? thickness : 3; return Math.max(thickness * force * force, 0.5); };
     CanvasDrawer.prototype.touchEnd = function (canvas, event) {
         this.lastEnd = Date.now();
         event.preventDefault();
@@ -147,6 +147,18 @@ var CanvasDrawer = (function () {
                 _this.normalizedTouches.shift();
             }
         }, 10);
+    };
+    CanvasDrawer.prototype.drawSignature = function (signature) {
+        for (var i = 0; i < signature.length; i++) {
+            var currTouch = signature[i];
+            if (currTouch) {
+                var context = this.canvas.nativeElement.getContext("2d");
+                context.beginPath();
+                context.arc(currTouch.x, currTouch.y, this.thickness(currTouch.pressure, 10), 0, 2 * Math.PI, false); // a circle at the start
+                context.fillStyle = 'blue';
+                context.fill();
+            }
+        }
     };
     CanvasDrawer.prototype.normalizeTouches = function () {
         var touches = this.touchesOverTime;
@@ -218,6 +230,41 @@ var SignatureComponent = (function () {
     SignatureComponent.prototype.ngOnInit = function () {
     };
     SignatureComponent.prototype.ngAfterViewInit = function () {
+        var _this = this;
+        if (this.sign) {
+            console.log("Signature with objg", this.sign);
+            // this.drawable.redraw()
+            setTimeout(function () {
+                var width = _this.drawable.canvas.nativeElement.width;
+                var height = _this.drawable.canvas.nativeElement.height;
+                _this.sign = _this.trasformSignatureToSize(_this.sign, width / _this.sign.width, height / _this.sign.height);
+                _this.signNormalized = _this.convertSignature(_this.sign);
+                _this.drawable.drawSignature(_this.signNormalized);
+            }, 250);
+        }
+    };
+    SignatureComponent.prototype.convertSignature = function (signature) {
+        var converted = [];
+        for (var i = 0; i < signature.x.length; i++) {
+            if (signature.x[i]) {
+                converted.push({
+                    x: signature.x[i],
+                    y: signature.y[i],
+                    pressure: signature.force[i]
+                });
+            }
+        }
+        return converted;
+    };
+    SignatureComponent.prototype.trasformSignatureToSize = function (signature, widthRatio, heightRatio) {
+        var newX = [], newY = [];
+        for (var i = 0; i < signature.x.length; i++) {
+            newX.push(signature.x[i] ? signature.x[i] * widthRatio : null);
+            newY.push(signature.x[i] ? signature.y[i] * heightRatio : null);
+        }
+        signature.x = newX;
+        signature.y = newY;
+        return signature;
     };
     SignatureComponent.prototype.clear = function () {
         // this.drawable.normalizedTouches = []
@@ -226,6 +273,10 @@ var SignatureComponent = (function () {
     SignatureComponent.prototype.getTouches = function () {
         return this.drawable.normalizedTouches;
     };
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', Object)
+    ], SignatureComponent.prototype, "sign", void 0);
     __decorate([
         core_1.ViewChild("signatureCanvas"), 
         __metadata('design:type', core_1.ElementRef)

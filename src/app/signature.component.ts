@@ -111,7 +111,7 @@ class CanvasDrawer {
 
   }
 
-  thickness(force, thickness){thickness = thickness? thickness : 3; return thickness * force * force}
+  thickness(force, thickness){thickness = thickness? thickness : 3; return Math.max( thickness * force * force, 0.5 )}
 
   @HostListener('touchend', ['$event.target', '$event'])
   touchEnd(canvas, event) {
@@ -176,6 +176,20 @@ class CanvasDrawer {
     }, 10)
   }
 
+  drawSignature(signature){
+    for(var i=0; i<signature.length; i++){
+        var currTouch = signature[i]
+        if(currTouch){
+          
+            let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
+            context.beginPath();
+            context.arc(currTouch.x, currTouch.y, this.thickness(currTouch.pressure, 10) , 0, 2 * Math.PI, false);  // a circle at the start
+            context.fillStyle = 'blue';
+            context.fill();
+        }
+    }
+  }
+
   normalizeTouches(){
     var touches = this.touchesOverTime
     var normalized = []
@@ -235,6 +249,8 @@ class CanvasDrawer {
 
 export class SignatureComponent implements OnInit, AfterViewInit{
   public touches;
+  @Input() sign:Object;
+  public signNormalized:Object;
 
   @ViewChild("signatureCanvas") signatureCanvas: ElementRef;
   @ViewChild(CanvasDrawer)
@@ -247,6 +263,45 @@ export class SignatureComponent implements OnInit, AfterViewInit{
  }
 
   ngAfterViewInit(){
+   if(this.sign){
+    console.log("Signature with objg", this.sign)
+   
+    // this.drawable.redraw()
+    setTimeout(() => {
+        var width = this.drawable.canvas.nativeElement.width
+        var height = this.drawable.canvas.nativeElement.height
+
+        this.sign = this.trasformSignatureToSize(this.sign, width / this.sign.width, height / this.sign.height)
+
+        this.signNormalized = this.convertSignature(this.sign)
+        this.drawable.drawSignature(this.signNormalized)
+      },250)
+   }
+  }
+
+  convertSignature(signature){
+    let converted = []
+    for(var i=0; i<signature.x.length; i++){
+      if(signature.x[i]){
+        converted.push({
+          x: signature.x[i],
+          y: signature.y[i],
+          pressure: signature.force[i]
+        })
+      }
+    }
+    return converted;
+  }
+
+  trasformSignatureToSize(signature, widthRatio, heightRatio){
+    var newX = [], newY = []
+    for(var i=0; i<signature.x.length; i++){
+      newX.push( signature.x[i] ? signature.x[i] * widthRatio : null )
+      newY.push( signature.x[i] ? signature.y[i] * heightRatio : null)
+    }
+    signature.x = newX
+    signature.y = newY
+    return signature
   }
 
   clear(){

@@ -64,6 +64,17 @@ export class ApiService {
     });
   }
 
+  getSignature(userid){
+    return new Promise((resolve, reject) => {
+      this._http.get('/api/signature/'+userid )
+            .subscribe(
+              data => resolve( JSON.parse(data._body) ),
+              err => console.log(err),
+              () => {}
+            );
+    });
+  }
+
   checkSignature(signature:Array){
     var headers = new Headers()
     headers.append('Content-Type', 'application/x-www-form-urlencoded');

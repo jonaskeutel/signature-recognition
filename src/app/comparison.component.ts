@@ -23,9 +23,11 @@ import {ApiService} from './services/api.service';
         <signature></signature>
       </div>
     </div>
-    <div class="existing-signatures">
+    <div class="existing-signatures" *ngIf="signatures">
       
-      
+      <div class="col-md-6" *ngFor="let sign of signatures">
+        <signature [sign]="sign"></signature>
+      </div>
     
     </div>
   `
@@ -35,6 +37,7 @@ export class ComparisonComponent implements OnInit, OnActivate {
 
   @ViewChild(SignatureComponent)
   private signatureComponent:SignatureComponent;
+  public signatures:Array;
 
   constructor(
     private _api:ApiService,
@@ -51,6 +54,12 @@ export class ComparisonComponent implements OnInit, OnActivate {
     this._api.getSignature(userid)
       .then( (signatures) => {
         console.log(signatures)
+        var signs = []
+        for(var i=0; i< signatures.length; i++){
+          signs.push( this.convertSignatureData(signatures[i]) )
+        }
+        console.log(signs)
+        this.signatures = signs
       })
   }
 
@@ -64,25 +73,36 @@ export class ComparisonComponent implements OnInit, OnActivate {
   }
 
   convertSignatureData(signature){
-    signature.x = JSON.parse( signature.x )
-    signature.y = JSON.parse( signature.y )
-    signature.force = JSON.parse( signature.force )
     var dataPoints = signature.x.length;
-    var width = Math.max.apply(Math, signature.x) - Math.min.apply(Math, signature.x)
-    var height = Math.max.apply(Math, signature.y) - Math.min.apply(Math, signature.y)
     
-    let converted = []
-    for(var i=0; i<dataPoints; i++){
-      converted.push({
-        x: signature.x[i],
-        y: signature.y[i],
-        pressure: signature.force[i]
-      })
-    }
-    
+    signature = this.normalizeSignature(signature)
+    signature.force = JSON.parse( signature.force )
+
+    return signature;
   }
 
   normalizeSignature(signature){
-    
+    signature.x = JSON.parse( signature.x )
+    signature.y = JSON.parse( signature.y )
+    var dataPoints = signature.x.length;
+    var width = Math.max.apply(Math, signature.x) - Math.min.apply(Math, signature.x.filter(function(elem){return elem != null}))
+    var height = Math.max.apply(Math, signature.y) - Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
+    var minX = Math.min.apply(Math, signature.x.filter(function(elem){return elem != null}))
+    var minY = Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
+    console.log(minX, minY)
+
+    var newX = [], newY = []
+    console.log(signature)
+    for(var i=0; i<dataPoints; i++){
+      newX.push( signature.x[i] ? signature.x[i] - minX : null )
+      newY.push( signature.x[i] ? signature.y[i] - minY : null)
+    }
+    console.log("normalize")
+    signature.x = newX
+    signature.y = newY
+    signature.width = width
+    signature.height = height
+
+    return signature
   }
 }
