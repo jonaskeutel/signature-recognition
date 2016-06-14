@@ -25,7 +25,7 @@ function compare(newSignature, savedSignatures, callback) {
     console.log("comparing y...")
   	var yResult = compareValues(newSignature.y, savedY, true, true)
     console.log("comparing force...")
-    var forceResult = compareValues(newSignature.y, savedY, true, false)
+    var forceResult = compareValues(newSignature.force, savedForce, true, false)
 
 
   	var combinedScore = combineScores(xResult, yResult, forceResult)
