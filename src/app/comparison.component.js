@@ -16,13 +16,14 @@ var ComparisonComponent = (function () {
     function ComparisonComponent(_api, _router) {
         this._api = _api;
         this._router = _router;
+        this.userid = "";
     }
     ComparisonComponent.prototype.ngOnInit = function () {
     };
     ComparisonComponent.prototype.routerOnActivate = function (curr) {
         var _this = this;
-        var userid = curr.getParam('userid');
-        this._api.getSignature(userid)
+        this.userid = curr.getParam('userid');
+        this._api.getSignature(this.userid)
             .then(function (signatures) {
             console.log(signatures);
             var signs = [];
@@ -34,7 +35,7 @@ var ComparisonComponent = (function () {
         });
     };
     ComparisonComponent.prototype.compare = function () {
-        this._api.checkSignature(this.signatureComponent.getTouches()); //TODO: also pass ID?
+        this._api.checkSignature(this.signatureComponent.getTouches(), this.userid); //TODO: also pass ID?
     };
     ComparisonComponent.prototype.clear = function () {
         console.log("clear canvas");

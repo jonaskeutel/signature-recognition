@@ -62,12 +62,12 @@ var ApiService = (function () {
                 .subscribe(function (data) { return resolve(JSON.parse(data._body)); }, function (err) { return console.log(err); }, function () { });
         });
     };
-    ApiService.prototype.checkSignature = function (signature) {
+    ApiService.prototype.checkSignature = function (signature, userId) {
         var _this = this;
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
         var data = {
-            personid: this.userId,
+            personid: userId,
             x: signature.map(function (elem) { return elem ? elem.x : null; }),
             y: signature.map(function (elem) { return elem ? elem.y : null; }),
             force: signature.map(function (elem) { return elem ? elem.pressure : null; }),
