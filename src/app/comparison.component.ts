@@ -38,6 +38,7 @@ export class ComparisonComponent implements OnInit, OnActivate {
   @ViewChild(SignatureComponent)
   private signatureComponent:SignatureComponent;
   public signatures:Array;
+  public userid:String = ""
 
   constructor(
     private _api:ApiService,
@@ -49,9 +50,9 @@ export class ComparisonComponent implements OnInit, OnActivate {
   }
 
   routerOnActivate(curr: RouteSegment) {
-    let userid = curr.getParam('userid')
+    this.userid = curr.getParam('userid')
     
-    this._api.getSignature(userid)
+    this._api.getSignature(this.userid)
       .then( (signatures) => {
         console.log(signatures)
         var signs = []
@@ -64,7 +65,7 @@ export class ComparisonComponent implements OnInit, OnActivate {
   }
 
   compare(){
-      this._api.checkSignature(this.signatureComponent.getTouches()) //TODO: also pass ID?
+      this._api.checkSignature(this.signatureComponent.getTouches(), this.userid) //TODO: also pass ID?
   }
 
   clear(){

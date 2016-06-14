@@ -75,12 +75,12 @@ export class ApiService {
     });
   }
 
-  checkSignature(signature:Array){
+  checkSignature(signature:Array, userId:String){
     var headers = new Headers()
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
     var data = {
-      personid: this.userId,
+      personid: userId,
       x: signature.map((elem) => { return elem ? elem.x : null }),
       y: signature.map((elem) => { return elem ? elem.y : null }),
       force: signature.map((elem) => { return elem ? elem.pressure : null }),
