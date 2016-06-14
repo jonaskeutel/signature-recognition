@@ -41,6 +41,7 @@ export class ApiService {
       gyroscope: [],
       duration: signature.length * 10
     }
+    data = this.normalizeSignature(data)
 
     return new Promise((resolve, reject) => {
       this._http.post('/api/signature', this.objectToString(data),  {headers: headers} )
@@ -88,6 +89,7 @@ export class ApiService {
       gyroscope: [],
       duration: signature.length * 10
     }
+    data = this.normalizeSignature(data)
 
     return new Promise((resolve, reject) => {
       this._http.post('/api/signature/check', this.objectToString(data),  {headers: headers} )
@@ -114,6 +116,27 @@ export class ApiService {
     }
     // console.log(converted)
     return converted
+  }
+
+  normalizeSignature(signature){
+    var dataPoints = signature.x.length;
+    var width = Math.max.apply(Math, signature.x) - Math.min.apply(Math, signature.x.filter(function(elem){return elem != null}))
+    var height = Math.max.apply(Math, signature.y) - Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
+    var minX = Math.min.apply(Math, signature.x.filter(function(elem){return elem != null}))
+    var minY = Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
+
+    var newX = [], newY = []
+    console.log(signature)
+    for(var i=0; i<dataPoints; i++){
+      newX.push( signature.x[i] ? signature.x[i] - minX : null )
+      newY.push( signature.x[i] ? signature.y[i] - minY : null)
+    }
+    signature.x = newX
+    signature.y = newY
+    signature.width = width
+    signature.height = height
+
+    return signature
   }
 
 }

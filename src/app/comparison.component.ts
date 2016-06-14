@@ -90,7 +90,6 @@ export class ComparisonComponent implements OnInit, OnActivate {
     var height = Math.max.apply(Math, signature.y) - Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
     var minX = Math.min.apply(Math, signature.x.filter(function(elem){return elem != null}))
     var minY = Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
-    console.log(minX, minY)
 
     var newX = [], newY = []
     console.log(signature)
