@@ -116,15 +116,6 @@ var CanvasDrawer = (function () {
         this.numStrokes--;
         var thing = this;
         this.normalizeTouches();
-        // setTimeout(function(){
-        //     // console.log(thing.numStrokes);
-        //     if (thing.numStrokes === 0) {
-        //         // TODO @Markus: save arrays
-        //         thing.touchesOverTime = [];
-        //         
-        //     }
-        // }, 1000);
-        // console.log(this.touchesOverTime)
     };
     CanvasDrawer.prototype.addTouchPoint = function (touchpoint, timestamp) {
         this.touchesOverTime.push(touchpoint);
@@ -273,6 +264,22 @@ var SignatureComponent = (function () {
     SignatureComponent.prototype.getTouches = function () {
         return this.drawable.normalizedTouches;
     };
+    SignatureComponent.prototype.getWidth = function () {
+        var xValues = this.getTouches().map(function (elem) { return elem ? elem.x : null; });
+        var min = Math.min.apply(null, xValues);
+        console.log(min);
+        var max = Math.max.apply(null, xValues);
+        console.log(max);
+        return max - min;
+    };
+    SignatureComponent.prototype.getHeight = function () {
+        var yValues = this.getTouches().map(function (elem) { return elem ? elem.y : null; });
+        var min = Math.min.apply(null, yValues);
+        console.log(min);
+        var max = Math.max.apply(null, yValues);
+        console.log(max);
+        return 12;
+    };
     __decorate([
         core_1.Input(), 
         __metadata('design:type', Object)
@@ -290,7 +297,7 @@ var SignatureComponent = (function () {
             selector: 'signature',
             providers: [],
             directives: [CanvasDrawer],
-            template: "\n    <div class=\"canvas-wrapper\">\n      <canvas #signatureCanvas class=\"signatureCanvas\" drawable>\n        Your browser does not support canvas element.\n      </canvas>\n      \n    </div>\n  "
+            template: "\n    <div class=\"canvas-wrapper\">\n      <canvas #signatureCanvas class=\"signatureCanvas\" drawable>\n        Your browser does not support canvas element.\n      </canvas>\n\n    </div>\n  "
         }), 
         __metadata('design:paramtypes', [])
     ], SignatureComponent);

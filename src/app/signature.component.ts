@@ -24,7 +24,7 @@ class CanvasDrawer {
       setTimeout(function(){
         el.nativeElement.width = el.nativeElement.clientWidth
       },200)
-      
+
   }
 
   @HostListener('touchstart', ['$event.target', '$event'])
@@ -50,7 +50,7 @@ class CanvasDrawer {
     //   console.log(touches[i])
     //   console.log(touches[i].identifier)
       this.currentTouch.push( { id: touches[i].identifier, x: x, y: y })
-   
+
       context.beginPath();
       context.arc(x, y, this.thickness(touches[i].force, 2), 0, 2 * Math.PI, false);  // a circle at the start
       context.fillStyle = 'blue';
@@ -139,17 +139,9 @@ class CanvasDrawer {
     this.numStrokes--;
     var  thing = this;
     this.normalizeTouches()
-    // setTimeout(function(){
-    //     // console.log(thing.numStrokes);
-    //     if (thing.numStrokes === 0) {
-    //         // TODO @Markus: save arrays
-    //         thing.touchesOverTime = [];
-    //         
-    //     }
-    // }, 1000);
-    // console.log(this.touchesOverTime)
+
   }
-  
+
   addTouchPoint(touchpoint, timestamp){
     this.touchesOverTime.push(touchpoint);
   }
@@ -158,13 +150,13 @@ class CanvasDrawer {
     let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
     context.clearRect(0, 0, this.canvas.nativeElement.width , this.canvas.nativeElement.height);
   }
-  
+
   redraw(){
     setInterval( () => {
       if(this.normalizedTouches.length > 0){
         if(this.normalizedTouches[0]){
            let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
-   
+
             context.beginPath();
             context.arc(this.normalizedTouches[0].x, this.normalizedTouches[0].y, this.thickness(this.normalizedTouches[0].pressure) , 0, 2 * Math.PI, false);  // a circle at the start
             context.fillStyle = 'blue';
@@ -172,7 +164,7 @@ class CanvasDrawer {
         }
         this.normalizedTouches.shift()
       }
-      
+
     }, 10)
   }
 
@@ -180,7 +172,7 @@ class CanvasDrawer {
     for(var i=0; i<signature.length; i++){
         var currTouch = signature[i]
         if(currTouch){
-          
+
             let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
             context.beginPath();
             context.arc(currTouch.x, currTouch.y, this.thickness(currTouch.pressure, 10) , 0, 2 * Math.PI, false);  // a circle at the start
@@ -198,14 +190,14 @@ class CanvasDrawer {
     //Interval in ms
     var interval = 10
     var offset = 0
-    
+
     if(this.normalizedTouches.length > 0){
       var pause = Math.floor( (touches[0].timestamp - this.normalizedTouches[this.normalizedTouches.length-1].timestamp ) / interval )
       for(var i=0; i < pause; i++){
         this.normalizedTouches.push(null)
       }
     }
-    
+
     while(touches.length > 0){
       if( normalized.length == 0 ){
         normalized.push(touches[0])
@@ -213,9 +205,9 @@ class CanvasDrawer {
         last = touches[0]
         touches.shift()
       }else{
-        
+
         if(touches[0].timestamp - lastStamp > interval + offset ){
-          normalized.push( last )  
+          normalized.push( last )
           offset += interval
         }else if(touches[0].timestamp - lastStamp <= interval + offset ){
           offset = 0
@@ -224,9 +216,9 @@ class CanvasDrawer {
           last = touches[0]
           touches.shift()
         }
-        
+
       }
-      
+
     }
     this.normalizedTouches = this.normalizedTouches.concat(normalized)
     normalizedTouches = this.normalizedTouches
@@ -242,7 +234,7 @@ class CanvasDrawer {
       <canvas #signatureCanvas class="signatureCanvas" drawable>
         Your browser does not support canvas element.
       </canvas>
-      
+
     </div>
   `
 })
@@ -255,17 +247,17 @@ export class SignatureComponent implements OnInit, AfterViewInit{
   @ViewChild("signatureCanvas") signatureCanvas: ElementRef;
   @ViewChild(CanvasDrawer)
   private drawable:CanvasDrawer;
-  
+
   constructor(){}
 
  ngOnInit(){
-   
+
  }
 
   ngAfterViewInit(){
    if(this.sign){
     console.log("Signature with objg", this.sign)
-   
+
     // this.drawable.redraw()
     setTimeout(() => {
         var width = this.drawable.canvas.nativeElement.width
@@ -308,9 +300,27 @@ export class SignatureComponent implements OnInit, AfterViewInit{
     // this.drawable.normalizedTouches = []
     this.drawable.clear()
   }
-  
+
   getTouches(){
     return this.drawable.normalizedTouches
+  }
+
+  getWidth() {
+      var xValues =  this.getTouches().map( (elem) => {return elem ? elem.x : null})
+      var min = Math.min.apply(null, xValues)
+      console.log(min)
+      var max = Math.max.apply(null, xValues)
+      console.log(max)
+      return max - min
+  }
+
+  getHeight() {
+      var yValues = this.getTouches().map( (elem) => {return elem ? elem.y : null})
+      var min = Math.min.apply(null, yValues)
+      console.log(min)
+      var max = Math.max.apply(null, yValues)
+      console.log(max)
+      return 12
   }
 
 }

@@ -29,22 +29,25 @@ var ApiService = (function () {
             resolve();
         });
     };
-    ApiService.prototype.addSignature = function (signature) {
+    ApiService.prototype.addSignature = function (signature, width, height) {
         var _this = this;
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
         var data = {
-            personID: this.userId,
+            personid: this.userId,
             x: signature.map(function (elem) { return elem ? elem.x : null; }),
             y: signature.map(function (elem) { return elem ? elem.y : null; }),
             force: signature.map(function (elem) { return elem ? elem.pressure : null; }),
             acceleration: [],
             gyroscope: [],
-            duration: signature.length * 10
+            duration: signature.length * 10,
+            height: height,
+            width: width,
         };
         data = this.normalizeSignature(data);
+        console.log(data);
         return new Promise(function (resolve, reject) {
-            _this._http.post('/api/signature', _this.objectToString(data), { headers: headers })
+            _this._http.post('/api/signature/' + data.personid, _this.objectToString(data), { headers: headers })
                 .subscribe(function (data) { return console.log(data); }, function (err) { return console.log(err); }, function () { return console.log('Authentication Complete'); });
             resolve();
         });
