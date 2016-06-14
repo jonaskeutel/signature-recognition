@@ -13,7 +13,7 @@ pg.connect('postgres://fzvidrvpjpbrcx:R6ZKMNDHXn7BQt720-WN0wbOuv@ec2-23-23-95-27
     });
 
   client
-    .query('SELECT * FROM SIGNATURE WHERE personId = 22 LIMIT 1;')
+    .query('SELECT * FROM SIGNATURE')
     .on('row', function(row) {
       console.log(row.duration);
       console.log("PersonId: " +  row.personId);
@@ -23,6 +23,8 @@ pg.connect('postgres://fzvidrvpjpbrcx:R6ZKMNDHXn7BQt720-WN0wbOuv@ec2-23-23-95-27
       console.log("force: " + row.force);
       console.log("acceleration: " + row.acceleration);
       console.log("gyroscope: " + row.gyroscope);
+      console.log("width: " + row.width);
+      console.log("height: " + row.height);
 
     });
 

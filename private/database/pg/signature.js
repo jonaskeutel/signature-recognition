@@ -10,7 +10,7 @@ module.exports = {
 function insert(signature) {
   const deferred = q.defer()
 
-  global.instance.query("INSERT INTO " + global.tables.signature + " (personID , x, y, force, acceleration, gyroscope, duration) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING personID", signature, function(err, result){
+  global.instance.query("INSERT INTO " + global.tables.signature + " (personID, x, y, force, acceleration, gyroscope, duration, width, height) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING personID", signature, function(err, result){
     if (err) {
       console.log('DB error (signature - insert):', err)
       deferred.reject(err)

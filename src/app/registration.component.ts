@@ -87,7 +87,7 @@ export class RegistrationComponent implements OnInit{
         hand: this.hand
       })
     }else if(this.step > 1){
-      this._api.addSignature(this.signatureComponent.getTouches())
+      this._api.addSignature(this.signatureComponent.getTouches(), this.signatureComponent.getWidth(), this.signatureComponent.getHeight())
       this.signatureComponent.clear()
     }
 

@@ -35,7 +35,7 @@ var RegistrationComponent = (function () {
             });
         }
         else if (this.step > 1) {
-            this._api.addSignature(this.signatureComponent.getTouches());
+            this._api.addSignature(this.signatureComponent.getTouches(), this.signatureComponent.getWidth(), this.signatureComponent.getHeight());
             this.signatureComponent.clear();
         }
         this.step++;

@@ -9,14 +9,12 @@ module.exports = {
 function compare(newSignature, savedSignatures) {
   	const deferred = q.defer()
 
-  	var dtw_result = undefined
-    dtw_evaluation.compare(req.body, savedSignatures, function(result){
-      dtw_result = result
+    dtw_evaluation.compare(newSignature, savedSignatures, function(result){
+        console.log("finished calculation: ", result)
+      	deferred.resolve(result)
+
     })
 
-  	deferred.resolve({
-      dtw: dtw_result,
-    })
 
-	return deferred.promise
+    return deferred.promise
 }

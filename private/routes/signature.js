@@ -9,24 +9,26 @@ module.exports = {
 }
 
 function newSignature(req, res) {
-  if(!req.body.personid || !req.body.x || !req.body.y || !req.body.force ||
-    !req.body.acceleration || !req.body.gyroscope || !req.body.duration) {
-        return res.json({"status": "error", "message": "missing a parameter #########new############"})
+    if(!req.body.personid || !req.body.x || !req.body.y || !req.body.force ||
+    !req.body.acceleration || !req.body.gyroscope || !req.body.duration || !req.body.width || !req.body.height) {
+        return res.json({"status": "error", "message": "missing a parameter"})
     } else {
     	var newSignature = [
     		req.body.personid,
     		req.body.x,
     		req.body.y,
-        req.body.force,
-        req.body.acceleration,
-        req.body.gyroscope,
-    		req.body.duration
+            req.body.force,
+            req.body.acceleration,
+            req.body.gyroscope,
+    		req.body.duration,
+            req.body.width,
+            req.body.height
     	]
     	db.newSignature(newSignature)
         .then(function() {
           return res.json({"status": "success", "message": "signature successfully created"})
         }, function(err) {
-      	  return res.json({"status": "error", "message": "signature not created"})
+      	  return res.json({"status": "error", "message": err})
     	  })
     }
 }
@@ -45,11 +47,9 @@ function getSignatures(req, res) {
 }
 
 function checkSignature(req, res) {
-  console.log("asdlkfjakldsfjhadlksfhjasdlkfhjasdlkfhjakldfhadklsfhadklf")
-  console.log(req.body)
   if(!req.body.personid || !req.body.x || !req.body.y || !req.body.force ||
     !req.body.acceleration || !req.body.gyroscope || !req.body.duration) {
-        return res.json({"status": "error", "message": "sdkjfhsdkjfhsdjkäfmissing a parameter"})
+        return res.json({"status": "error", "message": "missing a parameter"})
     } else {
       db.getSignatures(req.body.personid)
         .then(function(savedSignatures) {

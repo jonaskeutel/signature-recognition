@@ -28,23 +28,27 @@ export class ApiService {
     });
   }
 
-  addSignature(signature:Array){
+  addSignature(signature:Array, width, height){
     var headers = new Headers();
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
     var data = {
-      personID: this.userId,
+      personid: this.userId,
       x: signature.map( (elem) => {return elem ? elem.x : null}),
       y: signature.map( (elem) => {return elem ? elem.y: null}),
       force: signature.map( (elem) => {return elem ? elem.pressure : null}),
       acceleration: [],
       gyroscope: [],
-      duration: signature.length * 10
+      duration: signature.length * 10,
+      height: height,
+      width: width,
     }
     data = this.normalizeSignature(data)
 
+    console.log(data)
+
     return new Promise((resolve, reject) => {
-      this._http.post('/api/signature', this.objectToString(data),  {headers: headers} )
+      this._http.post('/api/signature/' + data.personid, this.objectToString(data),  {headers: headers} )
             .subscribe(
               data => console.log(data),
               err => console.log(err),

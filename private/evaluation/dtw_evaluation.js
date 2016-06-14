@@ -20,17 +20,13 @@ function compare(newSignature, savedSignatures, callback) {
         savedForce.push(savedSignatures[i].force)
   	}
 
-    console.log("comparing x...")
   	var xResult = compareValues(newSignature.x, savedX, true, true)
-    console.log("comparing y...")
   	var yResult = compareValues(newSignature.y, savedY, true, true)
-    console.log("comparing force...")
     var forceResult = compareValues(newSignature.force, savedForce, true, false)
 
-
   	var combinedScore = combineScores(xResult, yResult, forceResult)
-  	var success = combinedScore < SCORE_THRESHOLD ? true : false;
-  	result = {
+  	var success = combinedScore < SCORE_THRESHOLD ? true : false
+  	var result = {
   		success: success,
   		combinedScore: combinedScore,
   		x: xResult,
@@ -39,8 +35,8 @@ function compare(newSignature, savedSignatures, callback) {
   		gyroscope: null,
   		force: forceResult,
   	}
-
-		callback(result)
+    console.log("Result: " + result)
+	callback(result)
 }
 
 function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitude) {
@@ -51,7 +47,6 @@ function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitu
     var normalizedNew = normalize(newValues, normalizeLength, normalizeMagnitude)
 	for (var i = 0; i < savedValues.length; i++) {
 		var result = dtw.compute(normalizedNew, normalize(JSON.parse(savedValues[i]), normalizeLength, normalizeMagnitude)) / normalizedNew.length;
-        console.log(result)
 		score = score + result
 	}
 
@@ -66,13 +61,10 @@ function normalize(array, normalizeLength, normalizeMagnitude) {
     var normalized = array
     if (normalizeMagnitude) {
         normalized = normMagnitude(normalized)
-        console.log("magnitude normalized")
 
     }
     if (normalizeLength) {
-        console.log("normalize length")
         normalized = normLinear(normalized)
-        console.log("length normalized")
     }
 
     return normalized
