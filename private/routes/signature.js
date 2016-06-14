@@ -9,12 +9,12 @@ module.exports = {
 }
 
 function newSignature(req, res) {
-  if(!req.body.personID || !req.body.x || !req.body.y || !req.body.force ||
+  if(!req.body.personid || !req.body.x || !req.body.y || !req.body.force ||
     !req.body.acceleration || !req.body.gyroscope || !req.body.duration) {
-        return res.json({"status": "error", "message": "missing a parameter"})
+        return res.json({"status": "error", "message": "missing a parameter #########new############"})
     } else {
     	var newSignature = [
-    		req.body.personID,
+    		req.body.personid,
     		req.body.x,
     		req.body.y,
         req.body.force,
@@ -45,12 +45,13 @@ function getSignatures(req, res) {
 }
 
 function checkSignature(req, res) {
+  console.log("asdlkfjakldsfjhadlksfhjasdlkfhjasdlkfhjakldfhadklsfhadklf")
   console.log(req.body)
   if(!req.body.personid || !req.body.x || !req.body.y || !req.body.force ||
     !req.body.acceleration || !req.body.gyroscope || !req.body.duration) {
-        return res.json({"status": "error", "message": "missing a parameter"})
+        return res.json({"status": "error", "message": "sdkjfhsdkjfhsdjkäfmissing a parameter"})
     } else {
-      db.getSignatures(25) //req.body.personid
+      db.getSignatures(req.body.personid)
         .then(function(savedSignatures) {
           evaluation.compare(req.body, savedSignatures).done(function(result) {
             if (result) {

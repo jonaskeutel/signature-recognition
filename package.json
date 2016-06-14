@@ -10,8 +10,8 @@
     "tsc": "tsc -p src -w",
     "tsc:w": "tsc -p src -w",
     "stylusCompile:watch": "stylus -w -u nib src/assets/styles/main.styl",
-    "start": "concurrent \"npm run tsc:w\" \"npm run stylusCompile:watch\" \"node app.js\"",
-    "dev": "node app.js"
+    "start": "node app.js",
+    "dev": "concurrent \"npm run tsc:w\" \"npm run stylusCompile:watch\" \"nodemon app.js\""
   },
   "homepage": "lunch.time",
   "dependencies": {
