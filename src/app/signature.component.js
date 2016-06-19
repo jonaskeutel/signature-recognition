@@ -157,7 +157,7 @@ var CanvasDrawer = (function () {
         var last = {};
         var lastStamp = -1;
         //Interval in ms
-        var interval = 10;
+        var interval = 5;
         var offset = 0;
         if (this.normalizedTouches.length > 0) {
             var pause = Math.floor((touches[0].timestamp - this.normalizedTouches[this.normalizedTouches.length - 1].timestamp) / interval);

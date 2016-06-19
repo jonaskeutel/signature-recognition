@@ -188,7 +188,7 @@ class CanvasDrawer {
     var last = {}
     var lastStamp = -1
     //Interval in ms
-    var interval = 10
+    var interval = 5
     var offset = 0
 
     if(this.normalizedTouches.length > 0){
