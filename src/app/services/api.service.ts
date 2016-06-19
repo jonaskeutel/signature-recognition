@@ -124,8 +124,8 @@ export class ApiService {
 
   normalizeSignature(signature){
     var dataPoints = signature.x.length;
-    var width = Math.max.apply(Math, signature.x) - Math.min.apply(Math, signature.x.filter(function(elem){return elem != null}))
-    var height = Math.max.apply(Math, signature.y) - Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
+    // var width = Math.max.apply(Math, signature.x) - Math.min.apply(Math, signature.x.filter(function(elem){return elem != null}))
+    // var height = Math.max.apply(Math, signature.y) - Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
     var minX = Math.min.apply(Math, signature.x.filter(function(elem){return elem != null}))
     var minY = Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
 
@@ -137,8 +137,8 @@ export class ApiService {
     }
     signature.x = newX
     signature.y = newY
-    signature.width = width
-    signature.height = height
+    // signature.width = width
+    // signature.height = height
 
     return signature
   }
