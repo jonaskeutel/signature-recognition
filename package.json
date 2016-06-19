@@ -41,6 +41,7 @@
     "rxjs": "5.0.0-beta.6",
     "stylus": "^0.53.0",
     "symbol-observable": "^0.2.4",
+    "synaptic": "^1.0.4",
     "systemjs": "0.19.27",
     "zone.js": "^0.6.12"
   },
