@@ -311,7 +311,7 @@ export class SignatureComponent implements OnInit, AfterViewInit{
       console.log(min)
       var max = Math.max.apply(null, xValues)
       console.log(max)
-      return max - min
+      return Math.round(max - min)
   }
 
   getHeight() {
@@ -320,7 +320,7 @@ export class SignatureComponent implements OnInit, AfterViewInit{
       console.log(min)
       var max = Math.max.apply(null, yValues)
       console.log(max)
-      return 12
+      return Math.round(max - min)
   }
 
 }

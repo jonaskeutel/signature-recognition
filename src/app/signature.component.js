@@ -270,7 +270,7 @@ var SignatureComponent = (function () {
         console.log(min);
         var max = Math.max.apply(null, xValues);
         console.log(max);
-        return max - min;
+        return Math.round(max - min);
     };
     SignatureComponent.prototype.getHeight = function () {
         var yValues = this.getTouches().map(function (elem) { return elem ? elem.y : null; });
@@ -278,7 +278,7 @@ var SignatureComponent = (function () {
         console.log(min);
         var max = Math.max.apply(null, yValues);
         console.log(max);
-        return 12;
+        return Math.round(max - min);
     };
     __decorate([
         core_1.Input(), 
