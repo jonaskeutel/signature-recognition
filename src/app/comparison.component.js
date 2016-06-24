@@ -35,7 +35,10 @@ var ComparisonComponent = (function () {
         });
     };
     ComparisonComponent.prototype.compare = function () {
-        this._api.checkSignature(this.signatureComponent.getTouches(), this.userid); //TODO: also pass ID?
+        console.log("touches: " + this.signatureComponent.getTouches().length);
+        console.log("orientation: " + this.signatureComponent.getOrientation().length);
+        console.log("acceleration: " + this.signatureComponent.getAcceleration().length);
+        this._api.checkSignature(this.signatureComponent.getTouches(), this.userid);
     };
     ComparisonComponent.prototype.clear = function () {
         console.log("clear canvas");
@@ -77,7 +80,7 @@ var ComparisonComponent = (function () {
             selector: 'comparison-component',
             directives: [signature_component_1.SignatureComponent, router_1.ROUTER_DIRECTIVES],
             providers: [api_service_1.ApiService],
-            template: "\n    <div id=\"signature-comparison\">\n      <div class=\"header\">\n        <h1>Comparison</h1>\n      </div>\n\n      <div id=\"personal-information\">\n        <div class=\" form-buttons\">\n          <button class=\"btn btn-primary\" (click)=\"compare()\">Compare</button>\n          <button class=\"btn btn-primary\" (click)=\"clear()\">Clear</button>\n        </div>\n        <signature></signature>\n      </div>\n    </div>\n    <div class=\"existing-signatures\" *ngIf=\"signatures\">\n      \n      <div class=\"col-md-6\" *ngFor=\"let sign of signatures\">\n        <signature [sign]=\"sign\"></signature>\n      </div>\n    \n    </div>\n  "
+            template: "\n    <div id=\"signature-comparison\">\n      <div class=\"header\">\n        <h1>Comparison</h1>\n      </div>\n\n      <div id=\"personal-information\">\n        <div class=\" form-buttons\">\n          <button class=\"btn btn-primary\" (click)=\"compare()\">Compare</button>\n          <button class=\"btn btn-primary\" (click)=\"clear()\">Clear</button>\n        </div>\n        <signature></signature>\n      </div>\n    </div>\n    <div class=\"existing-signatures\" *ngIf=\"signatures\">\n\n      <div class=\"col-md-6\" *ngFor=\"let sign of signatures\">\n        <signature [sign]=\"sign\"></signature>\n      </div>\n\n    </div>\n  "
         }), 
         __metadata('design:paramtypes', [api_service_1.ApiService, router_1.Router])
     ], ComparisonComponent);

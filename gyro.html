@@ -184,6 +184,7 @@
               'b': event.beta,
               'c': event.gamma});
           }
+          console.log(event);
           document.getElementById("gyro").innerHTML = "Gyro: <br>" + event.alpha.toString().substring(0,5) + ' <br> ' + event.beta.toString().substring(0,5) + ' <br> ' + event.gamma.toString().substring(0,5);
         });
 

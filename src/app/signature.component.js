@@ -12,13 +12,18 @@ var core_1 = require('@angular/core');
 var normalizedTouches = [];
 var CanvasDrawer = (function () {
     function CanvasDrawer(el) {
+        this.startTime = null;
         this.currentTouch = [];
         this.touchesOverTime = [];
+        this.orientationOverTime = [];
+        this.accelerationOverTime = [];
         this.numStrokes = 0;
-        this.startTime = null;
         this.lastBegin = Date.now();
-        this.lastEnd = Date.now();
+        this.lastEnd = null;
+        this.secondLastEnd = null;
         this.normalizedTouches = [];
+        this.normalizedOrientation = [];
+        this.normalizedAcceleration = [];
         this.canvas = el;
         console.log("Construced");
         //  console.log(JSON.parse(JSON.stringify(el.nativeElement)) )
@@ -29,6 +34,9 @@ var CanvasDrawer = (function () {
     }
     CanvasDrawer.prototype.touchStart = function (canvas, event) {
         this.lastBegin = Date.now();
+        if (!this.startTime) {
+            this.startTime = this.lastBegin;
+        }
         this.numStrokes++;
         event.preventDefault();
         var context = this.canvas.nativeElement.getContext("2d");
@@ -131,7 +139,7 @@ var CanvasDrawer = (function () {
                 if (_this.normalizedTouches[0]) {
                     var context = _this.canvas.nativeElement.getContext("2d");
                     context.beginPath();
-                    context.arc(_this.normalizedTouches[0].x, _this.normalizedTouches[0].y, _this.thickness(_this.normalizedTouches[0].pressure), 0, 2 * Math.PI, false); // a circle at the start
+                    context.arc(_this.normalizedTouches[0].x, _this.normalizedTouches[0].y, _this.thickness(_this.normalizedTouches[0].pressure, 2), 0, 2 * Math.PI, false); // a circle at the start
                     context.fillStyle = 'blue';
                     context.fill();
                 }
@@ -153,7 +161,9 @@ var CanvasDrawer = (function () {
     };
     CanvasDrawer.prototype.normalizeTouches = function () {
         var touches = this.touchesOverTime;
-        var normalized = [];
+        var acceleration = this.accelerationOverTime;
+        var orientation = this.orientationOverTime;
+        var touchesNormalized = [];
         var last = {};
         var lastStamp = -1;
         //Interval in ms
@@ -165,29 +175,71 @@ var CanvasDrawer = (function () {
                 this.normalizedTouches.push(null);
             }
         }
+        var startTime = touches[0].timestamp;
         while (touches.length > 0) {
-            if (normalized.length == 0) {
-                normalized.push(touches[0]);
+            if (touchesNormalized.length == 0) {
+                touchesNormalized.push(touches[0]);
                 lastStamp = touches[0].timestamp;
                 last = touches[0];
                 touches.shift();
             }
             else {
                 if (touches[0].timestamp - lastStamp > interval + offset) {
-                    normalized.push(last);
+                    touchesNormalized.push(last);
                     offset += interval;
                 }
                 else if (touches[0].timestamp - lastStamp <= interval + offset) {
                     offset = 0;
-                    normalized.push(touches[0]);
+                    touchesNormalized.push(touches[0]);
                     lastStamp = touches[0].timestamp;
                     last = touches[0];
                     touches.shift();
                 }
             }
         }
-        this.normalizedTouches = this.normalizedTouches.concat(normalized);
+        this.normalizedTouches = this.normalizedTouches.concat(touchesNormalized);
+        this.normalizedOrientation = this.normalizedOrientation.concat(this.normalizeAccordingToTouches(this.orientationOverTime, startTime));
+        this.normalizedAcceleration = this.normalizedAcceleration.concat(this.normalizeAccordingToTouches(this.accelerationOverTime, startTime));
+        this.secondLastEnd = this.lastEnd;
         normalizedTouches = this.normalizedTouches;
+    };
+    CanvasDrawer.prototype.normalizeAccordingToTouches = function (array, startTime) {
+        var interval = 5; //ms
+        var normalizedArray = [];
+        if (this.secondLastEnd) {
+            startTime = this.secondLastEnd;
+        }
+        else {
+            this.secondLastEnd = this.lastEnd;
+        }
+        // get start
+        var startIndex = 0;
+        for (var i = 0; i < array.length; i++) {
+            if (array[i].timestamp < startTime) {
+                startIndex++;
+            }
+            else {
+                break;
+            }
+        }
+        startIndex--;
+        // TODO: fill everything until start with null
+        console.log("start: " + startIndex + " - length: " + array.length);
+        var lastTimestamp = array[startIndex].timestamp;
+        normalizedArray.push(array[startIndex]);
+        for (var i = startIndex; i < array.length; i++) {
+            if (array[i].timestamp > this.lastEnd) {
+                break;
+            }
+            if (array[i].timestamp - lastTimestamp < interval) {
+                continue;
+            }
+            else {
+                lastTimestamp = array[i].timestamp;
+                normalizedArray.push(array[i]);
+            }
+        }
+        return normalizedArray;
     };
     __decorate([
         core_1.HostListener('touchstart', ['$event.target', '$event']), 
@@ -219,6 +271,26 @@ var SignatureComponent = (function () {
     function SignatureComponent() {
     }
     SignatureComponent.prototype.ngOnInit = function () {
+        //  window.addEventListener('orientationchange', function() {
+        //    console.log(window.orientation)
+        //  }, false);
+        var that = this;
+        window.addEventListener('deviceorientation', function (event) {
+            that.drawable.orientationOverTime.push({
+                timestamp: Date.now(),
+                alpha: event.alpha,
+                beta: event.beta,
+                gamma: event.gamma
+            });
+        });
+        window.addEventListener("devicemotion", function (event) {
+            that.drawable.accelerationOverTime.push({
+                timestamp: Date.now(),
+                alpha: event.rotationRate.alpha,
+                beta: event.rotationRate.beta,
+                gamma: event.rotationRate.gamma
+            });
+        });
     };
     SignatureComponent.prototype.ngAfterViewInit = function () {
         var _this = this;
@@ -263,6 +335,12 @@ var SignatureComponent = (function () {
     };
     SignatureComponent.prototype.getTouches = function () {
         return this.drawable.normalizedTouches;
+    };
+    SignatureComponent.prototype.getOrientation = function () {
+        return this.drawable.normalizedOrientation;
+    };
+    SignatureComponent.prototype.getAcceleration = function () {
+        return this.drawable.normalizedAcceleration;
     };
     SignatureComponent.prototype.getWidth = function () {
         var xValues = this.getTouches().map(function (elem) { return elem ? elem.x : null; });

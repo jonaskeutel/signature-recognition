@@ -6,15 +6,25 @@ var normalizedTouches = []
 @Directive({
   selector: 'canvas[drawable]'
 })
+
+// angular.element($window).bind('orientationchange', function () {
+//  console.log(window.orientation)
+// })
+
 class CanvasDrawer {
+  private startTime = null;
   private canvas: ElementRef;
   private currentTouch = [];
   private touchesOverTime = [];
+  private orientationOverTime = [];
+  private accelerationOverTime = [];
   private numStrokes = 0;
-  private startTime = null;
   private lastBegin = Date.now()
-  private lastEnd = Date.now()
+  private lastEnd = null
+  private secondLastEnd = null
   public normalizedTouches = []
+  public normalizedOrientation = []
+  public normalizedAcceleration = []
 
   constructor(el: ElementRef) {
        this.canvas = el;
@@ -30,6 +40,9 @@ class CanvasDrawer {
   @HostListener('touchstart', ['$event.target', '$event'])
   touchStart(canvas, event) {
     this.lastBegin = Date.now()
+    if (!this.startTime) {
+        this.startTime = this.lastBegin
+    }
     this.numStrokes++;
     event.preventDefault()
     let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
@@ -58,6 +71,8 @@ class CanvasDrawer {
     }
 
   }
+
+
 
   @HostListener('touchmove', ['$event.target', '$event'])
   touchMove(canvas, event) {
@@ -158,7 +173,7 @@ class CanvasDrawer {
            let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
 
             context.beginPath();
-            context.arc(this.normalizedTouches[0].x, this.normalizedTouches[0].y, this.thickness(this.normalizedTouches[0].pressure) , 0, 2 * Math.PI, false);  // a circle at the start
+            context.arc(this.normalizedTouches[0].x, this.normalizedTouches[0].y, this.thickness(this.normalizedTouches[0].pressure, 2) , 0, 2 * Math.PI, false);  // a circle at the start
             context.fillStyle = 'blue';
             context.fill();
         }
@@ -184,7 +199,9 @@ class CanvasDrawer {
 
   normalizeTouches(){
     var touches = this.touchesOverTime
-    var normalized = []
+    var acceleration = this.accelerationOverTime
+    var orientation = this.orientationOverTime
+    var touchesNormalized = []
     var last = {}
     var lastStamp = -1
     //Interval in ms
@@ -197,21 +214,23 @@ class CanvasDrawer {
         this.normalizedTouches.push(null)
       }
     }
+    var startTime = touches[0].timestamp;
+
 
     while(touches.length > 0){
-      if( normalized.length == 0 ){
-        normalized.push(touches[0])
+      if( touchesNormalized.length == 0 ){
+        touchesNormalized.push(touches[0])
         lastStamp = touches[0].timestamp
         last = touches[0]
         touches.shift()
       }else{
 
         if(touches[0].timestamp - lastStamp > interval + offset ){
-          normalized.push( last )
+          touchesNormalized.push( last )
           offset += interval
         }else if(touches[0].timestamp - lastStamp <= interval + offset ){
           offset = 0
-          normalized.push( touches[0] )
+          touchesNormalized.push( touches[0] )
           lastStamp = touches[0].timestamp
           last = touches[0]
           touches.shift()
@@ -220,8 +239,55 @@ class CanvasDrawer {
       }
 
     }
-    this.normalizedTouches = this.normalizedTouches.concat(normalized)
+
+    this.normalizedTouches = this.normalizedTouches.concat(touchesNormalized)
+    this.normalizedOrientation = this.normalizedOrientation.concat(this.normalizeAccordingToTouches(this.orientationOverTime, startTime))
+    this.normalizedAcceleration = this.normalizedAcceleration.concat(this.normalizeAccordingToTouches(this.accelerationOverTime, startTime))
+
+    this.secondLastEnd = this.lastEnd
     normalizedTouches = this.normalizedTouches
+  }
+
+  normalizeAccordingToTouches(array, startTime) {
+      var interval = 5 //ms
+      var normalizedArray = []
+      if (this.secondLastEnd) {
+          startTime = this.secondLastEnd
+      } else {
+          this.secondLastEnd = this.lastEnd
+      }
+      // get start
+      var startIndex = 0;
+      for (let i = 0; i < array.length; i++) {
+          if( array[i].timestamp < startTime) {
+            startIndex++
+          } else{
+            break;
+          }
+      }
+      startIndex--;
+
+
+      // TODO: fill everything until start with null
+
+      console.log("start: " + startIndex + " - length: " + array.length)
+
+      var lastTimestamp = array[startIndex].timestamp
+      normalizedArray.push(array[startIndex])
+      for (let i = startIndex; i < array.length; i++) {
+          if (array[i].timestamp > this.lastEnd) {
+              break;
+          }
+
+          if (array[i].timestamp - lastTimestamp < interval) {
+              continue
+          } else {
+              lastTimestamp = array[i].timestamp;
+              normalizedArray.push(array[i])
+          }
+      }
+
+      return normalizedArray;
   }
 }
 
@@ -251,7 +317,28 @@ export class SignatureComponent implements OnInit, AfterViewInit{
   constructor(){}
 
  ngOnInit(){
+    //  window.addEventListener('orientationchange', function() {
+    //    console.log(window.orientation)
+    //  }, false);
+    var that = this;
 
+    window.addEventListener('deviceorientation', function(event) {
+      that.drawable.orientationOverTime.push({
+          timestamp: Date.now(),
+          alpha: event.alpha,
+          beta: event.beta,
+          gamma: event.gamma
+      })
+    })
+
+    window.addEventListener("devicemotion", function(event) {
+        that.drawable.accelerationOverTime.push({
+            timestamp: Date.now(),
+            alpha: event.rotationRate.alpha,
+            beta: event.rotationRate.beta,
+            gamma: event.rotationRate.gamma
+        })
+    })
  }
 
   ngAfterViewInit(){
@@ -304,6 +391,16 @@ export class SignatureComponent implements OnInit, AfterViewInit{
   getTouches(){
     return this.drawable.normalizedTouches
   }
+
+  getOrientation(){
+    return this.drawable.normalizedOrientation
+  }
+
+  getAcceleration(){
+    return this.drawable.normalizedAcceleration
+  }
+
+
 
   getWidth() {
       var xValues =  this.getTouches().map( (elem) => {return elem ? elem.x : null})

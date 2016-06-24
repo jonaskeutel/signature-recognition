@@ -24,11 +24,11 @@ import {ApiService} from './services/api.service';
       </div>
     </div>
     <div class="existing-signatures" *ngIf="signatures">
-      
+
       <div class="col-md-6" *ngFor="let sign of signatures">
         <signature [sign]="sign"></signature>
       </div>
-    
+
     </div>
   `
 })
@@ -51,7 +51,7 @@ export class ComparisonComponent implements OnInit, OnActivate {
 
   routerOnActivate(curr: RouteSegment) {
     this.userid = curr.getParam('userid')
-    
+
     this._api.getSignature(this.userid)
       .then( (signatures) => {
         console.log(signatures)
@@ -65,7 +65,10 @@ export class ComparisonComponent implements OnInit, OnActivate {
   }
 
   compare(){
-      this._api.checkSignature(this.signatureComponent.getTouches(), this.userid) //TODO: also pass ID?
+      console.log("touches: " + this.signatureComponent.getTouches().length)
+      console.log("orientation: " + this.signatureComponent.getOrientation().length)
+      console.log("acceleration: " + this.signatureComponent.getAcceleration().length)
+      this._api.checkSignature(this.signatureComponent.getTouches(), this.userid)
   }
 
   clear(){
@@ -75,7 +78,7 @@ export class ComparisonComponent implements OnInit, OnActivate {
 
   convertSignatureData(signature){
     var dataPoints = signature.x.length;
-    
+
     signature = this.normalizeSignature(signature)
     signature.force = JSON.parse( signature.force )
 
