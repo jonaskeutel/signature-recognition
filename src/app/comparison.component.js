@@ -36,8 +36,11 @@ var ComparisonComponent = (function () {
     };
     ComparisonComponent.prototype.compare = function () {
         console.log("touches: " + this.signatureComponent.getTouches().length);
+        //   console.log(this.signatureComponent.getTouches())
         console.log("orientation: " + this.signatureComponent.getOrientation().length);
+        //   console.log(this.signatureComponent.getOrientation())
         console.log("acceleration: " + this.signatureComponent.getAcceleration().length);
+        //   console.log(this.signatureComponent.getAcceleration())
         this._api.checkSignature(this.signatureComponent.getTouches(), this.userid);
     };
     ComparisonComponent.prototype.clear = function () {

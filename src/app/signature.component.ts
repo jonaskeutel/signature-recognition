@@ -12,7 +12,7 @@ var normalizedTouches = []
 // })
 
 class CanvasDrawer {
-  private startTime = null;
+  public startTime = null;
   private canvas: ElementRef;
   private currentTouch = [];
   private touchesOverTime = [];
@@ -134,6 +134,7 @@ class CanvasDrawer {
     event.preventDefault()
     var touches = event.changedTouches;
 
+    var index = this.getIndexForTimestamp(this.lastEnd)
     // console.log(event)
 
 
@@ -153,17 +154,38 @@ class CanvasDrawer {
     }
     this.numStrokes--;
     var  thing = this;
-    this.normalizeTouches()
 
   }
 
   addTouchPoint(touchpoint, timestamp){
-    this.touchesOverTime.push(touchpoint);
+    // this.touchesOverTime.push(touchpoint);
+    var index = this.getIndexForTimestamp(timestamp)
+    this.addEntryToArrayAtIndex(touchpoint, this.normalizedTouches, index)
   }
 
   clear(){
     let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
     context.clearRect(0, 0, this.canvas.nativeElement.width , this.canvas.nativeElement.height);
+  }
+
+  addEntryToArrayAtIndex(entry, array, index) {
+    // console.log("trying to add " + entry + " to " + array + " at " + index);
+    if (array[index]) {
+        return;
+    }
+    for (var i = array.length; i < index; i++) {
+        array[i] = null;
+    }
+    array[index] = entry;
+  }
+
+  getIndexForTimestamp(timestamp) {
+    if (!this.startTime) {
+        return undefined
+    }
+    var diff = timestamp - this.startTime;
+    var index = Math.floor(diff / 10);
+    return index;
   }
 
   redraw(){
@@ -197,98 +219,7 @@ class CanvasDrawer {
     }
   }
 
-  normalizeTouches(){
-    var touches = this.touchesOverTime
-    var acceleration = this.accelerationOverTime
-    var orientation = this.orientationOverTime
-    var touchesNormalized = []
-    var last = {}
-    var lastStamp = -1
-    //Interval in ms
-    var interval = 5
-    var offset = 0
 
-    if(this.normalizedTouches.length > 0){
-      var pause = Math.floor( (touches[0].timestamp - this.normalizedTouches[this.normalizedTouches.length-1].timestamp ) / interval )
-      for(var i=0; i < pause; i++){
-        this.normalizedTouches.push(null)
-      }
-    }
-    var startTime = touches[0].timestamp;
-
-
-    while(touches.length > 0){
-      if( touchesNormalized.length == 0 ){
-        touchesNormalized.push(touches[0])
-        lastStamp = touches[0].timestamp
-        last = touches[0]
-        touches.shift()
-      }else{
-
-        if(touches[0].timestamp - lastStamp > interval + offset ){
-          touchesNormalized.push( last )
-          offset += interval
-        }else if(touches[0].timestamp - lastStamp <= interval + offset ){
-          offset = 0
-          touchesNormalized.push( touches[0] )
-          lastStamp = touches[0].timestamp
-          last = touches[0]
-          touches.shift()
-        }
-
-      }
-
-    }
-
-    this.normalizedTouches = this.normalizedTouches.concat(touchesNormalized)
-    this.normalizedOrientation = this.normalizedOrientation.concat(this.normalizeAccordingToTouches(this.orientationOverTime, startTime))
-    this.normalizedAcceleration = this.normalizedAcceleration.concat(this.normalizeAccordingToTouches(this.accelerationOverTime, startTime))
-
-    this.secondLastEnd = this.lastEnd
-    normalizedTouches = this.normalizedTouches
-  }
-
-  normalizeAccordingToTouches(array, startTime) {
-      var interval = 5 //ms
-      var normalizedArray = []
-      if (this.secondLastEnd) {
-          startTime = this.secondLastEnd
-      } else {
-          this.secondLastEnd = this.lastEnd
-      }
-      // get start
-      var startIndex = 0;
-      for (let i = 0; i < array.length; i++) {
-          if( array[i].timestamp < startTime) {
-            startIndex++
-          } else{
-            break;
-          }
-      }
-      startIndex--;
-
-
-      // TODO: fill everything until start with null
-
-      console.log("start: " + startIndex + " - length: " + array.length)
-
-      var lastTimestamp = array[startIndex].timestamp
-      normalizedArray.push(array[startIndex])
-      for (let i = startIndex; i < array.length; i++) {
-          if (array[i].timestamp > this.lastEnd) {
-              break;
-          }
-
-          if (array[i].timestamp - lastTimestamp < interval) {
-              continue
-          } else {
-              lastTimestamp = array[i].timestamp;
-              normalizedArray.push(array[i])
-          }
-      }
-
-      return normalizedArray;
-  }
 }
 
 @Component({
@@ -323,21 +254,31 @@ export class SignatureComponent implements OnInit, AfterViewInit{
     var that = this;
 
     window.addEventListener('deviceorientation', function(event) {
-      that.drawable.orientationOverTime.push({
+      var entry = {
           timestamp: Date.now(),
           alpha: event.alpha,
           beta: event.beta,
           gamma: event.gamma
-      })
+      }
+
+      var index = that.drawable.getIndexForTimestamp(entry.timestamp)
+      if (index) {
+          that.drawable.addEntryToArrayAtIndex(entry, that.drawable.normalizedOrientation, index)
+      }
     })
 
     window.addEventListener("devicemotion", function(event) {
-        that.drawable.accelerationOverTime.push({
+        var entry = {
             timestamp: Date.now(),
             alpha: event.rotationRate.alpha,
             beta: event.rotationRate.beta,
             gamma: event.rotationRate.gamma
-        })
+        }
+
+        var index = that.drawable.getIndexForTimestamp(entry.timestamp)
+        if (index) {
+            that.drawable.addEntryToArrayAtIndex(entry, that.drawable.normalizedAcceleration, index)
+        }
     })
  }
 
@@ -384,23 +325,32 @@ export class SignatureComponent implements OnInit, AfterViewInit{
   }
 
   clear(){
-    // this.drawable.normalizedTouches = []
+    this.drawable.startTime = null
+    this.drawable.normalizedTouches = []
+    this.drawable.normalizedOrientation = []
+    this.drawable.normalizedAcceleration = []
     this.drawable.clear()
   }
 
   getTouches(){
-    return this.drawable.normalizedTouches
+    console.log("Last touch: " +  this.drawable.normalizedTouches[this.drawable.normalizedTouches.length - 1].timestamp)
+    return this.drawable.normalizedTouches.slice()
   }
 
   getOrientation(){
-    return this.drawable.normalizedOrientation
+    if ( this.drawable.normalizedOrientation[this.drawable.normalizedOrientation.length - 1]) {
+        console.log("Last orientation: " +  this.drawable.normalizedOrientation[this.drawable.normalizedOrientation.length - 1].timestamp)
+    }
+    return this.drawable.normalizedOrientation.slice(0, this.getTouches().length)
   }
 
   getAcceleration(){
-    return this.drawable.normalizedAcceleration
+    var cutAcceleration = this.drawable.normalizedAcceleration.slice(0, this.getTouches().length)
+    if (cutAcceleration[cutAcceleration.length - 1]) {
+        console.log("Last acceleration: " +  cutAcceleration[cutAcceleration.length - 1].timestamp)
+    }
+    return cutAcceleration
   }
-
-
 
   getWidth() {
       var xValues =  this.getTouches().map( (elem) => {return elem ? elem.x : null})
