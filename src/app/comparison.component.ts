@@ -71,7 +71,7 @@ export class ComparisonComponent implements OnInit, OnActivate {
     //   console.log(this.signatureComponent.getOrientation())
       console.log("acceleration: " + this.signatureComponent.getAcceleration().length)
     //   console.log(this.signatureComponent.getAcceleration())
-      this._api.checkSignature(this.signatureComponent.getTouches(), this.userid)
+      this._api.checkSignature(this.signatureComponent.getTouches(), this.signatureComponent.getOrientation(), this.signatureComponent.getAcceleration().length, this.userid)
   }
 
   clear(){

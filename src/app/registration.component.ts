@@ -88,7 +88,7 @@ export class RegistrationComponent implements OnInit{
       })
     }else if(this.step > 1){
       console.log("Width: " + this.signatureComponent.getWidth())
-      this._api.addSignature(this.signatureComponent.getTouches(), this.signatureComponent.getWidth(), this.signatureComponent.getHeight())
+      this._api.addSignature(this.signatureComponent.getTouches(), this.signatureComponent.getOrientation(), this.signatureComponent.getAcceleration(), this.signatureComponent.getWidth(), this.signatureComponent.getHeight())
       this.signatureComponent.clear()
     }
 

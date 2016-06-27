@@ -28,18 +28,18 @@ export class ApiService {
     });
   }
 
-  addSignature(signature:Array, width, height){
+  addSignature(touches:Array, orientation:Array, acceleration:Array, width, height){
     var headers = new Headers();
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
     var data = {
       personid: this.userId,
-      x: signature.map( (elem) => {return elem ? elem.x : null}),
-      y: signature.map( (elem) => {return elem ? elem.y: null}),
-      force: signature.map( (elem) => {return elem ? elem.pressure : null}),
-      acceleration: [],
-      gyroscope: [],
-      duration: signature.length * 10,
+      x: touches.map( (elem) => {return elem ? elem.x : null}),
+      y: touches.map( (elem) => {return elem ? elem.y: null}),
+      force: touches.map( (elem) => {return elem ? elem.pressure : null}),
+      acceleration: acceleration.map( (elem) => {return elem ? elem.y: null}),
+      gyroscope: orientation.map( (elem) => {return elem ? elem.y: null}),
+      duration: touches.length * 10,
       height: height,
       width: width,
     }
@@ -80,20 +80,20 @@ export class ApiService {
     });
   }
 
-  checkSignature(signature:Array, userId:String){
+  checkSignature(touches:Array, orientation:Array, acceleration:Array, userId:String){
     var headers = new Headers()
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
     var data = {
       personid: userId,
-      x: signature.map((elem) => { return elem ? elem.x : null }),
-      y: signature.map((elem) => { return elem ? elem.y : null }),
-      force: signature.map((elem) => { return elem ? elem.pressure : null }),
+      x: touches.map((elem) => { return elem ? elem.x : null }),
+      y: touches.map((elem) => { return elem ? elem.y : null }),
+      force: touches.map((elem) => { return elem ? elem.pressure : null }),
       acceleration: [],
       gyroscope: [],
-      duration: signature.length * 10
+      duration: touches.length * 10
     }
-    data = this.normalizeSignature(data)
+    // data = this.normalizeSignature(data)
 
     return new Promise((resolve, reject) => {
       this._http.post('/api/signature/check', this.objectToString(data),  {headers: headers} )

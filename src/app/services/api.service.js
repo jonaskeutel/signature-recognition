@@ -29,18 +29,18 @@ var ApiService = (function () {
             resolve();
         });
     };
-    ApiService.prototype.addSignature = function (signature, width, height) {
+    ApiService.prototype.addSignature = function (touches, orientation, acceleration, width, height) {
         var _this = this;
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
         var data = {
             personid: this.userId,
-            x: signature.map(function (elem) { return elem ? elem.x : null; }),
-            y: signature.map(function (elem) { return elem ? elem.y : null; }),
-            force: signature.map(function (elem) { return elem ? elem.pressure : null; }),
-            acceleration: [],
-            gyroscope: [],
-            duration: signature.length * 10,
+            x: touches.map(function (elem) { return elem ? elem.x : null; }),
+            y: touches.map(function (elem) { return elem ? elem.y : null; }),
+            force: touches.map(function (elem) { return elem ? elem.pressure : null; }),
+            acceleration: acceleration.map(function (elem) { return elem ? elem.y : null; }),
+            gyroscope: orientation.map(function (elem) { return elem ? elem.y : null; }),
+            duration: touches.length * 10,
             height: height,
             width: width,
         };
@@ -66,20 +66,20 @@ var ApiService = (function () {
                 .subscribe(function (data) { return resolve(JSON.parse(data._body)); }, function (err) { return console.log(err); }, function () { });
         });
     };
-    ApiService.prototype.checkSignature = function (signature, userId) {
+    ApiService.prototype.checkSignature = function (touches, orientation, acceleration, userId) {
         var _this = this;
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
         var data = {
             personid: userId,
-            x: signature.map(function (elem) { return elem ? elem.x : null; }),
-            y: signature.map(function (elem) { return elem ? elem.y : null; }),
-            force: signature.map(function (elem) { return elem ? elem.pressure : null; }),
+            x: touches.map(function (elem) { return elem ? elem.x : null; }),
+            y: touches.map(function (elem) { return elem ? elem.y : null; }),
+            force: touches.map(function (elem) { return elem ? elem.pressure : null; }),
             acceleration: [],
             gyroscope: [],
-            duration: signature.length * 10
+            duration: touches.length * 10
         };
-        data = this.normalizeSignature(data);
+        // data = this.normalizeSignature(data)
         return new Promise(function (resolve, reject) {
             _this._http.post('/api/signature/check', _this.objectToString(data), { headers: headers })
                 .subscribe(function (data) { return console.log(data); }, function (err) { return console.log(err); }, function () { return console.log('Authentication Complete'); });
