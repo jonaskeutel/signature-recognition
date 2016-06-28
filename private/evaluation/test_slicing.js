@@ -6,109 +6,109 @@ var dtw = new DTW();
 // ########################
 
 extrema = function(values, eps) {
-    // make y enumerated and define x = 1, 2, 3, ...
-    var x, y;
-    y = enumerate(values);
-    x = Object.keys(y).map(Math.floor);
-    // call extremaXY version
-    var res = extremaXY(x, y, eps);
-    res.minlist = res.minlist.map(function(val) {
-        var index = Math.floor((val[1] + val[0]) / 2);
-        return Object.keys(values)[index];
-    });
-    res.maxlist = res.maxlist.map(function(val) {
-        var index = Math.floor((val[1] + val[0]) / 2);
-        return Object.keys(values)[index];
-    });
+  // make y enumerated and define x = 1, 2, 3, ...
+  var x, y;
+  y = enumerate(values);
+  x = Object.keys(y).map(Math.floor);
+  // call extremaXY version
+  var res = extremaXY(x, y, eps);
+  res.minlist = res.minlist.map(function(val) {
+      var index = Math.floor((val[1] + val[0]) / 2);
+      return Object.keys(values)[index];
+  });
+  res.maxlist = res.maxlist.map(function(val) {
+      var index = Math.floor((val[1] + val[0]) / 2);
+      return Object.keys(values)[index];
+  });
 
-    return {minlist: res.minlist, maxlist: res.maxlist};
+  return {minlist: res.minlist, maxlist: res.maxlist};
 }
 
 extremaXY = function(x, y, eps) {
-        // declare local vars
-        var n, s, m, M, maxlist, minlist, i, j;
-        // define x & y enumerated arrays
-        var enumerate = function(obj) {
-            var arr = [];
-            var keys = Object.keys(obj);
-            for (var k = 0; k < keys.length; k++) {
-                arr[k] = obj[keys[k]];
-            }
-            return arr;
-        }
-        y = enumerate(y);
-        x = enumerate(x);
-        // set initial values
-        n = y.length;
-        s = 0;
-        m = y[0];
-        M = y[0];
-        maxlist = [];
-        minlist = [];
-        i = 1;
-        if (typeof eps == "undefined") {
-            eps = 0.1;
-        }
-        // the algorithm
-        while (i < n) {
-            if (s == 0) {
-                if (!(M - eps <= y[i] && y[i] <= m + eps)) {
-                    if (M - eps > y[i]) {
-                        s = -1;
-                    }
-                    if (m + eps < y[i]) {
-                        s = 1;
-                    }
-                }
-                M = Math.max(M, y[i]);
-                m = Math.min(m, y[i]);
-            }
-            else {
-                if (s == 1) {
-                    if (M - eps <= y[i]) {
-                        M = Math.max(M, y[i]);
-                    }
-                    else {
-                        j = i - 1;
-                        while(y[j] >= M - eps) {
-                            j--;
-                        }
-                        maxlist.push( [x[j], x[i]] );
-                        s = -1;
-                        m = y[i];
-                    }
-                }
-                else {
-                    if(s == -1) {
-                        if(m + eps >= y[i]) {
-                            m = Math.min(m, y[i]);
-                        }
-                        else {
-                            j = i - 1;
-                            while(y[j] <= m + eps) {
-                                j--;
-                            }
-                            minlist.push( [x[j], x[i]] );
-                            s = 1;
-                            M = y[i];
-                        }
-                    }
-                }
-            }
-            i++;
-        }
+  // declare local vars
+  var n, s, m, M, maxlist, minlist, i, j;
+  // define x & y enumerated arrays
+  var enumerate = function(obj) {
+      var arr = [];
+      var keys = Object.keys(obj);
+      for (var k = 0; k < keys.length; k++) {
+          arr[k] = obj[keys[k]];
+      }
+      return arr;
+  }
+  y = enumerate(y);
+  x = enumerate(x);
+  // set initial values
+  n = y.length;
+  s = 0;
+  m = y[0];
+  M = y[0];
+  maxlist = [];
+  minlist = [];
+  i = 1;
+  if (typeof eps == "undefined") {
+      eps = 0.1;
+  }
+  // the algorithm
+  while (i < n) {
+      if (s == 0) {
+          if (!(M - eps <= y[i] && y[i] <= m + eps)) {
+              if (M - eps > y[i]) {
+                  s = -1;
+              }
+              if (m + eps < y[i]) {
+                  s = 1;
+              }
+          }
+          M = Math.max(M, y[i]);
+          m = Math.min(m, y[i]);
+      }
+      else {
+          if (s == 1) {
+              if (M - eps <= y[i]) {
+                  M = Math.max(M, y[i]);
+              }
+              else {
+                  j = i - 1;
+                  while(y[j] >= M - eps) {
+                      j--;
+                  }
+                  maxlist.push( [x[j], x[i]] );
+                  s = -1;
+                  m = y[i];
+              }
+          }
+          else {
+              if(s == -1) {
+                  if(m + eps >= y[i]) {
+                      m = Math.min(m, y[i]);
+                  }
+                  else {
+                      j = i - 1;
+                      while(y[j] <= m + eps) {
+                          j--;
+                      }
+                      minlist.push( [x[j], x[i]] );
+                      s = 1;
+                      M = y[i];
+                  }
+              }
+          }
+      }
+      i++;
+  }
 
-        return {minlist: minlist, maxlist: maxlist};
+  return {minlist: minlist, maxlist: maxlist};
+}
+
+// helper to make an array or object an enumerated array
+var enumerate = function(obj) {
+    var arr = [];
+    var keys = Object.keys(obj);
+    for (var k = 0; k < keys.length; k++) {
+        arr[k] = obj[keys[k]];
     }
-
-    // helper to make an array or object an enumerated array
-    var enumerate = function(obj) {
-        var arr = [];
-        var keys = Object.keys(obj);
-        for (var k = 0; k < keys.length; k++) {
-            arr[k] = obj[keys[k]];
-        }
-        return arr;
+    return arr;
 }
 
 // ##################
