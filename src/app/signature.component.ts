@@ -126,7 +126,7 @@ class CanvasDrawer {
 
   }
 
-  thickness(force, thickness){thickness = thickness? thickness : 3; return Math.max( thickness * force * force, 0.5 )}
+  thickness(force, thickness){thickness == thickness? thickness : 3; return Math.max( thickness * force * force, 0.5 )}
 
   @HostListener('touchend', ['$event.target', '$event'])
   touchEnd(canvas, event) {
