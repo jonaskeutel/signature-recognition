@@ -93,7 +93,7 @@ export class ApiService {
       gyroscope: [],
       duration: touches.length * 10
     }
-    // data = this.normalizeSignature(data)
+    data = this.normalizeSignature(data)
 
     return new Promise((resolve, reject) => {
       this._http.post('/api/signature/check', this.objectToString(data),  {headers: headers} )

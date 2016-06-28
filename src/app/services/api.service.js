@@ -79,7 +79,7 @@ var ApiService = (function () {
             gyroscope: [],
             duration: touches.length * 10
         };
-        // data = this.normalizeSignature(data)
+        data = this.normalizeSignature(data);
         return new Promise(function (resolve, reject) {
             _this._http.post('/api/signature/check', _this.objectToString(data), { headers: headers })
                 .subscribe(function (data) { return console.log(data); }, function (err) { return console.log(err); }, function () { return console.log('Authentication Complete'); });
