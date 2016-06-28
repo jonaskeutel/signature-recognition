@@ -8,9 +8,9 @@ db.init()
 db.getAllUser()
   .then( (user) => {
     console.log(user)
-    db.getSignatures(52)
+    db.getSignatures(60)
       .then( (signatures_1) => {
-        db.getSignatures(47)
+        db.getSignatures(61)
           .then( (signatures_2) => {
               dtw_slicing.compare(signatures_2[0], signatures_1, function(result) {
                 console.log('finished');

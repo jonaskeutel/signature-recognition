@@ -1,5 +1,6 @@
 'use strict'
 const INDEX_THRESHOLD = 50
+const EXTREMA_GRANULARITY = '1'
 const LENGTH = 1000
 
 module.exports = {
@@ -201,7 +202,7 @@ function prepare_slicing(values) {
 	}
 
 	values = values.filter(function(n){ return n != undefined })
-	var extrema = extrema(values, "1")
+	var extrema = extrema(values, EXTREMA_GRANULARITY)
 
 	extrema.minlist = extrema.minlist.filter(function(n){ return n != undefined })
 	extrema.maxlist = extrema.maxlist.filter(function(n){ return n != undefined })
@@ -275,6 +276,7 @@ function map_extrema_lists(list_s, list_t) {
 	  }
 	  return [new_list_s, new_list_t]
 	}
+	return [[],[]]
 }
 
 function clean_up_lists(list_s, list_t) {
