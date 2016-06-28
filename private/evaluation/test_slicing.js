@@ -286,12 +286,40 @@ if (result_s.maxlist.length > 0 && result_t.maxlist.length > 0) {
     }
   }
 
-  console.log('dtw mapped maxlists:');
-  console.log(new_maxlist_s);
-  console.log(new_maxlist_t);
+console.log('dtw mapped maxlists:');
+console.log(new_maxlist_s);
+console.log(new_maxlist_t);
 
-  result_s.maxlist = new_maxlist_s
-  result_t.maxlist = new_maxlist_t
+var values_s = []
+var values_t = []
+for (var i = 0; i < new_minlist_s.length; i++) {
+  if ((Math.abs(new_minlist_s[i] - new_minlist_t[i])) > 50) {
+    values_s.push(new_minlist_s[i])
+    values_t.push(new_minlist_t[i])
+  }
+}
+
+for (var i = 0; i < values_s.length; i++) {
+  new_minlist_s.splice(new_minlist_s.indexOf(values_s[i]), 1)
+  new_minlist_t.splice(new_minlist_t.indexOf(values_t[i]), 1)
+}
+
+values_s = []
+values_t = []
+for (var i = 0; i < new_maxlist_s.length; i++) {
+  if ((Math.abs(new_maxlist_s[i] - new_maxlist_t[i])) > 50) {
+    values_s.push(new_maxlist_s[i])
+    values_t.push(new_maxlist_t[i])
+  }
+}
+
+for (var i = 0; i < values_s.length; i++) {
+  new_maxlist_s.splice(new_maxlist_s.indexOf(values_s[i]), 1)
+  new_maxlist_t.splice(new_maxlist_t.indexOf(values_t[i]), 1)
+}
+
+result_s.maxlist = new_maxlist_s
+result_t.maxlist = new_maxlist_t
 }
 
 // ####################################
