@@ -12,12 +12,14 @@ var normalizedTouches = []
 // })
 
 class CanvasDrawer {
-  public startTime = null;
+  public startTime = null
+  public lastOrientation = null
+  public lastAcceleration = null
   private canvas: ElementRef;
-  private currentTouch = [];
-  private touchesOverTime = [];
-  private orientationOverTime = [];
-  private accelerationOverTime = [];
+  private currentTouch = []
+  private touchesOverTime = []
+  private orientationOverTime = []
+  private accelerationOverTime = []
   private numStrokes = 0;
   private lastBegin = Date.now()
   private lastEnd = null
@@ -42,6 +44,9 @@ class CanvasDrawer {
     this.lastBegin = Date.now()
     if (!this.startTime) {
         this.startTime = this.lastBegin
+        let index = this.getIndexForTimestamp(this.lastBegin)
+        this.addEntryToArrayAtIndex(this.lastOrientation, this.orientationOverTime, index)
+        this.addEntryToArrayAtIndex(this.lastAcceleration, this.accelerationOverTime, index)
     }
     this.numStrokes++;
     event.preventDefault()
@@ -248,36 +253,28 @@ export class SignatureComponent implements OnInit, AfterViewInit{
   constructor(){}
 
  ngOnInit(){
-    //  window.addEventListener('orientationchange', function() {
-    //    console.log(window.orientation)
-    //  }, false);
     var that = this;
 
     window.addEventListener('deviceorientation', function(event) {
-      var entry = {
-          timestamp: Date.now(),
-          alpha: event.alpha,
-          beta: event.beta,
-          gamma: event.gamma
-      }
-
-      var index = that.drawable.getIndexForTimestamp(entry.timestamp)
+      var entry = Math.sqrt(event.alpha*event.alpha + event.beta*event.beta + event.gamma*event.gamma)
+      that.drawable.lastOrientation = entry
+      var index = that.drawable.getIndexForTimestamp(Date.now())
       if (index) {
           that.drawable.addEntryToArrayAtIndex(entry, that.drawable.normalizedOrientation, index)
       }
     })
 
     window.addEventListener("devicemotion", function(event) {
-        var entry = {
-            timestamp: Date.now(),
-            alpha: event.rotationRate.alpha,
-            beta: event.rotationRate.beta,
-            gamma: event.rotationRate.gamma
-        }
-
-        var index = that.drawable.getIndexForTimestamp(entry.timestamp)
+        var entry = Math.sqrt(event.rotationRate.alpha*event.rotationRate.alpha + event.rotationRate.beta*event.rotationRate.beta + event.rotationRate.gamma*event.rotationRate.gamma)
+        that.drawable.lastAcceleration = entry
+        var index = that.drawable.getIndexForTimestamp(Date.now())
         if (index) {
             that.drawable.addEntryToArrayAtIndex(entry, that.drawable.normalizedAcceleration, index)
+        }
+        if (that.drawable.normalizedAcceleration.length === 0) {
+            console.log("Still empty")
+        } else {
+            console.log("Not anymore...")
         }
     })
  }
@@ -325,6 +322,7 @@ export class SignatureComponent implements OnInit, AfterViewInit{
   }
 
   clear(){
+    console.log("Clear called!")
     this.drawable.startTime = null
     this.drawable.normalizedTouches = []
     this.drawable.normalizedOrientation = []
@@ -333,21 +331,21 @@ export class SignatureComponent implements OnInit, AfterViewInit{
   }
 
   getTouches(){
-    console.log("Last touch: " +  this.drawable.normalizedTouches[this.drawable.normalizedTouches.length - 1].timestamp)
     return this.drawable.normalizedTouches.slice()
   }
 
   getOrientation(){
-    if ( this.drawable.normalizedOrientation[this.drawable.normalizedOrientation.length - 1]) {
-        console.log("Last orientation: " +  this.drawable.normalizedOrientation[this.drawable.normalizedOrientation.length - 1].timestamp)
+    var cutOrientation = this.drawable.normalizedOrientation.slice(0, this.getTouches().length)
+    for (let i = 0; i < this.getTouches().length; i++) {
+        cutOrientation.push(null)
     }
-    return this.drawable.normalizedOrientation.slice(0, this.getTouches().length)
+    return cutOrientation
   }
 
   getAcceleration(){
     var cutAcceleration = this.drawable.normalizedAcceleration.slice(0, this.getTouches().length)
-    if (cutAcceleration[cutAcceleration.length - 1]) {
-        console.log("Last acceleration: " +  cutAcceleration[cutAcceleration.length - 1].timestamp)
+    for (let i = 0; i < this.getTouches().length; i++) {
+        cutAcceleration.push(null)
     }
     return cutAcceleration
   }
@@ -355,18 +353,14 @@ export class SignatureComponent implements OnInit, AfterViewInit{
   getWidth() {
       var xValues =  this.getTouches().map( (elem) => {return elem ? elem.x : null})
       var min = Math.min.apply(null, xValues)
-      console.log(min)
       var max = Math.max.apply(null, xValues)
-      console.log(max)
       return Math.round(max - min)
   }
 
   getHeight() {
       var yValues = this.getTouches().map( (elem) => {return elem ? elem.y : null})
       var min = Math.min.apply(null, yValues)
-      console.log(min)
       var max = Math.max.apply(null, yValues)
-      console.log(max)
       return Math.round(max - min)
   }
 
