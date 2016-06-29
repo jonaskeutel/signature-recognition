@@ -17,6 +17,8 @@ function compare(newSignature, savedSignatures, callback) {
     var savedForce = []
     var savedHeight = []
     var savedWidth = []
+    var savedAcceleration = []
+    var savedOrientation = []
 
   	for (var i = savedSignatures.length - 1; i >= 0; i--) {
   		savedX.push(savedSignatures[i].x)
@@ -24,19 +26,20 @@ function compare(newSignature, savedSignatures, callback) {
         savedForce.push(savedSignatures[i].force)
         savedWidth.push(savedSignatures[i].width)
         savedHeight.push(savedSignatures[i].height)
+        savedAcceleration.push(savedSignatures[i].acceleration)
+        savedOrientation.push(savedSignatures[i].gyroscope)
   	}
 
   	var xResult = compareValues(newSignature.x, savedX, true, true)
   	var yResult = compareValues(newSignature.y, savedY, true, true)
     var forceResult = compareValues(newSignature.force, savedForce, true, false)
-
-    console.log(savedWidth)
-    console.log(newSignature.width)
+    var accelerationResult = compareValues(newSignature.acceleration, savedAcceleration, true, false)
+    var orientationResult = compareValues(newSignature.gyroscope, savedOrientation, true, false)
     var widthResult = compareNumber(newSignature.width, savedWidth)
     var heightResult = compareNumber(newSignature.width, savedHeight)
 
 
-  	var combinedScore = combineScores(xResult, yResult, forceResult, widthResult, heightResult)
+  	var combinedScore = combineScores(xResult, yResult, forceResult, accelerationResult, orientationResult, widthResult, heightResult)
   	var success = combinedScore < SCORE_THRESHOLD ? true : false
   	var result = {
   		success: success,
@@ -85,7 +88,7 @@ function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitu
 	return score/savedValues.length
 }
 
-function combineScores(xScore, yScore, forceScore, widthScore, heigthScore) {
+function combineScores(xScore, yScore, forceScore, accelerationScore, orientationScore, widthScore, heigthScore) {
     var result = 0
     if (xScore) {
         result += xScore * 0.05
@@ -95,6 +98,12 @@ function combineScores(xScore, yScore, forceScore, widthScore, heigthScore) {
     }
     if (forceScore) {
         result += forceScore * 1000
+    }
+    if (accelerationScore) {
+        result += accelerationScore * 2
+    }
+    if (orientationScore) {
+        result += orientationScore * 2
     }
 
     result += widthScore + heigthScore
