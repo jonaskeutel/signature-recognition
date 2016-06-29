@@ -66,7 +66,7 @@ var ApiService = (function () {
                 .subscribe(function (data) { return resolve(JSON.parse(data._body)); }, function (err) { return console.log(err); }, function () { });
         });
     };
-    ApiService.prototype.checkSignature = function (touches, orientation, acceleration, userId) {
+    ApiService.prototype.checkSignature = function (touches, orientation, acceleration, width, height, userId) {
         var _this = this;
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -75,11 +75,14 @@ var ApiService = (function () {
             x: touches.map(function (elem) { return elem ? elem.x : null; }),
             y: touches.map(function (elem) { return elem ? elem.y : null; }),
             force: touches.map(function (elem) { return elem ? elem.pressure : null; }),
-            acceleration: [],
-            gyroscope: [],
+            acceleration: acceleration,
+            gyroscope: orientation,
+            width: width,
+            height: height,
             duration: touches.length * 10
         };
         data = this.normalizeSignature(data);
+        console.log("about to post to /api/signature/check");
         return new Promise(function (resolve, reject) {
             _this._http.post('/api/signature/check', _this.objectToString(data), { headers: headers })
                 .subscribe(function (data) { return console.log(data); }, function (err) { return console.log(err); }, function () { return console.log('Authentication Complete'); });
@@ -114,6 +117,7 @@ var ApiService = (function () {
         signature.y = newY;
         // signature.width = width
         // signature.height = height
+        console.log("normalized");
         return signature;
     };
     ApiService = __decorate([

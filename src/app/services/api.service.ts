@@ -80,7 +80,7 @@ export class ApiService {
     });
   }
 
-  checkSignature(touches:Array, orientation:Array, acceleration:Array, userId:String){
+  checkSignature(touches:Array, orientation:Array, acceleration:Array, width, height, userId:String){
     var headers = new Headers()
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -89,12 +89,14 @@ export class ApiService {
       x: touches.map((elem) => { return elem ? elem.x : null }),
       y: touches.map((elem) => { return elem ? elem.y : null }),
       force: touches.map((elem) => { return elem ? elem.pressure : null }),
-      acceleration: [],
-      gyroscope: [],
+      acceleration: acceleration,
+      gyroscope: orientation,
+      width: width,
+      height: height,
       duration: touches.length * 10
     }
     data = this.normalizeSignature(data)
-
+    console.log("about to post to /api/signature/check")
     return new Promise((resolve, reject) => {
       this._http.post('/api/signature/check', this.objectToString(data),  {headers: headers} )
             .subscribe(
@@ -139,7 +141,7 @@ export class ApiService {
     signature.y = newY
     // signature.width = width
     // signature.height = height
-
+    console.log("normalized")
     return signature
   }
 
