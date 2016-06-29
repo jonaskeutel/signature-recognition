@@ -231,10 +231,8 @@ var SignatureComponent = (function () {
                 that.drawable.addEntryToArrayAtIndex(entry, that.drawable.normalizedAcceleration, index);
             }
             if (that.drawable.normalizedAcceleration.length === 0) {
-                console.log("Still empty");
             }
             else {
-                console.log("Not anymore...");
             }
         });
     };

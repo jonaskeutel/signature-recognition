@@ -272,9 +272,9 @@ export class SignatureComponent implements OnInit, AfterViewInit{
             that.drawable.addEntryToArrayAtIndex(entry, that.drawable.normalizedAcceleration, index)
         }
         if (that.drawable.normalizedAcceleration.length === 0) {
-            console.log("Still empty")
+            // console.log("Still empty")
         } else {
-            console.log("Not anymore...")
+            // console.log("Not anymore...")
         }
     })
  }
