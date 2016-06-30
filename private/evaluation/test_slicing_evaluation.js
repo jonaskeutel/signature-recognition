@@ -8,18 +8,18 @@ db.init()
 db.getAllUser()
   .then( (user) => {
     console.log(user)
-    db.getSignatures(60)
+    db.getSignatures(66)
       .then( (signatures_1) => {
-        db.getSignatures(61)
+        db.getSignatures(66)
           .then( (signatures_2) => {
               dtw_slicing.compare(signatures_2[0], signatures_1, function(result) {
-                console.log('finished');
+                console.log('# Result #');
+                console.log('success:', result.success);
+                console.log('combinedScore:', result.combinedScore);
+                console.log('x:', result.x);
+                console.log('y:', result.y);
               })
           })
       })
     })
 })
-
-// dtw_slicing.compare('abc', 'def', function(result) {
-//   console.log(result);
-// })

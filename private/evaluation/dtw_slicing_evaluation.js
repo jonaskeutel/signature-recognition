@@ -1,7 +1,9 @@
 'use strict'
-const INDEX_THRESHOLD = 50
+const SCORE_THRESHOLD = 200
+const INDEX_MAX_THRESHOLD = 50
+const INDEX_MIN_THRESHOLD = 5
 const EXTREMA_GRANULARITY = '1'
-const LENGTH = 1000
+function arrayMin(arr) { return Math.min.apply(Math, arr); };
 
 module.exports = {
 	compare: compare
@@ -13,30 +15,24 @@ var dtw = new DTW()
 function compare(newSignature, savedSignatures, callback) {
 	var savedX = []
 	var savedY = []
-  var savedForce = []
 
 	for (var i = savedSignatures.length - 1; i >= 0; i--) {
 		savedX.push(savedSignatures[i].x)
 		savedY.push(savedSignatures[i].y)
-      savedForce.push(savedSignatures[i].force)
 	}
 
 	var xResult = compareValues(newSignature.x, savedX)
-	// var yResult = compareValues(newSignature.y, savedY)
-  // var forceResult = compareValues(newSignature.force, savedForce)
+	var yResult = compareValues(newSignature.y, savedY)
 
-	// var combinedScore = combineScores(xResult, yResult, forceResult)
-	// var success = combinedScore < SCORE_THRESHOLD ? true : false
+	var combinedScore = combineScores(xResult, yResult)
+	var success = combinedScore < SCORE_THRESHOLD ? true : false
 	var result = {
-		success: true,
-		combinedScore: null,
+		success: success,
+		combinedScore: combinedScore,
 		x: xResult,
-		y: null,
-		acceleration: null,
-		gyroscope: null,
-		force: null,
+		y: yResult
 	}
-  console.log("Result: " + result)
+
 	callback(result)
 }
 
@@ -50,8 +46,8 @@ function compareValues(newValues, savedValues) {
 	return score/savedValues.length
 }
 
-function combineScores(xScore, yScore, forceScore) {
-	return (xScore * 0.1 + yScore * 0.5 + forceScore * 1000) / 3
+function combineScores(xScore, yScore) {
+	return (xScore * 0.1 + yScore * 0.5) / 2
 }
 
 function compute_slicing_result(s, t) {
@@ -67,15 +63,16 @@ function compute_slicing_result(s, t) {
 	console.log(extrema_s);
 	console.log(extrema_t);
 
-	console.log('dtw mapped minlists:');
 	var mapped_extrema_minlists = map_extrema_lists(extrema_s.minlist, extrema_t.minlist)
 	extrema_s.minlist = mapped_extrema_minlists[0]
 	extrema_t.minlist = mapped_extrema_minlists[1]
 	var mapped_extrema_maxlists = map_extrema_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = mapped_extrema_maxlists[0]
 	extrema_t.maxlist = mapped_extrema_maxlists[1]
+	console.log('dtw mapped minlists:');
   console.log(extrema_s.minlist);
   console.log(extrema_t.minlist);
+	console.log('dtw mapped maxlists:');
 	console.log(extrema_s.maxlist);
   console.log(extrema_t.maxlist);
 	var cleaned_extrema_minlists = clean_up_lists(extrema_s.minlist, extrema_t.minlist)
@@ -84,12 +81,21 @@ function compute_slicing_result(s, t) {
 	var cleaned_extrema_maxlists = clean_up_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = cleaned_extrema_maxlists[0]
 	extrema_t.maxlist = cleaned_extrema_maxlists[1]
+	console.log('dtw mapped minlists cleaned:');
+	console.log(extrema_s.minlist);
+	console.log(extrema_t.minlist);
+	console.log('dtw mapped maxlists cleaned:');
+	console.log(extrema_s.maxlist);
+	console.log(extrema_t.maxlist);
 	var cutting_points = determine_cutting_points(extrema_s, extrema_t)
 	console.log('cutting points:');
 	console.log(cutting_points[0]);
 	console.log(cutting_points[1]);
+	var costs = calculate_costs(s, t, cutting_points)
+	var costs_all = dtw.compute(s, t)
+	console.log('Costs all:', costs_all);
 
-	return calculate_costs(s, t, cutting_points)
+	return costs
 }
 
 function prepare_slicing(values) {
@@ -215,7 +221,7 @@ function prepare_slicing(values) {
 
 function map_extrema_lists(list_s, list_t) {
 	if (list_s.length > 0 && list_t.length > 0) {
-		var cost_intervals = dtw.compute(list_s, list_s);
+		var cost_intervals = dtw.compute(list_s, list_t);
 	  var path = dtw.path();
 	  var new_list_s = [list_s[0]];
 	  var new_list_t = [list_t[0]];
@@ -226,7 +232,7 @@ function map_extrema_lists(list_s, list_t) {
 	          var indices = []
 	          for (var j = i; j < path.length; j++) {
 	            if (path[i][0] == path[j][0]) {
-	              indices.push(j);
+	              indices.push(path[j][1]);
 	            }
 	          }
 	          var distances = []
@@ -234,7 +240,7 @@ function map_extrema_lists(list_s, list_t) {
 	            var local_distance = Math.abs(list_s[path[i][0]] - list_t[indices[k]]);
 	            distances.push(local_distance);
 	          }
-	          var min = Math.min.apply(null, distances);
+	          var min = arrayMin(distances);
 	          var index = indices[distances.indexOf(min)];
 
 	          new_list_s.push(list_s[path[index][0]]);
@@ -261,7 +267,7 @@ function map_extrema_lists(list_s, list_t) {
 	            var local_distance = Math.abs(list_s[indices[k]] - list_t[path[i][1]]);
 	            distances.push(local_distance);
 	          }
-	          var min = Math.min.apply(null, distances);
+	          var min = arrayMin(distances);
 	          var index = indices[distances.indexOf(min)];
 
 	          new_list_s.push(list_s[path[index][0]]);
@@ -283,7 +289,7 @@ function clean_up_lists(list_s, list_t) {
 	var rejected_s = []
 	var rejected_t = []
 	for (var i = 0; i < list_s.length; i++) {
-	  if ((Math.abs(list_s[i] - list_t[i])) > INDEX_THRESHOLD) {
+	  if (Math.abs(list_s[i] - list_t[i]) > INDEX_MAX_THRESHOLD) {
 	    rejected_s.push(list_s[i])
 	    rejected_t.push(list_t[i])
 	  }
@@ -298,8 +304,8 @@ function clean_up_lists(list_s, list_t) {
 }
 
 function determine_cutting_points(extrema_s, extrema_t) {
-	var min_minlists = Math.min.apply(null, extrema_s.minlist.concat(extrema_t.minlist));
-	var min_maxlists = Math.min.apply(null, extrema_s.maxlist.concat(extrema_t.maxlist));
+	var min_minlists = arrayMin(extrema_s.minlist.concat(extrema_t.minlist));
+	var min_maxlists = arrayMin(extrema_s.maxlist.concat(extrema_t.maxlist));
 	var cutting_points = undefined
 
 	if (min_minlists < min_maxlists) {
@@ -317,7 +323,9 @@ function cutting_points_for_lists(list_s1, list_s2, list_t1, list_t2) {
 		points_s.push(list_s1[0])
 		points_t.push(list_t1[0])
 	}
-	if (list_s2.length > 0 && list_t2.length > 0) {
+	if (list_s2.length > 0 && list_t2.length > 0 &&
+		(Math.abs(list_s1[i] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
+		(Math.abs(list_t1[i] - points_s[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
 		points_s.push(list_s2[0])
 		points_t.push(list_t2[0])
 	}
@@ -325,14 +333,18 @@ function cutting_points_for_lists(list_s1, list_s2, list_t1, list_t2) {
 		if ((list_s1[i] != undefined) &&
 				(list_t1[i] != undefined) &&
 				(list_s1[i] > points_s[points_s.length - 1]) &&
-				(list_t1[i] > points_t[points_t.length - 1])) {
+				(list_t1[i] > points_t[points_t.length - 1]) &&
+				(Math.abs(list_s1[i] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
+				(Math.abs(list_t1[i] - points_s[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
 					points_s.push(list_s1[i])
 					points_t.push(list_t1[i])
 		}
 		if ((list_s2[i] != undefined) &&
 				(list_t2[i] != undefined) &&
 				(list_s2[i] > points_s[points_s.length - 1]) &&
-				(list_t2[i] > points_t[points_t.length - 1])) {
+				(list_t2[i] > points_t[points_t.length - 1]) &&
+				(Math.abs(list_s2[i] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
+				(Math.abs(list_t2[i] - points_s[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
 					points_s.push(list_s2[i])
 					points_t.push(list_t2[i])
 		}
