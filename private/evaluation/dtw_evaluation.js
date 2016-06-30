@@ -20,46 +20,85 @@ function compare(newSignature, savedSignatures, callback) {
     var savedDuration = []
 
   	for (var i = savedSignatures.length - 1; i >= 0; i--) {
-  		savedX.push(savedSignatures[i].x)
-  		savedY.push(savedSignatures[i].y)
-        savedForce.push(savedSignatures[i].force)
+  		savedX.push(JSON.parse(savedSignatures[i].x))
+  		savedY.push(JSON.parse(savedSignatures[i].y))
+        savedForce.push(JSON.parse(savedSignatures[i].force))
         savedWidth.push(savedSignatures[i].width)
         savedHeight.push(savedSignatures[i].height)
-        savedAcceleration.push(savedSignatures[i].acceleration)
-        savedOrientation.push(savedSignatures[i].gyroscope)
+        savedAcceleration.push(JSON.parse(savedSignatures[i].acceleration))
+        savedOrientation.push(JSON.parse(savedSignatures[i].gyroscope))
         savedDuration.push(savedSignatures[i].duration)
   	}
+    console.log("everything parsed for savedSignatures")
 
-    var xResult = compareValues(newSignature.x, savedX, true, true)
-  	var yResult = compareValues(newSignature.y, savedY, true, true)
-    var forceResult = compareValues(newSignature.force, savedForce, true, false)
-    var accelerationResult = compareValues(newSignature.acceleration, savedAcceleration, true, false)
-    var orientationResult = compareValues(newSignature.gyroscope, savedOrientation, true, false)
-    var widthResult = compareNumber(newSignature.width, savedWidth)
-    var heightResult = compareNumber(newSignature.width, savedHeight)
+    // var xResult = compareValues(newSignature.x, savedX, true, true)
+    // console.log("got xResult (numeric)")
+ //  	var yResult = compareValues(newSignature.y, savedY, true, true)
+    // var forceResult = compareValues(newSignature.force, savedForce, true, false)
+    // var accelerationResult = compareValues(newSignature.acceleration, savedAcceleration, true, false)
+    // var orientationResult = compareValues(newSignature.gyroscope, savedOrientation, true, false)
+    // var widthResult = compareNumber(newSignature.width, savedWidth)
+    // var heightResult = compareNumber(newSignature.width, savedHeight)
 
+    console.log()
+    console.log("-------------------------  x  --------------------------------")
     var xCertainity = getCertainity(JSON.parse(newSignature.x), savedX)
+    console.log()
+    console.log()
+    console.log("-------------------------  y  --------------------------------")
   	var yCertainity = getCertainity(JSON.parse(newSignature.y), savedY)
+    console.log()
+    console.log()
+    console.log("-------------------------  force  --------------------------------")
     var forceCertainity = getCertainity(JSON.parse(newSignature.force), savedForce)
+    console.log()
+    console.log()
+    console.log("-------------------------  acceleration  --------------------------------")
     var accelerationCertainity = getCertainity(JSON.parse(newSignature.acceleration), savedAcceleration)
+    console.log()
+    console.log()
+    console.log("-------------------------  orientation  --------------------------------")
     var orientationCertainity = getCertainity(JSON.parse(newSignature.gyroscope), savedOrientation)
+    // console.log("new width: " + newSignature.width + " ; old widths: " + savedWidth)
+    console.log()
+    console.log()
+    console.log("-------------------------  width  --------------------------------")
     var widthCertainity = getCertainity(newSignature.width, savedWidth)
+    console.log()
+    console.log()
+    console.log("-------------------------  height  --------------------------------")
     var heightCertainity = getCertainity(newSignature.height, savedHeight)
+    console.log()
+    console.log()
+    console.log("-------------------------  duration  --------------------------------")
     var durationCertainity = getCertainity(newSignature.duration, savedDuration)
+    // console.log("Got all certainities")
+    var combinedCertainity = combineCertainities(xCertainity, yCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity)
+    console.log("combinedCertainity: ", combinedCertainity)
+    var certainitySuccess = combinedCertainity > 0.8 ? true : false
+
+    //  	var combinedScore = combineScores(xResult, yResult, forceResult, accelerationResult, orientationResult, widthResult, heightResult)
+ //  	var success = combinedScore < SCORE_THRESHOLD ? true : false
+    // console.log("allright so far, now construct result object")
 
 
-  	var combinedScore = combineScores(xResult, yResult, forceResult, accelerationResult, orientationResult, widthResult, heightResult)
-  	var success = combinedScore < SCORE_THRESHOLD ? true : false
+        // scoreSuccess: success,
+// 		combinedScore: combinedScore,
+// 		x: xResult,
+// 		y: yResult,
+    // height: heightResult,
+    // width: widthResult,
+// 		acceleration: null,
+// 		gyroscope: null,
+// 		force: forceResult,
   	var result = {
-  		success: success,
-  		combinedScore: combinedScore,
-  		x: xResult,
-  		y: yResult,
-        height: heightResult,
-        width: widthResult,
-  		acceleration: null,
-  		gyroscope: null,
-  		force: forceResult,
+        certainitySuccess: certainitySuccess,
+        combinedCertainity: combinedCertainity,
+        xCertainity: xCertainity,
+        yCertainity: yCertainity,
+        forceCertainity: forceCertainity,
+        accelerationCertainity: accelerationCertainity,
+        orientationCertainity: orientationCertainity,
         widthCertainity: widthCertainity,
         heightCertainity: heightCertainity,
         durationCertainity: durationCertainity,
@@ -68,56 +107,103 @@ function compare(newSignature, savedSignatures, callback) {
 	callback(result)
 }
 
-function compareNumber(newValue, savedValues) {
+function compareNumber(newValue, savedValues, includesSelf) {
     var diff = 0
     for (var i = 0; i < savedValues.length; i++) {
         diff += Math.abs(savedValues[i] - newValue)
+    }
+    if (includesSelf) {
+        return diff / (savedValues.length - 1)
     }
     return diff / savedValues.length
 }
 
 function getCertainity(newValues, savedValues) {
-    console.log("inside getCertainity")
-    console.log(newValues)
+    // console.log(newValues)
+    var overallDiff = 0
+    var numberOfComparisons = 0
+    var maxDiff = 0
+    var newDiff = 0
+
     if (Array.isArray(newValues)) {
         // compare array of values (x, y, force, acceleration, ...)
-        console.log("compare arrays")
-        return null
-    } else {
-        // compare numbers (width, height, duration, ...)
-        console.log("compare single numbers")
 
-        // compute average diff
-        var diff = 0
-        var numberOfComparisons = 0
         for (var i = 0; i < savedValues.length; i++) {
             for (var j = 0; j < savedValues.length; j++) {
                 if (i <= j) {
                     continue
                 }
-                console.log("Comparison between " + i + " and " + j + " --> " + compareNumber(savedValues[i], savedValues))
-                diff += compareNumber(savedValues[i], savedValues)
+                var diff = compareValues(savedValues[i], savedValues)
+                // console.log("Comparison between " + i + " and " + j + " --> " + diff)
+                if (!diff) {
+                    continue
+                }
+                overallDiff += diff
+                maxDiff = diff > maxDiff ? diff : maxDiff
                 numberOfComparisons++
             }
         }
-        var averageDiff = diff / numberOfComparisons
-        var newDiff = compareNumber(newValues, savedValues)
-        console.log("new Diff: " + newDiff)
-        var certainity = newDiff < averageDiff ? 1 : averageDiff / newDiff
-        return certainity
+        newDiff = compareValues(newValues, savedValues)
+        console.log("new Diff:\t\t\t\t" + newDiff)
+    } else {
+        // compare numbers (width, height, duration, ...)
+
+        // compute average diff
+        for (var i = 0; i < savedValues.length; i++) {
+            for (var j = 0; j < savedValues.length; j++) {
+                if (i <= j) {
+                    continue
+                }
+                var diff = compareNumber(savedValues[i], savedValues, true)
+                // console.log("Comparison between " + i + " and " + j + " --> " + diff)
+                overallDiff += diff
+                maxDiff = diff > maxDiff ? diff : maxDiff
+                numberOfComparisons++
+            }
+        }
+        newDiff = compareNumber(newValues, savedValues, false)
+        console.log("new Diff:\t\t\t\t " + newDiff)
+        var averageValue = averageOfArray(savedValues)
+        var deviationFromAverageCertainity = 1 - (newDiff / averageValue)
+        console.log("average Value:\t\t\t\t " + averageValue)
+        console.log("deviationFromAverageCertainity:\t\t " + deviationFromAverageCertainity)
     }
+    if (numberOfComparisons === 0) {
+        return false
+    }
+    var averageDiff = overallDiff / numberOfComparisons
+    var avgCertainity = newDiff < averageDiff ? 1 : averageDiff / newDiff
+    var maxCertainity = newDiff < maxDiff ? 1 : maxDiff / newDiff
+    var resultingCertainity = (avgCertainity + maxCertainity) / 2
+    console.log("Average diff:\t\t\t	 " + averageDiff)
+    console.log("Average certainity:\t\t\t " + avgCertainity)
+    console.log("Max diff:\t\t\t\t " + maxDiff)
+    console.log("Max certainity:\t\t\t\t " + maxCertainity)
+    console.log("resulting certainity:\t\t\t " + ((avgCertainity + maxCertainity) / 2))
+    if (deviationFromAverageCertainity) {
+        var weightedCertainityFromDeviation = deviationFromAverageCertainity * resultingCertainity
+        console.log("weightedCertainityFromDeviation:\t " + weightedCertainityFromDeviation)
+        return weightedCertainityFromDeviation
+    }
+    return resultingCertainity
+}
+
+function averageOfArray(arr) {
+    var sum = 0
+    for (var i = 0; i < arr.length; i++) {
+        sum += arr[i]
+    }
+    return sum / arr.length
 }
 
 function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitude) {
     // console.log("Compare " + newValues + " with " + savedValues)
 	var score = 0;
-    newValues = normalize(JSON.parse(newValues), normalizeLength, normalizeMagnitude)
-
+    // newValues = normalize(JSON.parse(newValues), normalizeLength, normalizeMagnitude)
     var normalizedNew = normalize(newValues, normalizeLength, normalizeMagnitude)
 	for (var i = 0; i < savedValues.length; i++) {
-        var normalizedOld = normalize(JSON.parse(savedValues[i]), normalizeLength, normalizeMagnitude)
+        var normalizedOld = normalize(savedValues[i], normalizeLength, normalizeMagnitude)
 		var result
-
         try {
             result = dtw.compute(normalizedNew, normalizedOld) / normalizedNew.length;
         }
@@ -132,10 +218,51 @@ function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitu
 	return score/savedValues.length
 }
 
+function combineCertainities(xCertainity, yCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity) {
+    var certainity = 0
+    var numberOfCertainities = 0
+    var i = 0
+    if (xCertainity) {
+        certainity += xCertainity
+        numberOfCertainities++
+    }
+    if (yCertainity) {
+        certainity += yCertainity
+        numberOfCertainities++
+    }
+    if (forceCertainity) {
+        certainity += forceCertainity
+        numberOfCertainities++
+    }
+    if (accelerationCertainity) {
+        certainity += accelerationCertainity
+        numberOfCertainities++
+    }
+    if (orientationCertainity) {
+        certainity += orientationCertainity
+        numberOfCertainities++
+    }
+    if (widthCertainity) {
+        certainity += widthCertainity
+        numberOfCertainities++
+    }
+    if (heightCertainity) {
+        certainity += heightCertainity
+        numberOfCertainities++
+    }
+    if (durationCertainity) {
+        certainity += durationCertainity
+        numberOfCertainities++
+    }
+
+    if (numberOfCertainities === 0) {
+        return 0
+    }
+    return certainity / numberOfCertainities
+}
+
 function combineScores(xScore, yScore, forceScore, accelerationScore, orientationScore, widthScore, heigthScore) {
     var result = 0
-    var certainity = 0
-    var numberOfScores = 0
     if (xScore) {
         result += xScore * 0.05
         numberOfScores++
