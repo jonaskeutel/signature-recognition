@@ -6,7 +6,8 @@ const EXTREMA_GRANULARITY = '1'
 function arrayMin(arr) { return Math.min.apply(Math, arr); };
 
 module.exports = {
-	compare: compare
+	compare: compare,
+	getCertainity: getCertainity
 }
 
 var DTW = require('dtw')
@@ -36,19 +37,59 @@ function compare(newSignature, savedSignatures, callback) {
 	callback(result)
 }
 
+function getCertainity(newValues, savedValues) {
+    var overallDiff = 0
+    var numberOfComparisons = 0
+    var maxDiff = 0
+    var newDiff = 0
+    // compare array of values (x, y, force, acceleration, ...)
+    for (var i = 0; i < savedValues.length; i++) {
+        for (var j = 0; j < savedValues.length; j++) {
+            if (i <= j) {
+                continue
+            }
+            var diff = compareValues(savedValues[i], savedValues)
+            // console.log("Comparison between " + i + " and " + j + " --> " + diff)
+            if (!diff) {
+                continue
+            }
+            overallDiff += diff
+            maxDiff = diff > maxDiff ? diff : maxDiff
+            numberOfComparisons++
+        }
+    }
+
+    newDiff = compareValues(newValues, savedValues)
+    console.log("new Diff:\t\t\t\t" + newDiff)
+
+    if (numberOfComparisons === 0) {
+        return false
+    }
+    var averageDiff = overallDiff / numberOfComparisons
+    var avgCertainity = newDiff < averageDiff ? 1 : averageDiff / newDiff
+    var maxCertainity = newDiff < maxDiff ? 1 : maxDiff / newDiff
+    var resultingCertainity = (avgCertainity + maxCertainity) / 2
+    console.log("Average diff:\t\t\t	 " + averageDiff)
+    console.log("Average certainity:\t\t\t " + avgCertainity)
+    console.log("Max diff:\t\t\t\t " + maxDiff)
+    console.log("Max certainity:\t\t\t\t " + maxCertainity)
+    console.log("resulting certainity:\t\t\t " + resultingCertainity)
+
+    return resultingCertainity
+}
+
 function compareValues(newValues, savedValues) {
 	var score = 0;
 	for (var i = 0; i < savedValues.length; i++) {
-		var result = compute_slicing_result(JSON.parse(newValues), JSON.parse(savedValues[i]));
+		var result = compute_slicing_result(newValues, savedValues[i]);
 		score = score + result
 	}
-
 	return score/savedValues.length
 }
 
-function combineScores(xScore, yScore) {
-	return (xScore * 0.1 + yScore * 0.5) / 2
-}
+// function combineScores(xScore, yScore) {
+// 	return (xScore + yScore) / 2
+// }
 
 function compute_slicing_result(s, t) {
 	console.log('Elements in s:', s.length);

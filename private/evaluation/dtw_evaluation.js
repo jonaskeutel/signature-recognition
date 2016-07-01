@@ -3,6 +3,8 @@ const SCORE_THRESHOLD = 200
 const CERTAINITY_THRESHOLD = 0.85
 const LENGTH = 1000
 
+const dtw_slicing = require(__dirname + "/dtw_slicing_evaluation.js")
+
 module.exports = {
 	compare: compare
 }
@@ -48,8 +50,14 @@ function compare(newSignature, savedSignatures, callback) {
     var xCertainity = getCertainity(JSON.parse(newSignature.x), savedX)
     console.log()
     console.log()
+		var xSlicingCertainity = dtw_slicing.getCertainity(JSON.parse(newSignature.x), savedX)
+    console.log()
+    console.log()
     console.log("-------------------------  y  --------------------------------")
   	var yCertainity = getCertainity(JSON.parse(newSignature.y), savedY)
+    console.log()
+    console.log()
+		var ySlicingCertainity = dtw_slicing.getCertainity(JSON.parse(newSignature.y), savedY)
     console.log()
     console.log()
     console.log("-------------------------  force  --------------------------------")
@@ -82,7 +90,7 @@ function compare(newSignature, savedSignatures, callback) {
     console.log()
     console.log()
     // console.log("Got all certainities")
-    var combinedCertainity = combineCertainities(xCertainity, yCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity)
+    var combinedCertainity = combineCertainities(xCertainity, xSlicingCertainity, yCertainity, ySlicingCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity)
     console.log("combinedCertainity: ", combinedCertainity)
     console.log()
     console.log()
@@ -106,7 +114,9 @@ function compare(newSignature, savedSignatures, callback) {
         certainitySuccess: certainitySuccess,
         combinedCertainity: combinedCertainity,
         xCertainity: xCertainity,
+				xSlicingCertainity: xSlicingCertainity,
         yCertainity: yCertainity,
+				ySlicingCertainity: ySlicingCertainity,
         forceCertainity: forceCertainity,
         accelerationCertainity: accelerationCertainity,
         orientationCertainity: orientationCertainity,
@@ -253,7 +263,7 @@ function getNumStrokesCertainity(numStrokes, savedNumStrokes) {
     return resultingCertainity
 }
 
-function combineCertainities(xCertainity, yCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity) {
+function combineCertainities(xCertainity, xSlicingCertainity, yCertainity, ySlicingCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity) {
     var certainity = 0
     var numberOfCertainities = 0
     var i = 0
@@ -261,8 +271,16 @@ function combineCertainities(xCertainity, yCertainity, forceCertainity, accelera
         certainity += xCertainity
         numberOfCertainities++
     }
+		if (xSlicingCertainity) {
+        certainity += xSlicingCertainity
+        numberOfCertainities++
+    }
     if (yCertainity) {
         certainity += yCertainity
+        numberOfCertainities++
+    }
+		if (ySlicingCertainity) {
+        certainity += ySlicingCertainity
         numberOfCertainities++
     }
     if (forceCertainity) {
