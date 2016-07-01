@@ -110,6 +110,22 @@ export class ApiService {
     });
   }
 
+
+  addCertainities(certainities){
+    var headers = new Headers();
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+    return new Promise((resolve, reject) => {
+      this._http.post('/api/certainities/' + certainities.personid, this.objectToString(certainities),  {headers: headers} )
+            .subscribe(
+              data => console.log(data),
+              err => console.log(err),
+              () => console.log('Complete')
+            );
+      resolve()
+    });
+  }
+
   objectToString(body:Object){
     var converted:string = ""
 

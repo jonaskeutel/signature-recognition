@@ -2,6 +2,7 @@
 
 const user  = require(__dirname + "/routes/user.js")
 const signature  = require(__dirname + "/routes/signature.js")
+const certainities  = require(__dirname + "/routes/certainities.js")
 
 module.exports = function(app) {
 
@@ -26,5 +27,9 @@ module.exports = function(app) {
   app.route('/api/signature/:userid')
     .post(signature.newSignature)
     .get(signature.getSignatures)
+
+  app.route('/api/certainities/:userid')
+    .post(certainities.newCertainities)
+    .get(certainities.getCertainities)
 
 }

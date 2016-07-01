@@ -7,7 +7,8 @@ const q   = require('q')
 //Tables
 let tables = {
   user: 'person',
-  signature: 'signature'
+  signature: 'signature',
+  certainities: 'certainities'
 }
 
 module.exports = {
@@ -55,4 +56,3 @@ function setupDatabase () {
       console.log("DB setup error: ", err)
     })
 }
-

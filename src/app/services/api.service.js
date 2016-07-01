@@ -91,6 +91,16 @@ var ApiService = (function () {
             resolve();
         });
     };
+    ApiService.prototype.addCertainities = function (certainities) {
+        var _this = this;
+        var headers = new http_1.Headers();
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        return new Promise(function (resolve, reject) {
+            _this._http.post('/api/certainities/' + certainities.personid, _this.objectToString(certainities), { headers: headers })
+                .subscribe(function (data) { return console.log(data); }, function (err) { return console.log(err); }, function () { return console.log('Complete'); });
+            resolve();
+        });
+    };
     ApiService.prototype.objectToString = function (body) {
         var converted = "";
         for (var i = 0; i < Object.keys(body).length; i++) {
