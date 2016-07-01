@@ -238,8 +238,8 @@ function getNumStrokesCertainity(numStrokes, savedNumStrokes) {
         max = savedNumStrokes[i] > max ? savedNumStrokes[i] : max
     }
 
-    var minCertainity = numStrokes <= min ? numStrokes / min : 1 - (numStrokes / min)
-    var maxCertainity = numStrokes <= max ? numStrokes / max : 1 - (numStrokes / max)
+    var minCertainity = numStrokes <= min ? numStrokes / min : 1 / (numStrokes / min)
+    var maxCertainity = numStrokes <= max ? numStrokes / max : 1 / (numStrokes / max)
     var resultingCertainity = (minCertainity + maxCertainity) / 2
     console.log("numStrokes: \t\t\t\t" + numStrokes)
     console.log("min: \t\t\t\t\t" + min)
