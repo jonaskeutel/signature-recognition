@@ -1,5 +1,6 @@
 'use strict'
 const SCORE_THRESHOLD = 200
+const CERTAINITY_THRESHOLD = 0.85
 const LENGTH = 1000
 
 module.exports = {
@@ -85,7 +86,7 @@ function compare(newSignature, savedSignatures, callback) {
     console.log("combinedCertainity: ", combinedCertainity)
     console.log()
     console.log()
-    var certainitySuccess = combinedCertainity > 0.8 ? true : false
+    var certainitySuccess = combinedCertainity >= CERTAINITY_THRESHOLD ? true : false
 
     //  	var combinedScore = combineScores(xResult, yResult, forceResult, accelerationResult, orientationResult, widthResult, heightResult)
  //  	var success = combinedScore < SCORE_THRESHOLD ? true : false
@@ -265,32 +266,32 @@ function combineCertainities(xCertainity, yCertainity, forceCertainity, accelera
         numberOfCertainities++
     }
     if (forceCertainity) {
-        certainity += forceCertainity
-        numberOfCertainities++
+        certainity += 5 * forceCertainity
+        numberOfCertainities += 5
     }
     if (accelerationCertainity) {
-        certainity += accelerationCertainity
-        numberOfCertainities++
+        certainity += 2 * accelerationCertainity
+        numberOfCertainities += 2
     }
     if (orientationCertainity) {
-        certainity += orientationCertainity
-        numberOfCertainities++
+        certainity += 0.1 * orientationCertainity
+        numberOfCertainities += 0.1
     }
     if (widthCertainity) {
-        certainity += widthCertainity
-        numberOfCertainities++
+        certainity += 3 * widthCertainity
+        numberOfCertainities += 3
     }
     if (heightCertainity) {
-        certainity += heightCertainity
-        numberOfCertainities++
+        certainity += 10 * heightCertainity
+        numberOfCertainities += 10
     }
     if (durationCertainity) {
-        certainity += durationCertainity
-        numberOfCertainities++
+        certainity += 10 * durationCertainity
+        numberOfCertainities += 10
     }
     if (numStrokesCertainity) {
-        certainity += numStrokesCertainity
-        numberOfCertainities++
+        certainity += 10 * numStrokesCertainity
+        numberOfCertainities += 10
     }
 
     if (numberOfCertainities === 0) {
