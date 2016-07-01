@@ -20,7 +20,7 @@ class CanvasDrawer {
   private touchesOverTime = []
   private orientationOverTime = []
   private accelerationOverTime = []
-  private numStrokes = 0;
+  public numStrokes = 0;
   private lastBegin = Date.now()
   private lastEnd = null
   private secondLastEnd = null
@@ -157,7 +157,7 @@ class CanvasDrawer {
         this.currentTouch.splice(ind, 1)
 
     }
-    this.numStrokes--;
+    // this.numStrokes--;
     var  thing = this;
 
   }
@@ -169,8 +169,9 @@ class CanvasDrawer {
   }
 
   clear(){
-    let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d");
-    context.clearRect(0, 0, this.canvas.nativeElement.width , this.canvas.nativeElement.height);
+    let context:CanvasRenderingContext2D = this.canvas.nativeElement.getContext("2d")
+    context.clearRect(0, 0, this.canvas.nativeElement.width , this.canvas.nativeElement.height)
+    this.numStrokes = 0
   }
 
   addEntryToArrayAtIndex(entry, array, index) {
@@ -336,7 +337,8 @@ export class SignatureComponent implements OnInit, AfterViewInit{
 
   getOrientation(){
     var cutOrientation = this.drawable.normalizedOrientation.slice(0, this.getTouches().length)
-    for (let i = 0; i < this.getTouches().length; i++) {
+
+    while (cutOrientation.length < this.getTouches().length) {
         cutOrientation.push(null)
     }
     return cutOrientation
@@ -344,7 +346,8 @@ export class SignatureComponent implements OnInit, AfterViewInit{
 
   getAcceleration(){
     var cutAcceleration = this.drawable.normalizedAcceleration.slice(0, this.getTouches().length)
-    for (let i = 0; i < this.getTouches().length; i++) {
+
+    while (cutAcceleration.length < this.getTouches().length) {
         cutAcceleration.push(null)
     }
     return cutAcceleration
@@ -362,6 +365,10 @@ export class SignatureComponent implements OnInit, AfterViewInit{
       var min = Math.min.apply(null, yValues)
       var max = Math.max.apply(null, yValues)
       return Math.round(max - min)
+  }
+
+  getNumStrokes() {
+      return this.drawable.numStrokes
   }
 
 }

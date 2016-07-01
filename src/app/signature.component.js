@@ -127,7 +127,7 @@ var CanvasDrawer = (function () {
             if (ind > -1)
                 this.currentTouch.splice(ind, 1);
         }
-        this.numStrokes--;
+        // this.numStrokes--;
         var thing = this;
     };
     CanvasDrawer.prototype.addTouchPoint = function (touchpoint, timestamp) {
@@ -138,6 +138,7 @@ var CanvasDrawer = (function () {
     CanvasDrawer.prototype.clear = function () {
         var context = this.canvas.nativeElement.getContext("2d");
         context.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+        this.numStrokes = 0;
     };
     CanvasDrawer.prototype.addEntryToArrayAtIndex = function (entry, array, index) {
         // console.log("trying to add " + entry + " to " + array + " at " + index);
@@ -286,14 +287,14 @@ var SignatureComponent = (function () {
     };
     SignatureComponent.prototype.getOrientation = function () {
         var cutOrientation = this.drawable.normalizedOrientation.slice(0, this.getTouches().length);
-        for (var i = 0; i < this.getTouches().length; i++) {
+        while (cutOrientation.length < this.getTouches().length) {
             cutOrientation.push(null);
         }
         return cutOrientation;
     };
     SignatureComponent.prototype.getAcceleration = function () {
         var cutAcceleration = this.drawable.normalizedAcceleration.slice(0, this.getTouches().length);
-        for (var i = 0; i < this.getTouches().length; i++) {
+        while (cutAcceleration.length < this.getTouches().length) {
             cutAcceleration.push(null);
         }
         return cutAcceleration;
@@ -309,6 +310,9 @@ var SignatureComponent = (function () {
         var min = Math.min.apply(null, yValues);
         var max = Math.max.apply(null, yValues);
         return Math.round(max - min);
+    };
+    SignatureComponent.prototype.getNumStrokes = function () {
+        return this.drawable.numStrokes;
     };
     __decorate([
         core_1.Input(), 
