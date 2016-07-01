@@ -23,7 +23,8 @@ function newSignature(req, res) {
             req.body.gyroscope,
     		req.body.duration,
             req.body.width,
-            req.body.height
+            req.body.height,
+            req.body.strokes
     	]
     	db.newSignature(newSignature)
         .then(function() {

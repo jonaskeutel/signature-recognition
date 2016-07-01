@@ -29,7 +29,7 @@ var ApiService = (function () {
             resolve();
         });
     };
-    ApiService.prototype.addSignature = function (touches, orientation, acceleration, width, height) {
+    ApiService.prototype.addSignature = function (touches, orientation, acceleration, width, height, strokes) {
         var _this = this;
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -43,6 +43,7 @@ var ApiService = (function () {
             duration: touches.length * 10,
             height: height,
             width: width,
+            strokes: strokes,
         };
         data = this.normalizeSignature(data);
         console.log(data);
@@ -66,7 +67,7 @@ var ApiService = (function () {
                 .subscribe(function (data) { return resolve(JSON.parse(data._body)); }, function (err) { return console.log(err); }, function () { });
         });
     };
-    ApiService.prototype.checkSignature = function (touches, orientation, acceleration, width, height, userId) {
+    ApiService.prototype.checkSignature = function (touches, orientation, acceleration, width, height, strokes, userId) {
         var _this = this;
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -79,6 +80,7 @@ var ApiService = (function () {
             gyroscope: orientation,
             width: width,
             height: height,
+            strokes: strokes,
             duration: touches.length * 10
         };
         data = this.normalizeSignature(data);
@@ -108,7 +110,7 @@ var ApiService = (function () {
         var minX = Math.min.apply(Math, signature.x.filter(function (elem) { return elem != null; }));
         var minY = Math.min.apply(Math, signature.y.filter(function (elem) { return elem != null; }));
         var newX = [], newY = [];
-        console.log(signature);
+        // console.log(signature)
         for (var i = 0; i < dataPoints; i++) {
             newX.push(signature.x[i] ? signature.x[i] - minX : null);
             newY.push(signature.x[i] ? signature.y[i] - minY : null);

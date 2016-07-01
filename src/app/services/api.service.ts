@@ -28,7 +28,7 @@ export class ApiService {
     });
   }
 
-  addSignature(touches:Array, orientation:Array, acceleration:Array, width, height){
+  addSignature(touches:Array, orientation:Array, acceleration:Array, width, height, strokes){
     var headers = new Headers();
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -42,6 +42,7 @@ export class ApiService {
       duration: touches.length * 10,
       height: height,
       width: width,
+      strokes: strokes,
     }
     data = this.normalizeSignature(data)
 
@@ -80,7 +81,7 @@ export class ApiService {
     });
   }
 
-  checkSignature(touches:Array, orientation:Array, acceleration:Array, width, height, userId:String){
+  checkSignature(touches:Array, orientation:Array, acceleration:Array, width, height, strokes, userId:String){
     var headers = new Headers()
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -93,6 +94,7 @@ export class ApiService {
       gyroscope: orientation,
       width: width,
       height: height,
+      strokes,
       duration: touches.length * 10
     }
     data = this.normalizeSignature(data)
@@ -132,7 +134,7 @@ export class ApiService {
     var minY = Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
 
     var newX = [], newY = []
-    console.log(signature)
+    // console.log(signature)
     for(var i=0; i<dataPoints; i++){
       newX.push( signature.x[i] ? signature.x[i] - minX : null )
       newY.push( signature.x[i] ? signature.y[i] - minY : null)

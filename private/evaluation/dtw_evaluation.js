@@ -18,6 +18,7 @@ function compare(newSignature, savedSignatures, callback) {
     var savedAcceleration = []
     var savedOrientation = []
     var savedDuration = []
+    var savedNumStrokes = []
 
   	for (var i = savedSignatures.length - 1; i >= 0; i--) {
   		savedX.push(JSON.parse(savedSignatures[i].x))
@@ -28,6 +29,7 @@ function compare(newSignature, savedSignatures, callback) {
         savedAcceleration.push(JSON.parse(savedSignatures[i].acceleration))
         savedOrientation.push(JSON.parse(savedSignatures[i].gyroscope))
         savedDuration.push(savedSignatures[i].duration)
+        savedNumStrokes.push(savedSignatures[i].strokes)
   	}
     console.log("everything parsed for savedSignatures")
 
@@ -72,9 +74,17 @@ function compare(newSignature, savedSignatures, callback) {
     console.log()
     console.log("-------------------------  duration  --------------------------------")
     var durationCertainity = getCertainity(newSignature.duration, savedDuration)
+    console.log()
+    console.log()
+    console.log("-------------------------  numStrokes  --------------------------------")
+    var numStrokesCertainity = getNumStrokesCertainity(newSignature.strokes, savedNumStrokes)
+    console.log()
+    console.log()
     // console.log("Got all certainities")
-    var combinedCertainity = combineCertainities(xCertainity, yCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity)
+    var combinedCertainity = combineCertainities(xCertainity, yCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity)
     console.log("combinedCertainity: ", combinedCertainity)
+    console.log()
+    console.log()
     var certainitySuccess = combinedCertainity > 0.8 ? true : false
 
     //  	var combinedScore = combineScores(xResult, yResult, forceResult, accelerationResult, orientationResult, widthResult, heightResult)
@@ -102,8 +112,9 @@ function compare(newSignature, savedSignatures, callback) {
         widthCertainity: widthCertainity,
         heightCertainity: heightCertainity,
         durationCertainity: durationCertainity,
+        numStrokesCertainity: numStrokesCertainity,
   	}
-    console.log("Result: " + result)
+    // console.log("Result: " + result)
 	callback(result)
 }
 
@@ -218,7 +229,30 @@ function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitu
 	return score/savedValues.length
 }
 
-function combineCertainities(xCertainity, yCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity) {
+function getNumStrokesCertainity(numStrokes, savedNumStrokes) {
+    var min = Infinity
+    var max = 0
+    for (var i = 0; i < savedNumStrokes.length; i++) {
+        min = savedNumStrokes[i] < min ? savedNumStrokes[i] : min
+        max = savedNumStrokes[i] > max ? savedNumStrokes[i] : max
+    }
+
+    var minCertainity = numStrokes <= min ? numStrokes / min : 1 - (numStrokes / min)
+    var maxCertainity = numStrokes <= max ? numStrokes / max : 1 - (numStrokes / max)
+    var resultingCertainity = (minCertainity + maxCertainity) / 2
+    console.log("numStrokes: \t\t\t\t" + numStrokes)
+    console.log("min: \t\t\t\t\t" + min)
+    console.log("max: \t\t\t\t\t" + max)
+    console.log("minCertainity: \t\t\t\t" + minCertainity)
+    console.log("maxCertainity: \t\t\t\t" + maxCertainity)
+    console.log("resultingCertainity: \t\t\t" + resultingCertainity)
+    if (numStrokes >= min && numStrokes <= max) {
+        return 1
+    }
+    return resultingCertainity
+}
+
+function combineCertainities(xCertainity, yCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity) {
     var certainity = 0
     var numberOfCertainities = 0
     var i = 0
@@ -252,6 +286,10 @@ function combineCertainities(xCertainity, yCertainity, forceCertainity, accelera
     }
     if (durationCertainity) {
         certainity += durationCertainity
+        numberOfCertainities++
+    }
+    if (numStrokesCertainity) {
+        certainity += numStrokesCertainity
         numberOfCertainities++
     }
 

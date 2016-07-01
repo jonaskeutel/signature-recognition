@@ -71,7 +71,7 @@ export class ComparisonComponent implements OnInit, OnActivate {
       console.log("width: " + this.signatureComponent.getWidth())
       console.log("height: " + this.signatureComponent.getHeight())
       console.log("num strokes: " + this.signatureComponent.getNumStrokes())
-      this._api.checkSignature(this.signatureComponent.getTouches(), this.signatureComponent.getOrientation(), this.signatureComponent.getAcceleration(), this.signatureComponent.getWidth(), this.signatureComponent.getHeight(), this.userid)
+      this._api.checkSignature(this.signatureComponent.getTouches(), this.signatureComponent.getOrientation(), this.signatureComponent.getAcceleration(), this.signatureComponent.getWidth(), this.signatureComponent.getHeight(), this.signatureComponent.getNumStrokes(), this.userid)
   }
 
   clear(){
