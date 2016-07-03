@@ -300,7 +300,7 @@ function map_extrema_lists(list_s, list_t) {
 	          var indices = []
 	          for (var j = i; j < path.length; j++) {
 	            if (path[i][1] == path[j][1]) {
-	              indices.push(j);
+	              indices.push(path[j][0]);
 	            }
 	          }
 	          var distances = []
