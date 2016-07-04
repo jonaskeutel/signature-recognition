@@ -10,16 +10,15 @@ db.getAllUser()
     console.log(user)
     db.getSignatures(66)
       .then( (signatures_1) => {
-        db.getSignatures(65)
+        db.getSignatures(66)
           .then( (signatures_2) => {
-            var savedX = []
-            var savedY = []
-            for (var i = signatures_1.length - 1; i >= 0; i--) {
-          		savedX.push(JSON.parse(signatures_1[i].x))
-          		savedY.push(JSON.parse(signatures_1[i].y))
-            }
-            var certainity = dtw_slicing.getCertainity(JSON.parse(signatures_2[0].x), savedX)
-            console.log('certainity:', certainity);
+              dtw_slicing.compare(signatures_2[0], signatures_1, function(result) {
+                console.log('# Result #');
+                console.log('success:', result.success);
+                console.log('combinedScore:', result.combinedScore);
+                console.log('x:', result.x);
+                console.log('y:', result.y);
+              })
           })
       })
     })
