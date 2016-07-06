@@ -398,7 +398,7 @@ function calculate_costs(s, t, cutting_points) {
 	var costs = undefined
 	for (var i = 0; i < cutting_points[0].length - 1; i++) {
 	  var s_slice = s.slice(cutting_points[0][i], cutting_points[0][i+1])
-	  var t_slice = t.slice(cutting_points[0][i], cutting_points[0][i+1])
+	  var t_slice = t.slice(cutting_points[1][i], cutting_points[1][i+1])
 	  costs = dtw.compute(s_slice, t_slice)
 	  sum = sum + costs
 	  console.log('Costs slice_' + (i + 1) + ':', costs)
