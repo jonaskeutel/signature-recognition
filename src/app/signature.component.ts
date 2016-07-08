@@ -174,13 +174,13 @@ class CanvasDrawer {
     this.numStrokes = 0
   }
 
-  addEntryToArrayAtIndex(entry, array, index) {
+  addEntryToArrayAtIndex(entry, array, index, filler = null) {
     // console.log("trying to add " + entry + " to " + array + " at " + index);
     if (array[index]) {
         return;
     }
     for (var i = array.length; i < index; i++) {
-        array[i] = null;
+        array[i] = filler;
     }
     array[index] = entry;
   }
@@ -257,11 +257,12 @@ export class SignatureComponent implements OnInit, AfterViewInit{
     var that = this;
 
     window.addEventListener('deviceorientation', function(event) {
-      var entry = Math.sqrt(event.alpha*event.alpha + event.beta*event.beta + event.gamma*event.gamma)
+    //   var entry = Math.sqrt(event.alpha*event.alpha + event.beta*event.beta + event.gamma*event.gamma)
+      var entry = event.alpha
       that.drawable.lastOrientation = entry
       var index = that.drawable.getIndexForTimestamp(Date.now())
       if (index) {
-          that.drawable.addEntryToArrayAtIndex(entry, that.drawable.normalizedOrientation, index)
+          that.drawable.addEntryToArrayAtIndex(entry, that.drawable.normalizedOrientation, index, entry)
       }
     })
 
@@ -339,7 +340,7 @@ export class SignatureComponent implements OnInit, AfterViewInit{
     var cutOrientation = this.drawable.normalizedOrientation.slice(0, this.getTouches().length)
 
     while (cutOrientation.length < this.getTouches().length) {
-        cutOrientation.push(null)
+        cutOrientation.push(this.drawable.lastOrientation)
     }
     return cutOrientation
   }

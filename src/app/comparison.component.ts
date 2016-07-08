@@ -67,6 +67,7 @@ export class ComparisonComponent implements OnInit, OnActivate {
   compare(){
       console.log("touches: " + this.signatureComponent.getTouches().length)
       console.log("orientation: " + this.signatureComponent.getOrientation().length)
+      console.log(this.signatureComponent.getOrientation())
       console.log("acceleration: " + this.signatureComponent.getAcceleration().length)
       console.log("width: " + this.signatureComponent.getWidth())
       console.log("height: " + this.signatureComponent.getHeight())
