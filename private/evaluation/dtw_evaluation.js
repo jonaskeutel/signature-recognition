@@ -51,8 +51,7 @@ function compare(newSignature, savedSignatures, callback) {
     console.log()
     console.log()
     console.log("-------------------------  x slicing --------------------------------")
-    // var xSlicingCertainity = dtw_slicing.getCertainity(JSON.parse(newSignature.x), savedX)
-	var xSlicingCertainity = false
+	var xSlicingCertainity = dtw_slicing.getCertainity(JSON.parse(newSignature.x), savedX)
     console.log()
     console.log()
     console.log("-------------------------  y  --------------------------------")
@@ -60,8 +59,7 @@ function compare(newSignature, savedSignatures, callback) {
     console.log()
     console.log()
     console.log("-------------------------  y slicing  --------------------------------")
-    // var ySlicingCertainity = dtw_slicing.getCertainity(JSON.parse(newSignature.y), savedY)
-    var ySlicingCertainity = false
+    var ySlicingCertainity = dtw_slicing.getCertainity(JSON.parse(newSignature.y), savedY)
     console.log()
     console.log()
     console.log("-------------------------  force  --------------------------------")
