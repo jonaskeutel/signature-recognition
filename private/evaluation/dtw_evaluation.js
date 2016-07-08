@@ -63,7 +63,7 @@ function compare(newSignature, savedSignatures, callback) {
     console.log()
     console.log()
     console.log("-------------------------  force  --------------------------------")
-    var forceCertainity = getCertainity(JSON.parse(newSignature.force), savedForce)
+    var forceCertainity = getForceCertainity(JSON.parse(newSignature.force), savedForce)
     console.log()
     console.log()
     console.log("-------------------------  acceleration  --------------------------------")
@@ -262,6 +262,33 @@ function getNumStrokesCertainity(numStrokes, savedNumStrokes) {
     if (numStrokes >= min && numStrokes <= max) {
         return 1
     }
+    return resultingCertainity
+}
+
+function getForceCertainity(newForce, savedForce) {
+    var forceCertainity = getForceCertainity(newForce, savedForce)
+
+    var minNew = Math.min.apply(null, newForce)
+    var maxNew = Math.max.apply(null, newForce)
+    var minOld = Infinity
+    var maxOld = 0
+    for (var i = 0; i < savedForce.length; i++) {
+        var currentMin = Math.min.apply(null, savedForce[i])
+        minOld = currentMin < minOld ? currentMin : minOld
+        var currentMax = Math.max.apply(null, savedForce[i])
+        maxOld = currentMax > maxOld ? currentMax : maxOld
+    }
+    console.log("minOld: \t\t\t\t" + minOld)
+    console.log("maxOld: \t\t\t\t" + maxOld)
+
+    var minCertainity = minNew <= minOld ? minNew / minOld : 1 / (minNew / minOld)
+    var maxCertainity = maxNew <= maxOld ? maxNew / maxOld : 1 / (maxNew / maxOld)
+    var resultingCertainity = (minCertainity + maxCertainity) / 2
+    console.log("minCertainity: \t\t\t\t" + minCertainity)
+    console.log("maxCertainity: \t\t\t\t" + maxCertainity)
+    console.log("min/max resultingCertainity: \t" + resultingCertainity)
+    var resultingCertainity = (forceCertainity + resultingCertainity) / 2
+    console.log("min/max resultingCertainity: \t" + resultingCertainity)
     return resultingCertainity
 }
 
