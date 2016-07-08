@@ -96,11 +96,13 @@ function compute_slicing_result(s, t) {
 	// console.log('Elements in t:', t.length);
 	s = s.filter(function(n){ return n != undefined })
 	t = t.filter(function(n){ return n != undefined })
+    console.log("filter successful")
 	// console.log('Numeric elements in s:', s.length);
 	// console.log('Numeric elements in t:', t.length);
 
 	var extrema_s = prepare_slicing(s)
 	var extrema_t = prepare_slicing(t)
+    console.log("prepare slicing successful")
 	// console.log(extrema_s);
 	// console.log(extrema_t);
 
@@ -109,7 +111,8 @@ function compute_slicing_result(s, t) {
 	extrema_t.minlist = mapped_extrema_minlists[1]
 	var mapped_extrema_maxlists = map_extrema_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = mapped_extrema_maxlists[0]
-	extrema_t.maxlist = mapped_extrema_maxlists[1]
+    extrema_t.maxlist = mapped_extrema_maxlists[1]
+    console.log("mapping extrema successful")
 	// console.log('dtw mapped minlists:');
   // console.log(extrema_s.minlist);
   // console.log(extrema_t.minlist);
@@ -122,6 +125,7 @@ function compute_slicing_result(s, t) {
 	var cleaned_extrema_maxlists = clean_up_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = cleaned_extrema_maxlists[0]
 	extrema_t.maxlist = cleaned_extrema_maxlists[1]
+    console.log("cleaned extrema successful")
 	// console.log('dtw mapped minlists cleaned:');
 	// console.log(extrema_s.minlist);
 	// console.log(extrema_t.minlist);
@@ -129,11 +133,14 @@ function compute_slicing_result(s, t) {
 	// console.log(extrema_s.maxlist);
 	// console.log(extrema_t.maxlist);
 	var cutting_points = determine_cutting_points(extrema_s, extrema_t)
+    console.log("getting cutting points successful")
 	// console.log('cutting points:');
 	// console.log(cutting_points[0]);
 	// console.log(cutting_points[1]);
 	var costs = calculate_costs(s, t, cutting_points)
+    console.log("calculate costs (part 1) successful")
 	var costs_all = dtw.compute(s, t)
+    console.log("calculate costs (part 1) successful")
 	// console.log('Costs all:', costs_all);
 
 	return costs
