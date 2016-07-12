@@ -1,6 +1,7 @@
 'use strict'
 const db  = require(__dirname + "/../database/dbinterface.js")
 const evaluation = require(__dirname + "/../evaluation/evaluation.js")
+const neural_network = require(__dirname + "/../evaluation/neural_network_wrapper.js")
 
 module.exports = {
   newSignature: newSignature,
@@ -53,32 +54,51 @@ function checkSignature(req, res) {
     !req.body.acceleration || !req.body.gyroscope || !req.body.duration) {
         return res.json({"status": "error", "message": "missing a parameter"})
     } else {
-      db.getSignatures(req.body.personid)
-        .then(function(savedSignatures) {
-          evaluation.compare(req.body, savedSignatures).done(function(result) {
-            if (result) {
-              return res.json(result)
-              // var newSignature = [
-              //   req.body.personID,
-              //   req.body.x,
-              //   req.body.y,
-              //   req.body.force,
-              //   req.body.acceleration,
-              //   req.body.gyroscope,
-              //   req.body.duration
-              // ]
-              // db.newSignature(newSignature)
-              //   .then(function() {
-              //     return res.json({"status": "success", "message": "signature check successful and new signature successfully created"})
-              //   }, function(err) {
-              //     return res.json({"status": "error", "message": "signature check successful, but new signature not created"})
-              //   })
-            } else {
-              return res.json({"status": "error", "message": "signature check not successful"})
-            }
+      db.getAllUser()
+          .then( (all_user) => {
+             var user_index = 0;
+             for(var i=0; i<all_user.length; i++){
+               if(all_user[i].id == req.body.personid){
+                 user_index = i;
+                 break;
+               }
+             }
+              db.getSignatures(req.body.personid)
+                  .then(function(savedSignatures) {
+                    evaluation.compare(req.body, savedSignatures).done(function(result) {
+                      
+                      if (result) {
+                        var neural = neural_network.testSignature(req.body)
+                        console.log(neural)
+                        var prob = (1 * result.dtw.combinedCertainity + 1 * neural[user_index] ) / 2;
+                        console.log(prob, user_index)
+                        return res.json({
+                          probability: prob
+                        })
+                        // var newSignature = [
+                        //   req.body.personID,
+                        //   req.body.x,
+                        //   req.body.y,
+                        //   req.body.force,
+                        //   req.body.acceleration,
+                        //   req.body.gyroscope,
+                        //   req.body.duration
+                        // ]
+                        // db.newSignature(newSignature)
+                        //   .then(function() {
+                        //     return res.json({"status": "success", "message": "signature check successful and new signature successfully created"})
+                        //   }, function(err) {
+                        //     return res.json({"status": "error", "message": "signature check successful, but new signature not created"})
+                        //   })
+                      } else {
+                        return res.json({"status": "error", "message": "signature check not successful"})
+                      }
+                    })
+                  }, function(err) {
+                    return res.json({"status": "error", "message": "DB error getSignatures"})
+                  })
+
           })
-        }, function(err) {
-          return res.json({"status": "error", "message": "DB error getSignatures"})
-        })
+      
     }
 }

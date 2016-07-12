@@ -5,7 +5,10 @@ var Canvas          = require('canvas')
 var evaluation      = require('./evaluation.js')
 var q               = require('q')
 
+var network = null;
+
 module.exports = {
+  testSignature: testSign,
   init: function(){
     const deferred = q.defer()
     console.log(" -----  INIT NEURAL NETWORK -----")
@@ -19,19 +22,29 @@ module.exports = {
             //   .then( (signatures) => {
             //     featurizeSignatures(signatures)
             //   })
-            train_all(user)
-              .then(deferred.resolve)
+            // train_all(user)
+            //   .then(deferred.resolve)
+            network = neural_network.existing()
+            
+            deferred.resolve()
           })
     // })
 
     return deferred.promise
-  },
-  test: function(signature){
-    return network.activate(signature)
   }
 }
 
-var network = null;
+
+function testSign(signature){
+    signature.width = parseInt(signature.width)
+    signature.height = parseInt(signature.height)
+    signature.duration = parseInt(signature.duration)
+    signature.strokes = parseInt(signature.strokes)
+
+    signature = featurize_signature( signature , null)
+
+    return network.activate(signature)
+  }
 
 function train_all(user){
   const deferred = q.defer()
@@ -61,7 +74,7 @@ function train_all(user){
       // for(var u=0; u<all.length;u++){
       //   console.log(u + '. User: ' + network.activate( all[u][0]) )
       // }
-      fs.writeFile(__dirname + '/network.json', network.toJson());
+      fs.writeFile(__dirname + '/network.json', JSON.stringify( network.toJSON() ) );
       deferred.resolve(network)
     })
     .catch(console.log)
@@ -141,11 +154,12 @@ function featurize_signature(signature, dtw_result){
 
 
 function drawSignature(signature){
+  try{
   canvas = new Canvas(signature.width, signature.height)
   ctx = canvas.getContext('2d');
-  signature.x = JSON.parse(signature.x)
-  signature.y = JSON.parse(signature.y)
-  signature.force = JSON.parse(signature.force)
+  signature.x = typeof signature.x == 'object' ? signature.x : JSON.parse(signature.x)
+  signature.y = typeof signature.y == 'object' ? signature.y : JSON.parse(signature.y) 
+  signature.force = typeof signature.force == 'object' ? signature.force : JSON.parse(signature.force)
   
   var currTouch = signature
   for(var i=0; i<signature.x.length; i++){
@@ -164,6 +178,7 @@ function drawSignature(signature){
           ctx.stroke();
       }
   }
+  }catch(err){console.log(err)}
   // fs.writeFile('out.svg', canvas.toBuffer());
   return canvas
 }
@@ -199,12 +214,15 @@ const raster_width = 25
 const raster_height = 25
 
 function blackDensity(canvas, signature){
+  
+  try{
   var width_step = Math.ceil(signature.width / raster_width);
   var height_step = Math.ceil(signature.height / raster_height);
   var grid = create_grid(signature.width, signature.height)
   var vert_vector = grid[0]
   grid.splice(0,1)
   var image_data = canvas.getContext('2d').getImageData(0,0,signature.width, signature.height);
+  
   // var densities = []
   var width = signature.width
   var height = signature.height
@@ -214,6 +232,7 @@ function blackDensity(canvas, signature){
   var y_coord = 0;
   var x_coord = 0;
   var densities = []
+
   for(var row = 0; row<vert_vector.length; row++){
     var dens_row = array_of_length(raster_width, 0);
     for(var y = 0; y < vert_vector[row]; y++){
@@ -238,8 +257,9 @@ function blackDensity(canvas, signature){
         y_coord++;
     }
     densities.push(dens_row)
+  
   }
-
+  }catch(err){console.log(err)}
   // for(var y = 0; y<signature.height; y++){
   //     var y_index = y % height_step == 0 ? (y / height_step) : Math.max( Math.floor( (y / height_step) ), 0);
   //     y_index = Math.min(y_index, raster_height)
@@ -277,6 +297,7 @@ function blackDensity(canvas, signature){
 }
 
 function create_grid(width, height){
+  try{
   var grid = []
   var vert = []
   var width_step = Math.floor(width / raster_width);
@@ -307,8 +328,9 @@ function create_grid(width, height){
       if(x == raster_width-1){
         grid[y][x] += left_row_elems
       }
-    } 
+    }
   }
+  }catch(err){console.log(err)}
 
   return [vert].concat(grid)
 }

@@ -26,16 +26,17 @@ app.use( express.static(__dirname + '/node_modules') )
 require('./private/routes.js')(app)
 
 // Database initialization
+console.log(neural_network)
 dbInit.init()
   .then(neural_network.init)
   .then(function(){
        // --- server and https setup
       // app.listen(port)
-      app.listen(process.env.PORT || port);
-      console.log("Listens on Port " + port)
   })
   .catch(function(err){console.log(err)})
 
 
+      app.listen(process.env.PORT || port);
+      console.log("Listens on Port " + port)
 
 

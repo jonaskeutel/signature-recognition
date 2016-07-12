@@ -39,3 +39,6 @@ jspm_packages
 .vscode
 *.svg
 
+private/evaluation/network.js
+private/evaluation/network.json
+private/.DS_Store

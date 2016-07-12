@@ -7,9 +7,12 @@ const Network = synaptic.Network
 const Trainer = synaptic.Trainer
 const Architect = synaptic.Architect;
 
+const exst_network = require(__dirname + "/network.js") 
+
 module.exports = {
   create: newNetwork,
-  create_all: newNetworkAll
+  create_all: newNetworkAll,
+  existing: getExistingNetwork
 }
 
 // var historicMatch = {
@@ -75,6 +78,14 @@ function newNetwork(signatures){
   }
 
   return network
+}
+
+function getExistingNetwork(){
+  console.log("here")
+  try{
+    var imported = Network.fromJSON(exst_network);
+  }catch(err) {console.log(err)}
+  return imported
 }
 
 function newNetworkAll(all_signatures){
