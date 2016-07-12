@@ -5,22 +5,37 @@ var Canvas          = require('canvas')
 var evaluation      = require('./evaluation.js')
 var q               = require('q')
 
-db.init()
-  .then( () => {
+module.exports = {
+  init: function(){
+    const deferred = q.defer()
+    console.log(" -----  INIT NEURAL NETWORK -----")
+    // db.init()
+    //   .then( () => {
 
-db.getAllUser()
-  .then( (user) => {
-    console.log(user)
-    // db.getSignatures(66)
-    //   .then( (signatures) => {
-    //     featurizeSignatures(signatures)
-    //   })
-    train_all(user)
-  })
-})
+        db.getAllUser()
+          .then( (user) => {
+            console.log(user)
+            // db.getSignatures(66)
+            //   .then( (signatures) => {
+            //     featurizeSignatures(signatures)
+            //   })
+            train_all(user)
+              .then(deferred.resolve)
+          })
+    // })
 
+    return deferred.promise
+  },
+  test: function(signature){
+    return network.activate(signature)
+  }
+}
+
+var network = null;
 
 function train_all(user){
+  const deferred = q.defer()
+
   var promises = []
   for(var i=0; i<user.length; i++){
     promises.push( db.getSignatures(user[i].id) )
@@ -40,14 +55,18 @@ function train_all(user){
         all.push(user_signs)
       }
 
-      var network = neural_network.create_all(all)
+      network = neural_network.create_all(all)
       // var check_sign = featurize_signature( result[0][0], null )
 
-      for(var u=0; u<all.length;u++){
-        console.log(u + '. User: ' + network.activate( all[u][0]) )
-      }
+      // for(var u=0; u<all.length;u++){
+      //   console.log(u + '. User: ' + network.activate( all[u][0]) )
+      // }
+      fs.writeFile(__dirname + '/network.json', network.toJson());
+      deferred.resolve(network)
     })
     .catch(console.log)
+
+    return deferred.promise
 }
 
 function featurizeSignatures(signatures){
@@ -190,7 +209,7 @@ function blackDensity(canvas, signature){
   var width = signature.width
   var height = signature.height
   var pixel_index = 0;
-  console.log(canvas.width, canvas.height, height_step, width_step)
+  // console.log(canvas.width, canvas.height, height_step, width_step)
   // console.log(grid)
   var y_coord = 0;
   var x_coord = 0;
@@ -253,7 +272,7 @@ function blackDensity(canvas, signature){
       result.push(densities[row][col])
     }
   }
-  console.log(densities.length + " / " + densities[1].length ," Result: " + result.length)
+  // console.log(densities.length + " / " + densities[1].length ," Result: " + result.length)
   return result
 }
 

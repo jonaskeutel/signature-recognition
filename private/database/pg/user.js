@@ -42,7 +42,7 @@ function get(id) {
 function all(callback) {
   const deferred = q.defer()
 
-  global.instance.query('SELECT * FROM '+ global.tables.user, function(err, result){
+  global.instance.query('SELECT * FROM '+ global.tables.user + ' order by id', function(err, result){
     if (err) {
       console.log('DB error (user- all):', err)
       deferred.reject(err)

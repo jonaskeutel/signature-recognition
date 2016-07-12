@@ -85,7 +85,7 @@ function newNetworkAll(all_signatures){
     for(var i=0; i<signatures.length; i++){
       var output = array_of_length(all_signatures.length, 0)
       output[j] = 1
-      console.log(output)
+      
       trainingSet.push( {
         "input": signatures[i],
         "output": output
@@ -93,7 +93,7 @@ function newNetworkAll(all_signatures){
     }
   }
  
-  console.log("Training set " + trainingSet.length)
+  // console.log("Training set " + trainingSet.length)
   try{
   var network = new Architect.Perceptron(trainingSet[0].input.length, 10 ,all_signatures.length)
   var trainer = new Trainer(network)
