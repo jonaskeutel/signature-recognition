@@ -8,7 +8,8 @@ const Trainer = synaptic.Trainer
 const Architect = synaptic.Architect;
 
 module.exports = {
-  create: newNetwork
+  create: newNetwork,
+  create_all: newNetworkAll
 }
 
 // var historicMatch = {
@@ -52,13 +53,13 @@ function newNetwork(signatures){
     })
   }
  
-  // console.log(trainingSet)
+  console.log("Training set " + trainingSet.length)
   try{
-  var network = new Architect.Perceptron(trainingSet[0].input.length, 6,6,1)
+  var network = new Architect.Perceptron(trainingSet[0].input.length, 10 ,1)
   var trainer = new Trainer(network)
   
   trainer.train(trainingSet, {
-    rate: .0003,
+    rate: .00003,
     iteration: 100000,
     log: 100,
     schedule: {
@@ -74,4 +75,54 @@ function newNetwork(signatures){
   }
 
   return network
+}
+
+function newNetworkAll(all_signatures){
+  var trainingSet = []
+  for(var j=0; j<all_signatures.length; j++){
+    signatures = all_signatures[j]
+
+    for(var i=0; i<signatures.length; i++){
+      var output = array_of_length(all_signatures.length, 0)
+      output[j] = 1
+      console.log(output)
+      trainingSet.push( {
+        "input": signatures[i],
+        "output": output
+      })
+    }
+  }
+ 
+  console.log("Training set " + trainingSet.length)
+  try{
+  var network = new Architect.Perceptron(trainingSet[0].input.length, 10 ,all_signatures.length)
+  var trainer = new Trainer(network)
+  
+  trainer.train(trainingSet, {
+    rate: .003,
+    iteration: 1000,
+    log: 100,
+    schedule: {
+      every: 10000,
+      do: function(data){
+        console.log("error ", data.error)
+      }
+      }
+    })
+  
+  // console.log( network.toJSON() ) 
+}catch(err){
+    console.log('Network error ', err)
+  }
+
+  return network
+}
+
+
+function array_of_length(length, val){
+  var arr = []
+  for(var i=0; i<length; i++){
+    arr.push(val)
+  }
+  return arr
 }
