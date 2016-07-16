@@ -10,7 +10,7 @@ db.getAllUser()
     console.log(user)
     db.getSignatures(66)
       .then( (signatures_1) => {
-        db.getSignatures(65)
+        db.getSignatures(84)
           .then( (signatures_2) => {
             var savedX = []
             var savedY = []
