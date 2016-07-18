@@ -18,13 +18,13 @@ module.exports = {
         db.getAllUser()
           .then( (user) => {
             console.log(user)
-            // db.getSignatures(66)
-            //   .then( (signatures) => {
-            //     featurizeSignatures(signatures)
-            //   })
-            // train_all(user)
-            //   .then(deferred.resolve)
-            network = neural_network.existing()
+            db.getSignatures(66)
+              .then( (signatures) => {
+                featurizeSignatures(signatures)
+              })
+            train_all(user)
+              .then(deferred.resolve)
+            // network = neural_network.existing()
             
             deferred.resolve()
           })
