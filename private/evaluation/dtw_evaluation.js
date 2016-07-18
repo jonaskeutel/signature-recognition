@@ -1,9 +1,10 @@
 'use strict'
-const SCORE_THRESHOLD = 200
+
 const CERTAINITY_THRESHOLD = 0.85
 const LENGTH = 1000
 
 const dtw_slicing = require(__dirname + "/dtw_slicing_evaluation.js")
+const featurizer = require(__dirname + "/featurizer.js")
 
 module.exports = {
 	compare: compare
@@ -13,122 +14,89 @@ var DTW = require('dtw')
 var dtw = new DTW()
 
 function compare(newSignature, savedSignatures, callback) {
-  	var savedX = []
-  	var savedY = []
-    var savedForce = []
-    var savedHeight = []
-    var savedWidth = []
-    var savedAcceleration = []
-    var savedOrientation = []
-    var savedDuration = []
-    var savedNumStrokes = []
+  	var newFeatures = featurizer.featurize(newSignature)
+    var oldFeatures = []
 
   	for (var i = savedSignatures.length - 1; i >= 0; i--) {
-  		savedX.push(JSON.parse(savedSignatures[i].x))
-  		savedY.push(JSON.parse(savedSignatures[i].y))
-        savedForce.push(JSON.parse(savedSignatures[i].force))
-        savedWidth.push(savedSignatures[i].width)
-        savedHeight.push(savedSignatures[i].height)
-        savedAcceleration.push(JSON.parse(savedSignatures[i].acceleration))
-        savedOrientation.push(JSON.parse(savedSignatures[i].gyroscope))
-        savedDuration.push(savedSignatures[i].duration)
-        savedNumStrokes.push(savedSignatures[i].strokes)
+  		oldFeatures.push(featurizer.featurize(savedSignatures[i]))
   	}
-    console.log("everything parsed for savedSignatures")
+    console.log("everything featurized")
 
-    // var xResult = compareValues(newSignature.x, savedX, true, true)
-    // console.log("got xResult (numeric)")
- //  	var yResult = compareValues(newSignature.y, savedY, true, true)
-    // var forceResult = compareValues(newSignature.force, savedForce, true, false)
-    // var accelerationResult = compareValues(newSignature.acceleration, savedAcceleration, true, false)
-    // var orientationResult = compareValues(newSignature.gyroscope, savedOrientation, true, false)
-    // var widthResult = compareNumber(newSignature.width, savedWidth)
-    // var heightResult = compareNumber(newSignature.width, savedHeight)
-
-    console.log()
-    console.log("-------------------------  x  --------------------------------")
-    var xCertainity = getCertainity(JSON.parse(newSignature.x), savedX)
-    console.log()
-    console.log()
-    console.log("-------------------------  x slicing --------------------------------")
-	var xSlicingCertainity = dtw_slicing.getCertainity(JSON.parse(newSignature.x), savedX)
-    console.log()
-    console.log()
-    console.log("-------------------------  y  --------------------------------")
-  	var yCertainity = getCertainity(JSON.parse(newSignature.y), savedY)
-    console.log()
-    console.log()
-    console.log("-------------------------  y slicing  --------------------------------")
-    var ySlicingCertainity = dtw_slicing.getCertainity(JSON.parse(newSignature.y), savedY)
-    console.log()
-    console.log()
-    console.log("-------------------------  force  --------------------------------")
-    var forceCertainity = getForceCertainity(JSON.parse(newSignature.force), savedForce)
-    console.log()
-    console.log()
-    console.log("-------------------------  acceleration  --------------------------------")
-    var accelerationCertainity = getCertainity(JSON.parse(newSignature.acceleration), savedAcceleration)
-    console.log()
-    console.log()
-    console.log("-------------------------  orientation  --------------------------------")
-    var orientationCertainity = getCertainity(JSON.parse(newSignature.gyroscope), savedOrientation)
-    // console.log("new width: " + newSignature.width + " ; old widths: " + savedWidth)
-    console.log()
-    console.log()
-    console.log("-------------------------  width  --------------------------------")
-    var widthCertainity = getCertainity(newSignature.width, savedWidth)
-    console.log()
-    console.log()
-    console.log("-------------------------  height  --------------------------------")
-    var heightCertainity = getCertainity(newSignature.height, savedHeight)
-    console.log()
-    console.log()
-    console.log("-------------------------  duration  --------------------------------")
-    var durationCertainity = getCertainity(newSignature.duration, savedDuration)
-    console.log()
-    console.log()
-    console.log("-------------------------  numStrokes  --------------------------------")
-    var numStrokesCertainity = getNumStrokesCertainity(newSignature.strokes, savedNumStrokes)
-    console.log()
-    console.log()
-    // console.log("Got all certainities")
-    var combinedCertainity = combineCertainities(xCertainity, xSlicingCertainity, yCertainity, ySlicingCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity)
-    console.log("combinedCertainity: ", combinedCertainity)
-    console.log()
-    console.log()
-    var certainitySuccess = combinedCertainity >= CERTAINITY_THRESHOLD ? true : false
-
-    //  	var combinedScore = combineScores(xResult, yResult, forceResult, accelerationResult, orientationResult, widthResult, heightResult)
- //  	var success = combinedScore < SCORE_THRESHOLD ? true : false
-    // console.log("allright so far, now construct result object")
-
-
-        // scoreSuccess: success,
-// 		combinedScore: combinedScore,
-// 		x: xResult,
-// 		y: yResult,
-    // height: heightResult,
-    // width: widthResult,
-// 		acceleration: null,
-// 		gyroscope: null,
-// 		force: forceResult,
-  	var result = {
-        certainitySuccess: certainitySuccess,
-        combinedCertainity: combinedCertainity,
-        xCertainity: xCertainity,
-				xSlicingCertainity: xSlicingCertainity,
-        yCertainity: yCertainity,
-				ySlicingCertainity: ySlicingCertainity,
-        forceCertainity: forceCertainity,
-        accelerationCertainity: accelerationCertainity,
-        orientationCertainity: orientationCertainity,
-        widthCertainity: widthCertainity,
-        heightCertainity: heightCertainity,
-        durationCertainity: durationCertainity,
-        numStrokesCertainity: numStrokesCertainity,
-  	}
-    // console.log("Result: " + result)
+    var result = calculateCertainitiesFromFeatures(newFeatures, oldFeatures)
 	callback(result)
+}
+
+function calculateCertainitiesFromFeatures(newFeatures, oldFeatures) {
+        console.log()
+        console.log("-------------------------  x  --------------------------------")
+        var xCertainity = getCertainity(newFeatures.x, oldFeatures.map(function(o){return o.x}))
+        console.log()
+        console.log()
+        console.log("-------------------------  x slicing --------------------------------")
+    	var xSlicingCertainity = dtw_slicing.getCertainity(newFeatures.x, oldFeatures.map(function(o){return o.x}))
+        console.log()
+        console.log()
+        console.log("-------------------------  y  --------------------------------")
+      	var yCertainity = getCertainity(newFeatures.y, oldFeatures.map(function(o){return o.y}))
+        console.log()
+        console.log()
+        console.log("-------------------------  y slicing  --------------------------------")
+        var ySlicingCertainity = dtw_slicing.getCertainity(newFeatures.y, oldFeatures.map(function(o){return o.y}))
+        console.log()
+        console.log()
+        console.log("-------------------------  force  --------------------------------")
+        var forceCertainity = getForceCertainity(newFeatures.force, oldFeatures.map(function(o){return o.force}))
+        console.log()
+        console.log()
+        console.log("-------------------------  acceleration  --------------------------------")
+        var accelerationCertainity = getCertainity(newFeatures.acceleration, oldFeatures.map(function(o){return o.acceleration}))
+        console.log()
+        console.log()
+        console.log("-------------------------  orientation  --------------------------------")
+        var orientationCertainity = getCertainity(newFeatures.gyroscope, oldFeatures.map(function(o){return o.orientation}))
+        // console.log("new width: " + newSignature.width + " ; old widths: " + savedWidth)
+        console.log()
+        console.log()
+        console.log("-------------------------  width  --------------------------------")
+        var widthCertainity = getCertainity(newFeatures.width, oldFeatures.map(function(o){return o.width}))
+        console.log()
+        console.log()
+        console.log("-------------------------  height  --------------------------------")
+        var heightCertainity = getCertainity(newFeatures.height, oldFeatures.map(function(o){return o.height}))
+        console.log()
+        console.log()
+        console.log("-------------------------  duration  --------------------------------")
+        var durationCertainity = getCertainity(newFeatures.duration, oldFeatures.map(function(o){return o.duration}))
+        console.log()
+        console.log()
+        console.log("-------------------------  numStrokes  --------------------------------")
+        var numStrokesCertainity = getNumStrokesCertainity(newFeatures.numStrokes, oldFeatures.map(function(o){return o.numStrokes}))
+        console.log()
+        console.log()
+        // console.log("Got all certainities")
+        var combinedCertainity = combineCertainities(xCertainity, xSlicingCertainity, yCertainity, ySlicingCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity)
+        console.log("combinedCertainity: ", combinedCertainity)
+        console.log()
+        console.log()
+        var certainitySuccess = combinedCertainity >= CERTAINITY_THRESHOLD ? true : false
+
+      	var result = {
+            certainitySuccess: certainitySuccess,
+            combinedCertainity: combinedCertainity,
+            xCertainity: xCertainity,
+    		xSlicingCertainity: xSlicingCertainity,
+            yCertainity: yCertainity,
+    		ySlicingCertainity: ySlicingCertainity,
+            forceCertainity: forceCertainity,
+            accelerationCertainity: accelerationCertainity,
+            orientationCertainity: orientationCertainity,
+            widthCertainity: widthCertainity,
+            heightCertainity: heightCertainity,
+            durationCertainity: durationCertainity,
+            numStrokesCertainity: numStrokesCertainity,
+      	}
+        // console.log("Result: " + result)
+        return result
 }
 
 function compareNumber(newValue, savedValues, includesSelf) {
@@ -354,72 +322,9 @@ function combineCertainities(xCertainity, xSlicingCertainity, yCertainity, ySlic
     return certainity / numberOfCertainities
 }
 
-function combineScores(xScore, yScore, forceScore, accelerationScore, orientationScore, widthScore, heigthScore) {
-    var result = 0
-    if (xScore) {
-        result += xScore * 0.05
-        numberOfScores++
-    }
-    if (yScore) {
-        result += yScore * 0.25
-        numberOfScores++
-    }
-    if (forceScore) {
-        result += forceScore * 1000
-        numberOfScores++
-    }
-    if (accelerationScore) {
-        result += accelerationScore * 2
-        numberOfScores++
-    }
-    if (orientationScore) {
-        result += orientationScore * 2
-        numberOfScores++
-    }
-
-
-    result += widthScore + heigthScore
-    return result
-}
-
 function normalize(array, normalizeLength, normalizeMagnitude) {
     var normalized = array
     normalized[0] = normalized[0] ? normalized[0] : 0
-    // if (normalizeMagnitude) {
-    //     normalized = normMagnitude(normalized)
-    //
-    // }
-    // if (normalizeLength) {
-    //     normalized = normLinear(normalized)
-    // }
 
     return normalized
-}
-
-function normMagnitude(array) {
-    var normalized = []
-    var min = Infinity;
-    for (var i = 0; i < array.length; i++) {
-        min = (array[i] !== null && array[i] < min) ? array[i] : min
-    }
-    normalized = array.map(function(num) {
-        return num === null ? null : num - min
-    })
-    return normalized
-}
-
-function normLinear(array) {
-    var normalizedLengthArray = []
-    var startIndex = 0
-    var endIndex = 0
-    for (var i = 0; i < array.length - 1; i++) {
-        var startValue = array[i]
-        var endValue = array[i+1]
-        endIndex = Math.floor(((i+1) / (array.length - 1)) * LENGTH - 1)
-        for (var j = startIndex; j <= endIndex; j++) {
-            normalizedLengthArray[j] = startValue + ((j-startIndex) / (endIndex - startIndex)) * (endValue - startValue)
-        }
-        startIndex = endIndex
-    }
-    return normalizedLengthArray
 }
