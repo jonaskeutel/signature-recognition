@@ -205,7 +205,7 @@ function getCertainity(newValues, savedValues) {
     console.log("Max certainity:\t\t\t\t " + maxCertainity)
     console.log("resulting certainity:\t\t\t " + ((avgCertainity + maxCertainity) / 2))
     if (deviationFromAverageCertainity) {
-        var weightedCertainityFromDeviation = deviationFromAverageCertainity * resultingCertainity
+        var weightedCertainityFromDeviation = (deviationFromAverageCertainity + resultingCertainity) / 2
         console.log("weightedCertainityFromDeviation:\t " + weightedCertainityFromDeviation)
         return weightedCertainityFromDeviation
     }
@@ -266,7 +266,10 @@ function getNumStrokesCertainity(numStrokes, savedNumStrokes) {
 }
 
 function getForceCertainity(newForce, savedForce) {
-    var forceCertainity = getForceCertainity(newForce, savedForce)
+    var forceCertainity = getCertainity(newForce, savedForce)
+    if (!forceCertainity) {
+        return false
+    }
 
     var minNew = Math.min.apply(null, newForce)
     var maxNew = Math.max.apply(null, newForce)
@@ -283,6 +286,10 @@ function getForceCertainity(newForce, savedForce) {
 
     var minCertainity = minNew <= minOld ? minNew / minOld : 1 / (minNew / minOld)
     var maxCertainity = maxNew <= maxOld ? maxNew / maxOld : 1 / (maxNew / maxOld)
+    if (!minCertainity || !maxCertainity) {
+        return forceCertainity
+    }
+
     var resultingCertainity = (minCertainity + maxCertainity) / 2
     console.log("minCertainity: \t\t\t\t" + minCertainity)
     console.log("maxCertainity: \t\t\t\t" + maxCertainity)
