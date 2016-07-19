@@ -87,7 +87,15 @@ var ApiService = (function () {
         console.log("about to post to /api/signature/check");
         return new Promise(function (resolve, reject) {
             _this._http.post('/api/signature/check', _this.objectToString(data), { headers: headers })
-                .subscribe(function (data) { return console.log(data); }, function (err) { return console.log(err); }, function () { return console.log('Authentication Complete'); });
+                .subscribe(function (data) {
+                var result = JSON.parse(data['_body']);
+                var resString = "Signature was ";
+                if (!result.success) {
+                    resString += "not ";
+                }
+                resString += "successful. Certainity was " + Math.round(result.combinedCertainity * 100) + "%, but the threshold is 85%.";
+                alert(resString);
+            }, function (err) { return console.log(err); }, function () { return console.log('Authentication Complete'); });
             resolve();
         });
     };

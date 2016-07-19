@@ -102,7 +102,15 @@ export class ApiService {
     return new Promise((resolve, reject) => {
       this._http.post('/api/signature/check', this.objectToString(data),  {headers: headers} )
             .subscribe(
-              data => console.log(data),
+              data => {
+                        var result = JSON.parse(data['_body']);
+                        var resString = "Signature was ";
+                        if (!result.success) {
+                            resString += "not "
+                        }
+                        resString += "successful. Certainity was " + Math.round(result.combinedCertainity * 100) + "%, but the threshold is 85%.";
+                        alert(resString);
+                      },
               err => console.log(err),
               () => console.log('Authentication Complete')
             );
