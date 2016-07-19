@@ -89,8 +89,8 @@ var ApiService = (function () {
             _this._http.post('/api/signature/check', _this.objectToString(data), { headers: headers })
                 .subscribe(function (data) {
                 var result = JSON.parse(data['_body']);
-                var resString = "Signature was ";
-                if (!result.success) {
+                var resString = "Authentication was ";
+                if (!result.certainitySuccess) {
                     resString += "not ";
                 }
                 resString += "successful. Certainity was " + Math.round(result.combinedCertainity * 100) + "%, but the threshold is 85%.";
