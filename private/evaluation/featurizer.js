@@ -1,7 +1,8 @@
 'use strict'
 
 module.exports = {
-	featurize: featurize
+	featurize: featurize,
+    featuresToArray: featuresToArray
 }
 
 /*
@@ -35,9 +36,28 @@ function featurize(signature) {
         orientation: orientation,
         minOrientation: minOrientation,
         maxOrientation: maxOrientation,
-        width: signature.width,
-        height: signature.height,
-        duration: signature.duration,
-        numStrokes: signature.strokes,
+        width: parseInt(signature.width),
+        height: parseInt(signature.height),
+        duration: parseInt(signature.duration),
+        numStrokes: parseInt(signature.strokes),
     }
+}
+
+function featuresToArray(features) {
+    //TODO: rasterize
+    // if we don't want to skip the data series for x, y, force, acceleration, orientation just delete these lines
+    var skip = ['x', 'y', 'force', 'acceleration', 'orientation']
+    var temp = []
+    for (var prop in features) {
+        if (features.hasOwnProperty(prop) && skip.indexOf(prop) == -1) {
+            if (Array.isArray(features[prop])) {
+                for (var i = 0; i < features[prop].length; i++) {
+                    temp.push(features[prop][i])
+                }
+            } else {
+                temp.push(features[prop])
+            }
+        }
+    }
+    return temp
 }

@@ -23,6 +23,7 @@ function compare(newSignature, savedSignatures, callback) {
     console.log("everything featurized")
 
     var result = calculateCertainitiesFromFeatures(newFeatures, oldFeatures)
+
 	callback(result)
 }
 

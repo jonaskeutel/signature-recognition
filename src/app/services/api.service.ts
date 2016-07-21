@@ -108,7 +108,7 @@ export class ApiService {
                         if (!result.certainitySuccess) {
                             resString += "not "
                         }
-                        resString += "successful. Certainity was " + Math.round(result.combinedCertainity * 100) + "%, but the threshold is 85%.";
+                        resString += "successful. Certainity was " + Math.round(result.combinedCertainity * 100) + "%; the threshold is 85%.";
                         alert(resString);
                       },
               err => console.log(err),

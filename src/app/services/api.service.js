@@ -93,7 +93,7 @@ var ApiService = (function () {
                 if (!result.certainitySuccess) {
                     resString += "not ";
                 }
-                resString += "successful. Certainity was " + Math.round(result.combinedCertainity * 100) + "%, but the threshold is 85%.";
+                resString += "successful. Certainity was " + Math.round(result.combinedCertainity * 100) + "%; the threshold is 85%.";
                 alert(resString);
             }, function (err) { return console.log(err); }, function () { return console.log('Authentication Complete'); });
             resolve();
