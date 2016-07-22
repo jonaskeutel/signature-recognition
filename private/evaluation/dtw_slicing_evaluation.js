@@ -1,88 +1,31 @@
 'use strict'
-const SCORE_THRESHOLD = 200
+
 const INDEX_MAX_THRESHOLD = 50
 const INDEX_MIN_THRESHOLD = 5
 const EXTREMA_GRANULARITY = '1'
-function arrayMin(arr) { return Math.min.apply(Math, arr); };
 
 module.exports = {
-	getCertainity: getCertainity
+	computeDTWResult: computeDTWResult
 }
 
 var DTW = require('dtw')
 var dtw = new DTW()
 // var plotly = require('plotly')("user", "key")
 
-function getCertainity(newValues, savedValues) {
-    var overallDiff = 0
-    var numberOfComparisons = 0
-    var maxDiff = 0
-    var newDiff = 0
+function arrayMin(arr) { return Math.min.apply(Math, arr); };
 
-    for (var i = 0; i < savedValues.length; i++) {
-        for (var j = 0; j < savedValues.length; j++) {
-            if (i <= j) {
-                continue
-            }
+function computeDTWResult(normalizedNew, normalizedSaved) {
+	var result
+  try {
+  	result = compute_slicing_result(normalizedNew, normalizedSaved)
+  }
+  catch(err) {
+    console.log(err)
+    return false;
+  }
 
-            var diff = compareValues(savedValues[i], savedValues)
-            if (!diff) {
-                continue
-            }
-            overallDiff += diff
-            maxDiff = diff > maxDiff ? diff : maxDiff
-            numberOfComparisons++
-        }
-    }
-
-    newDiff = compareValues(newValues, savedValues)
-    console.log("new Diff:\t\t\t\t" + newDiff)
-
-    if (numberOfComparisons === 0) {
-        return false
-    }
-    var averageDiff = overallDiff / numberOfComparisons
-    var avgCertainity = newDiff < averageDiff ? 1 : averageDiff / newDiff
-    var maxCertainity = newDiff < maxDiff ? 1 : maxDiff / newDiff
-    var resultingCertainity = (avgCertainity + maxCertainity) / 2
-    console.log("Average diff:\t\t\t	 " + averageDiff)
-    console.log("Average certainity:\t\t\t " + avgCertainity)
-    console.log("Max diff:\t\t\t\t " + maxDiff)
-    console.log("Max certainity:\t\t\t\t " + maxCertainity)
-    console.log("resulting certainity:\t\t\t " + resultingCertainity)
-
-    return resultingCertainity
+	return result
 }
-
-function compareValues(newValues, savedValues) {
-	var score = 0;
-  var normalizedNew = normalize(newValues)
-	for (var i = 0; i < savedValues.length; i++) {
-    var normalizedSaved = normalize(savedValues[i])
-		var result
-    try {
-        result = compute_slicing_result(normalizedNew, normalizedSaved) / normalizedNew.length;
-    }
-    catch(err) {
-        console.log(err)
-        return false;
-    }
-		score = score + result
-	}
-
-	return score/savedValues.length
-}
-
-function normalize(array) {
-    var normalized = array
-    normalized[0] = normalized[0] ? normalized[0] : 0
-
-    return normalized
-}
-
-// function combineScores(xScore, yScore) {
-// 	return (xScore + yScore) / 2
-// }
 
 function compute_slicing_result(s, t) {
 	// console.log('Elements in s:', s.length);

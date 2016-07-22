@@ -19,13 +19,13 @@ function newSignature(req, res) {
     		req.body.personid,
     		req.body.x,
     		req.body.y,
-            req.body.force,
-            req.body.acceleration,
-            req.body.gyroscope,
+        req.body.force,
+        req.body.acceleration,
+        req.body.gyroscope,
     		req.body.duration,
-            req.body.width,
-            req.body.height,
-            req.body.strokes
+        req.body.width,
+        req.body.height,
+        req.body.strokes
     	]
     	db.newSignature(newSignature)
         .then(function() {
@@ -66,7 +66,7 @@ function checkSignature(req, res) {
               db.getSignatures(req.body.personid)
                   .then(function(savedSignatures) {
                     evaluation.compare(req.body, savedSignatures).done(function(result) {
-                      
+
                       if (result) {
                         var neural = neural_network.testSignature(req.body)
                         console.log(neural)
@@ -75,21 +75,6 @@ function checkSignature(req, res) {
                         return res.json({
                           probability: prob
                         })
-                        // var newSignature = [
-                        //   req.body.personID,
-                        //   req.body.x,
-                        //   req.body.y,
-                        //   req.body.force,
-                        //   req.body.acceleration,
-                        //   req.body.gyroscope,
-                        //   req.body.duration
-                        // ]
-                        // db.newSignature(newSignature)
-                        //   .then(function() {
-                        //     return res.json({"status": "success", "message": "signature check successful and new signature successfully created"})
-                        //   }, function(err) {
-                        //     return res.json({"status": "error", "message": "signature check successful, but new signature not created"})
-                        //   })
                       } else {
                         return res.json({"status": "error", "message": "signature check not successful"})
                       }
@@ -99,6 +84,6 @@ function checkSignature(req, res) {
                   })
 
           })
-      
+
     }
 }

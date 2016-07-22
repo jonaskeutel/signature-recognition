@@ -1,7 +1,6 @@
-// var dtw_slicing  = require('./dtw_slicing_evaluation.js')
-var dtw_slicing  = require('./dtw_evaluation.js')
-var db              = require('../database/dbInterface.js')
-var fs              = require('fs')
+var evaluation  = require('./evaluation.js')
+var db          = require('../database/dbInterface.js')
+var fs          = require('fs')
 
 db.init()
   .then( () => {
@@ -19,8 +18,8 @@ db.getAllUser()
           		savedX.push(JSON.parse(signatures_1[i].x))
           		savedY.push(JSON.parse(signatures_1[i].y))
             }
-            var certainity = dtw_slicing.getCertainity(JSON.parse(signatures_2[0].y), savedY)
-            console.log('certainity:', certainity);
+            var certainity = evaluation.getCertainity(JSON.parse(signatures_2[0].y), savedY, true)
+            console.log('certainity:', certainity)
           })
       })
     })
