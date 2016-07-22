@@ -26,7 +26,6 @@ app.use( express.static(__dirname + '/node_modules') )
 require('./private/routes.js')(app)
 
 // Database initialization
-console.log(neural_network)
 dbInit.init()
   .then(neural_network.init)
   .then(function(){

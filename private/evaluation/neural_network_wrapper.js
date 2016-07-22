@@ -15,19 +15,20 @@ module.exports = {
     // db.init()
     //   .then( () => {
 
-        db.getAllUser()
-          .then( (user) => {
-            console.log(user)
-            db.getSignatures(66)
-              .then( (signatures) => {
-                featurizeSignatures(signatures)
-              })
-            train_all(user)
-              .then(deferred.resolve)
-            // network = neural_network.existing()
-            
-            deferred.resolve()
-          })
+    db.getAllUser()
+      .then( (user) => {
+        console.log(user)
+        // db.getSignatures(66)
+        //   .then( (signatures) => {
+        //     featurizeSignatures(signatures)
+        //   })
+        train_all(user)
+          .then(deferred.resolve)
+        // network = neural_network.existing()
+        
+        deferred.resolve()
+      })
+
     // })
 
     return deferred.promise
@@ -82,33 +83,6 @@ function train_all(user){
     return deferred.promise
 }
 
-function featurizeSignatures(signatures){
-  var newSignatures = []
-
-  evaluation.compare(signatures[0], signatures)
-    .then( dtw_result => {
-            // console.log(dtw_result)
-        //Put according vectors into one array to be passed
-        for(var j=0; j<signatures.length-1; j++){
-          newSignatures.push( featurize_signature(signatures[j], dtw_result) )
-          console.log("After sign " + j + " / " + signatures.length)
-        }
-
-        var network = neural_network.create(newSignatures)
-        // check_signature(66, signatures[signatures.length -1], network)
-        var check_sign = featurize_signature( signatures[signatures.length -1], dtw_result )
-            // console.log(check_sign)
-            console.log('First: ' + network.activate(check_sign))
-
-        db.getSignatures(67)
-            .then( (signatures) => {
-              console.log("check signature")
-              check_signature(66, signatures[0], network)
-            })
-            .catch(console.log)
-    })
-  
-}
 
 function check_signature(user_id, signature, network){
   var deferred = q.defer()
@@ -182,32 +156,7 @@ function drawSignature(signature){
   // fs.writeFile('out.svg', canvas.toBuffer());
   return canvas
 }
-function printSignature(signature){
-  canvas = new Canvas(signature.width, signature.height, 'svg')
-  ctx = canvas.getContext('2d');
-  signature.x = JSON.parse(signature.x)
-  signature.y = JSON.parse(signature.y)
-  signature.force = JSON.parse(signature.force)
-  
-  var currTouch = signature
-  for(var i=0; i<signature.x.length; i++){
-      if(i==0 && currTouch.x[i] != null || currTouch.x[i] != null && currTouch.x[i-1] == null){
-          ctx.beginPath();
-          ctx.arc(currTouch.x[i], currTouch.y[i], thickness(currTouch.force[i], 10) , 0, 2 * Math.PI, false);  // a circle at the start
-          ctx.fillStyle = 'black';
-          ctx.fill();
-          ctx.stroke();
-      }else if(currTouch.x[i] != null ){
-          ctx.beginPath();
-          ctx.moveTo(currTouch.x[i-1], currTouch.y[i-1]);
-          ctx.lineTo(currTouch.x[i], currTouch.y[i]);
-          ctx.lineWidth = thickness(currTouch.force[i], null);
-          ctx.strokeStyle = 'black';
-          ctx.stroke();
-      }
-  }
-  fs.writeFile(Math.random()+'out.svg', canvas.toBuffer());
-}
+
 function thickness(force, thickness){thickness = thickness != null ? thickness : 5; return Math.max( thickness * force * force, 0.3 )}
 
 const raster_width = 25
@@ -260,32 +209,8 @@ function blackDensity(canvas, signature){
   
   }
   }catch(err){console.log(err)}
-  // for(var y = 0; y<signature.height; y++){
-  //     var y_index = y % height_step == 0 ? (y / height_step) : Math.max( Math.floor( (y / height_step) ), 0);
-  //     y_index = Math.min(y_index, raster_height)
-  //     if(y_index > densities.length-1){
-  //       densities.push([])
-  //     }
-  //     for(var x=0; x<signature.width; x++){
-  //       var x_index = x % width_step == 0 ? (x / width_step) : Math.max( Math.floor( (x / width_step) ), 0);
-  //       x_index = Math.min(x_index, raster_width)
-  //       if(x_index > densities[y_index].length-1){
-  //         densities[y_index].push(0)
-  //       }
-  //       var pixel = y * signature.width * 4 + x * 4;
-  //       var r = image_data.data[pixel]
-  //       var g = image_data.data[pixel+1]
-  //       var b = image_data.data[pixel+2]
-  //       var alpha = image_data.data[pixel+3]
-  //       if(r!=0 || g != 0 || b != 0 || alpha != 0){
-  //         // console.log("Pixel at: " + x + " / " + y + " has (" + r +"/"+g+"/"+b+") - " + alpha)
-  //         densities[y_index][x_index] += 1;
-  //       }
-
-  //     }
-  // }
   
-  // // Calc density and put into 1 array
+  // Calc density and put into 1 array
   var result = []
   for(var row=0; row<densities.length; row++){
     for(var col=0; col<densities[row].length; col++){
@@ -343,4 +268,91 @@ function array_of_length(length, val){
     arr.push(val)
   }
   return arr
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// deprecated +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function featurizeSignatures(signatures){
+  var newSignatures = []
+
+  evaluation.compare(signatures[0], signatures)
+    .then( dtw_result => {
+            // console.log(dtw_result)
+        //Put according vectors into one array to be passed
+        for(var j=0; j<signatures.length-1; j++){
+          newSignatures.push( featurize_signature(signatures[j], dtw_result) )
+          console.log("After sign " + j + " / " + signatures.length)
+        }
+
+        var network = neural_network.create(newSignatures)
+        // check_signature(66, signatures[signatures.length -1], network)
+        var check_sign = featurize_signature( signatures[signatures.length -1], dtw_result )
+            // console.log(check_sign)
+            console.log('First: ' + network.activate(check_sign))
+
+        db.getSignatures(67)
+            .then( (signatures) => {
+              console.log("check signature")
+              check_signature(66, signatures[0], network)
+            })
+            .catch(console.log)
+    })
+  
+}
+
+function printSignature(signature){
+  canvas = new Canvas(signature.width, signature.height, 'svg')
+  ctx = canvas.getContext('2d');
+  signature.x = JSON.parse(signature.x)
+  signature.y = JSON.parse(signature.y)
+  signature.force = JSON.parse(signature.force)
+  
+  var currTouch = signature
+  for(var i=0; i<signature.x.length; i++){
+      if(i==0 && currTouch.x[i] != null || currTouch.x[i] != null && currTouch.x[i-1] == null){
+          ctx.beginPath();
+          ctx.arc(currTouch.x[i], currTouch.y[i], thickness(currTouch.force[i], 10) , 0, 2 * Math.PI, false);  // a circle at the start
+          ctx.fillStyle = 'black';
+          ctx.fill();
+          ctx.stroke();
+      }else if(currTouch.x[i] != null ){
+          ctx.beginPath();
+          ctx.moveTo(currTouch.x[i-1], currTouch.y[i-1]);
+          ctx.lineTo(currTouch.x[i], currTouch.y[i]);
+          ctx.lineWidth = thickness(currTouch.force[i], null);
+          ctx.strokeStyle = 'black';
+          ctx.stroke();
+      }
+  }
+  fs.writeFile(Math.random()+'out.svg', canvas.toBuffer());
 }
