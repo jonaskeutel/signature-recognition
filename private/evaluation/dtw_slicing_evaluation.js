@@ -6,7 +6,6 @@ const EXTREMA_GRANULARITY = '1'
 function arrayMin(arr) { return Math.min.apply(Math, arr); };
 
 module.exports = {
-	compare: compare,
 	getCertainity: getCertainity
 }
 
@@ -14,43 +13,19 @@ var DTW = require('dtw')
 var dtw = new DTW()
 // var plotly = require('plotly')("user", "key")
 
-function compare(newSignature, savedSignatures, callback) {
-	var savedX = []
-	var savedY = []
-
-	for (var i = savedSignatures.length - 1; i >= 0; i--) {
-		savedX.push(savedSignatures[i].x)
-		savedY.push(savedSignatures[i].y)
-	}
-
-	var xResult = compareValues(newSignature.x, savedX)
-	var yResult = compareValues(newSignature.y, savedY)
-
-	var combinedScore = combineScores(xResult, yResult)
-	var success = combinedScore < SCORE_THRESHOLD ? true : false
-	var result = {
-		success: success,
-		combinedScore: combinedScore,
-		x: xResult,
-		y: yResult
-	}
-
-	callback(result)
-}
-
 function getCertainity(newValues, savedValues) {
     var overallDiff = 0
     var numberOfComparisons = 0
     var maxDiff = 0
     var newDiff = 0
-    // compare array of values (x, y, force, acceleration, ...)
+
     for (var i = 0; i < savedValues.length; i++) {
         for (var j = 0; j < savedValues.length; j++) {
             if (i <= j) {
                 continue
             }
+
             var diff = compareValues(savedValues[i], savedValues)
-            // console.log("Comparison between " + i + " and " + j + " --> " + diff)
             if (!diff) {
                 continue
             }
@@ -161,57 +136,57 @@ function compute_slicing_result(s, t) {
   // console.log("calculate costs (part 2) successful")
 	// console.log('Costs all:', costs_all);
 
-	var trace1 = {
-		x: Array.apply(null, {length: s.length}).map(Number.call, Number),
-		y: s,
-		type: "scatter"
-	};
-	var trace2 = {
-		x: Array.apply(null, {length: t.length}).map(Number.call, Number),
-		y: t,
-		// yaxis: "y2",
-		type: "scatter"
-	};
-	var y_axis_0 = cutting_points[0].map(function(point) {
-  	return s[point];
-	});
-	var trace3 = {
-		x: cutting_points[0],
-		y: y_axis_0,
-		mode: "markers",
-		type: "scatter"
-	};
-	var y_axis_1 = cutting_points[1].map(function(point) {
-  	return t[point];
-	});
-	var trace4 = {
-		x: cutting_points[1],
-		y: y_axis_1,
-		// yaxis: "y2",
-		mode: "markers",
-		type: "scatter"
-	};
-	var concat_extrema_s = extrema_s.minlist.concat(extrema_s.maxlist);
-	var y_axis_2 = concat_extrema_s.map(function(point) {
-  	return s[point];
-	});
-	var trace5 = {
-		x: concat_extrema_s,
-		y: y_axis_2,
-		mode: "markers",
-		type: "scatter"
-	};
-	var concat_extrema_t = extrema_t.minlist.concat(extrema_t.maxlist);
-	var y_axis_3 = concat_extrema_t.map(function(point) {
-  	return t[point];
-	});
-	var trace6= {
-		x: concat_extrema_t,
-		y: y_axis_3,
-		// yaxis: "y2",
-		mode: "markers",
-		type: "scatter"
-	};
+	// var trace1 = {
+	// 	x: Array.apply(null, {length: s.length}).map(Number.call, Number),
+	// 	y: s,
+	// 	type: "scatter"
+	// };
+	// var trace2 = {
+	// 	x: Array.apply(null, {length: t.length}).map(Number.call, Number),
+	// 	y: t,
+	// 	// yaxis: "y2",
+	// 	type: "scatter"
+	// };
+	// var y_axis_0 = cutting_points[0].map(function(point) {
+  // 	return s[point];
+	// });
+	// var trace3 = {
+	// 	x: cutting_points[0],
+	// 	y: y_axis_0,
+	// 	mode: "markers",
+	// 	type: "scatter"
+	// };
+	// var y_axis_1 = cutting_points[1].map(function(point) {
+  // 	return t[point];
+	// });
+	// var trace4 = {
+	// 	x: cutting_points[1],
+	// 	y: y_axis_1,
+	// 	// yaxis: "y2",
+	// 	mode: "markers",
+	// 	type: "scatter"
+	// };
+	// var concat_extrema_s = extrema_s.minlist.concat(extrema_s.maxlist);
+	// var y_axis_2 = concat_extrema_s.map(function(point) {
+  // 	return s[point];
+	// });
+	// var trace5 = {
+	// 	x: concat_extrema_s,
+	// 	y: y_axis_2,
+	// 	mode: "markers",
+	// 	type: "scatter"
+	// };
+	// var concat_extrema_t = extrema_t.minlist.concat(extrema_t.maxlist);
+	// var y_axis_3 = concat_extrema_t.map(function(point) {
+  // 	return t[point];
+	// });
+	// var trace6= {
+	// 	x: concat_extrema_t,
+	// 	y: y_axis_3,
+	// 	// yaxis: "y2",
+	// 	mode: "markers",
+	// 	type: "scatter"
+	// };
 	// var data_plotly = [trace1, trace2, trace3, trace4, trace5, trace6];
 	// var layout = {
 	//   yaxis: {domain: [0, 0.5]},
@@ -223,11 +198,11 @@ function compute_slicing_result(s, t) {
 	// 	if (err) return console.log(err);
 	// 	console.log(msg);
 	// });
-	var data = [trace1, trace2, trace3, trace4, trace5, trace6];
-	var graphOptions = {filename: "basic-line", fileopt: "overwrite"};
-	plotly.plot(data, graphOptions, function (err, msg) {
-			console.log(msg);
-	});
+	// var data = [trace1, trace2, trace3, trace4, trace5, trace6];
+	// var graphOptions = {filename: "basic-line", fileopt: "overwrite"};
+	// plotly.plot(data, graphOptions, function (err, msg) {
+	// 		console.log(msg);
+	// });
 
 	return costs
 }

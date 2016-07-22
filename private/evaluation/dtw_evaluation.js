@@ -34,7 +34,7 @@ function calculateCertainitiesFromFeatures(newFeatures, oldFeatures) {
         console.log()
         console.log()
         console.log("-------------------------  x slicing --------------------------------")
-    	var xSlicingCertainity = dtw_slicing.getCertainity(newFeatures.x, oldFeatures.map(function(o){return o.x}))
+    		var xSlicingCertainity = dtw_slicing.getCertainity(newFeatures.x, oldFeatures.map(function(o){return o.x}))
         console.log()
         console.log()
         console.log("-------------------------  y  --------------------------------")
