@@ -12,6 +12,7 @@ module.exports = {
 
 var DTW = require('dtw')
 var dtw = new DTW()
+// var plotly = require('plotly')("user", "key")
 
 function compare(newSignature, savedSignatures, callback) {
 	var savedX = []
@@ -80,11 +81,28 @@ function getCertainity(newValues, savedValues) {
 
 function compareValues(newValues, savedValues) {
 	var score = 0;
+  var normalizedNew = normalize(newValues)
 	for (var i = 0; i < savedValues.length; i++) {
-		var result = compute_slicing_result(newValues, savedValues[i]);
+    var normalizedSaved = normalize(savedValues[i])
+		var result
+    try {
+        result = compute_slicing_result(normalizedNew, normalizedSaved) / normalizedNew.length;
+    }
+    catch(err) {
+        console.log(err)
+        return false;
+    }
 		score = score + result
 	}
+
 	return score/savedValues.length
+}
+
+function normalize(array) {
+    var normalized = array
+    normalized[0] = normalized[0] ? normalized[0] : 0
+
+    return normalized
 }
 
 // function combineScores(xScore, yScore) {
@@ -142,6 +160,74 @@ function compute_slicing_result(s, t) {
 	var costs_all = dtw.compute(s, t)
   // console.log("calculate costs (part 2) successful")
 	// console.log('Costs all:', costs_all);
+
+	var trace1 = {
+		x: Array.apply(null, {length: s.length}).map(Number.call, Number),
+		y: s,
+		type: "scatter"
+	};
+	var trace2 = {
+		x: Array.apply(null, {length: t.length}).map(Number.call, Number),
+		y: t,
+		// yaxis: "y2",
+		type: "scatter"
+	};
+	var y_axis_0 = cutting_points[0].map(function(point) {
+  	return s[point];
+	});
+	var trace3 = {
+		x: cutting_points[0],
+		y: y_axis_0,
+		mode: "markers",
+		type: "scatter"
+	};
+	var y_axis_1 = cutting_points[1].map(function(point) {
+  	return t[point];
+	});
+	var trace4 = {
+		x: cutting_points[1],
+		y: y_axis_1,
+		// yaxis: "y2",
+		mode: "markers",
+		type: "scatter"
+	};
+	var concat_extrema_s = extrema_s.minlist.concat(extrema_s.maxlist);
+	var y_axis_2 = concat_extrema_s.map(function(point) {
+  	return s[point];
+	});
+	var trace5 = {
+		x: concat_extrema_s,
+		y: y_axis_2,
+		mode: "markers",
+		type: "scatter"
+	};
+	var concat_extrema_t = extrema_t.minlist.concat(extrema_t.maxlist);
+	var y_axis_3 = concat_extrema_t.map(function(point) {
+  	return t[point];
+	});
+	var trace6= {
+		x: concat_extrema_t,
+		y: y_axis_3,
+		// yaxis: "y2",
+		mode: "markers",
+		type: "scatter"
+	};
+	// var data_plotly = [trace1, trace2, trace3, trace4, trace5, trace6];
+	// var layout = {
+	//   yaxis: {domain: [0, 0.5]},
+	//   yaxis2: {domain: [0.5, 1]},
+	// };
+	// var graphOptions = {layout: layout, fileopt : "overwrite", filename : "simple-node-example"};
+	//
+	// plotly.plot(data_plotly, graphOptions, function (err, msg) {
+	// 	if (err) return console.log(err);
+	// 	console.log(msg);
+	// });
+	var data = [trace1, trace2, trace3, trace4, trace5, trace6];
+	var graphOptions = {filename: "basic-line", fileopt: "overwrite"};
+	plotly.plot(data, graphOptions, function (err, msg) {
+			console.log(msg);
+	});
 
 	return costs
 }

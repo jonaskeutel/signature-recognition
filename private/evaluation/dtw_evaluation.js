@@ -92,9 +92,9 @@ function calculateCertainitiesFromFeatures(newFeatures, oldFeatures) {
             certainitySuccess: certainitySuccess,
             combinedCertainity: combinedCertainity,
             xCertainity: xCertainity,
-    		xSlicingCertainity: xSlicingCertainity,
+    				xSlicingCertainity: xSlicingCertainity,
             yCertainity: yCertainity,
-    		ySlicingCertainity: ySlicingCertainity,
+    				ySlicingCertainity: ySlicingCertainity,
             forceCertainity: forceDTWCertainity,
             accelerationCertainity: accelerationDTWCertainity,
             orientationCertainity: orientationCertainity,
@@ -198,10 +198,10 @@ function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitu
     // newValues = normalize(JSON.parse(newValues), normalizeLength, normalizeMagnitude)
     var normalizedNew = normalize(newValues, normalizeLength, normalizeMagnitude)
 	for (var i = 0; i < savedValues.length; i++) {
-        var normalizedOld = normalize(savedValues[i], normalizeLength, normalizeMagnitude)
+        var normalizedSaved = normalize(savedValues[i], normalizeLength, normalizeMagnitude)
 		var result
         try {
-            result = dtw.compute(normalizedNew, normalizedOld) / normalizedNew.length;
+            result = dtw.compute(normalizedNew, normalizedSaved) / normalizedNew.length;
         }
         catch(err) {
             console.log(err)
