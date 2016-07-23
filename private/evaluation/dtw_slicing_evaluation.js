@@ -94,22 +94,6 @@ function compute_slicing_result(s, t) {
 	// var y_axis_0 = cutting_points[0].map(function(point) {
   // 	return s[point];
 	// });
-	// var trace3 = {
-	// 	x: cutting_points[0],
-	// 	y: y_axis_0,
-	// 	mode: "markers",
-	// 	type: "scatter"
-	// };
-	// var y_axis_1 = cutting_points[1].map(function(point) {
-  // 	return t[point];
-	// });
-	// var trace4 = {
-	// 	x: cutting_points[1],
-	// 	y: y_axis_1,
-	// 	// yaxis: "y2",
-	// 	mode: "markers",
-	// 	type: "scatter"
-	// };
 	// var concat_extrema_s = extrema_s.minlist.concat(extrema_s.maxlist);
 	// var y_axis_2 = concat_extrema_s.map(function(point) {
   // 	return s[point];
@@ -131,7 +115,7 @@ function compute_slicing_result(s, t) {
 	// 	mode: "markers",
 	// 	type: "scatter"
 	// };
-	// var data_plotly = [trace1, trace2, trace3, trace4, trace5, trace6];
+	// var data_plotly = [trace1, trace2, trace5, trace6];
 	// var layout = {
 	//   yaxis: {domain: [0, 0.5]},
 	//   yaxis2: {domain: [0.5, 1]},
@@ -142,7 +126,7 @@ function compute_slicing_result(s, t) {
 	// 	if (err) return console.log(err);
 	// 	console.log(msg);
 	// });
-	// var data = [trace1, trace2, trace3, trace4, trace5, trace6];
+	// var data = [trace1, trace2];
 	// var graphOptions = {filename: "basic-line", fileopt: "overwrite"};
 	// plotly.plot(data, graphOptions, function (err, msg) {
 	// 		console.log(msg);
@@ -377,8 +361,8 @@ function cutting_points_for_lists(list_s1, list_s2, list_t1, list_t2) {
 		points_t.push(list_t1[0])
 	}
 	if (list_s2.length > 0 && list_t2.length > 0 &&
-		(Math.abs(list_s1[i] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
-		(Math.abs(list_t1[i] - points_s[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
+		(Math.abs(list_s2[0] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
+		(Math.abs(list_t2[0] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
 		points_s.push(list_s2[0])
 		points_t.push(list_t2[0])
 	}
@@ -388,18 +372,39 @@ function cutting_points_for_lists(list_s1, list_s2, list_t1, list_t2) {
 				(list_s1[i] > points_s[points_s.length - 1]) &&
 				(list_t1[i] > points_t[points_t.length - 1]) &&
 				(Math.abs(list_s1[i] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
-				(Math.abs(list_t1[i] - points_s[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
+				(Math.abs(list_t1[i] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
 					points_s.push(list_s1[i])
 					points_t.push(list_t1[i])
+		} else if ((list_s1[i + 1] != undefined) &&
+				(list_t1[i + 1] != undefined) &&
+				(list_s1[i + 1] > points_s[points_s.length - 1]) &&
+				(list_t1[i + 1] > points_t[points_t.length - 1]) &&
+				(Math.abs(list_s1[i + 1] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
+				(Math.abs(list_t1[i + 1] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD) &&
+				(list_s1[i + 1] < list_s2[i]) &&
+				(list_t1[i + 1] < list_t2[i])) {
+					points_s.push(list_s1[i + 1])
+					points_t.push(list_t1[i + 1])
 		}
 		if ((list_s2[i] != undefined) &&
 				(list_t2[i] != undefined) &&
 				(list_s2[i] > points_s[points_s.length - 1]) &&
 				(list_t2[i] > points_t[points_t.length - 1]) &&
 				(Math.abs(list_s2[i] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
-				(Math.abs(list_t2[i] - points_s[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
+				(Math.abs(list_t2[i] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
 					points_s.push(list_s2[i])
 					points_t.push(list_t2[i])
+		} else if ((list_s2[i + 1] != undefined) &&
+				(list_t2[i + 1] != undefined) &&
+				(list_s2[i + 1] > points_s[points_s.length - 1]) &&
+				(list_t2[i + 1] > points_t[points_t.length - 1]) &&
+				(Math.abs(list_s2[i + 1] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
+				(Math.abs(list_t2[i + 1] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD) &&
+				(list_s2[i + 1] < list_s1[i]) &&
+				(list_t2[i + 1] < list_t1[i])) {
+					console.log('here');
+					points_s.push(list_s2[i + 1])
+					points_t.push(list_t2[i + 1])
 		}
 	}
 	return [points_s, points_t]
