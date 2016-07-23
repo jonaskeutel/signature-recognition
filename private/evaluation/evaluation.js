@@ -81,12 +81,20 @@ function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {
         var xCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), DTW_NORMAL)
         console.log()
         console.log()
+				console.log("-------------------------  x filtered  --------------------------------")
+        var xFilteredCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), DTW_FILTERED)
+        console.log()
+        console.log()
         console.log("-------------------------  x slicing --------------------------------")
     		var xSlicingCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), DTW_SLICING)
         console.log()
         console.log()
         console.log("-------------------------  y  --------------------------------")
       	var yCertainity = getCertainity(newFeatures.y, savedFeatures.map(function(o){return o.y}), DTW_NORMAL)
+        console.log()
+        console.log()
+				console.log("-------------------------  y filtered  --------------------------------")
+        var yFilteredCertainity = getCertainity(newFeatures.y, savedFeatures.map(function(o){return o.y}), DTW_FILTERED)
         console.log()
         console.log()
         console.log("-------------------------  y slicing  --------------------------------")
@@ -130,7 +138,7 @@ function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {
         console.log()
         console.log()
         // console.log("Got all certainities")
-        var combinedCertainity = combineCertainities(xCertainity, xSlicingCertainity, yCertainity, ySlicingCertainity, forceDTWCertainity, accelerationDTWCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity)
+        var combinedCertainity = combineCertainities(xCertainity, xFilteredCertainity, xSlicingCertainity, yCertainity, yFilteredCertainity, ySlicingCertainity, forceDTWCertainity, accelerationDTWCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity)
         console.log("combinedCertainity: ", combinedCertainity)
         console.log()
         console.log()
@@ -140,8 +148,10 @@ function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {
             certainitySuccess: certainitySuccess,
             combinedCertainity: combinedCertainity,
             xCertainity: xCertainity,
+    				xFilteredCertainity: xFilteredCertainity,
     				xSlicingCertainity: xSlicingCertainity,
             yCertainity: yCertainity,
+    				yFilteredCertainity: yFilteredCertainity,
     				ySlicingCertainity: ySlicingCertainity,
             forceCertainity: forceDTWCertainity,
             accelerationCertainity: accelerationDTWCertainity,
@@ -294,7 +304,7 @@ function getMinMaxCertainity(newMin, newMax, savedMin, savedMax) {
     return resultingCertainity
 }
 
-function combineCertainities(xCertainity, xSlicingCertainity, yCertainity, ySlicingCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity) {
+function combineCertainities(xCertainity, xFilteredCertainity, xSlicingCertainity, yCertainity, yFilteredCertainity, ySlicingCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity) {
     var certainity = 0
     var numberOfCertainities = 0
     var i = 0
@@ -303,12 +313,20 @@ function combineCertainities(xCertainity, xSlicingCertainity, yCertainity, ySlic
         certainity += xCertainity
         numberOfCertainities++
     }
+		if (xFilteredCertainity) {
+        certainity += xFilteredCertainity
+        numberOfCertainities++
+    }
 		if (xSlicingCertainity) {
         certainity += xSlicingCertainity
         numberOfCertainities++
     }
     if (yCertainity) {
         certainity += yCertainity
+        numberOfCertainities++
+    }
+		if (yFilteredCertainity) {
+        certainity += yFilteredCertainity
         numberOfCertainities++
     }
 		if (ySlicingCertainity) {
