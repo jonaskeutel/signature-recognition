@@ -402,7 +402,6 @@ function cutting_points_for_lists(list_s1, list_s2, list_t1, list_t2) {
 				(Math.abs(list_t2[i + 1] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD) &&
 				(list_s2[i + 1] < list_s1[i]) &&
 				(list_t2[i + 1] < list_t1[i])) {
-					console.log('here');
 					points_s.push(list_s2[i + 1])
 					points_t.push(list_t2[i + 1])
 		}

@@ -241,7 +241,7 @@ function compareValues(newValues, savedValues, dtwFunction) {
     var normalizedSaved = normalize(savedValues[i])
 		var result
 		result = computeDTWResult(dtwFunction, [normalizedNew, normalizedSaved])
-		if (!result) {
+		if (typeof(result) == "boolean" && !result) {
 			return false
 		}
 		score = score + result
