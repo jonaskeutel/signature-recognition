@@ -1,7 +1,7 @@
 'use strict'
 
 const INDEX_MAX_THRESHOLD = 50
-const INDEX_MIN_THRESHOLD = 5
+const INDEX_MIN_THRESHOLD = 3
 const EXTREMA_GRANULARITY = '1'
 
 module.exports = {
@@ -76,6 +76,7 @@ function compute_slicing_result(s, t) {
 	var costs = calculate_costs(s, t, cutting_points)
   // console.log("calculate costs (part 1) successful")
 	var costs_all = dtw.compute(s, t)
+	// console.log('path:', dtw.path());
   // console.log("calculate costs (part 2) successful")
 	// console.log('Costs all:', costs_all);
 
@@ -412,7 +413,7 @@ function calculate_costs(s, t, cutting_points) {
 	  var t_slice = t.slice(cutting_points[1][i], cutting_points[1][i+1])
 	  costs = dtw.compute(s_slice, t_slice)
 	  sum = sum + costs
-	//   console.log('Costs slice_' + (i + 1) + ':', costs)
+	  // console.log('Costs slice_' + (i + 1) + ':', cutting_points[0][i], cutting_points[0][i+1], costs)
 	}
 	// console.log('Costs sum slices: ' + sum)
 	return sum

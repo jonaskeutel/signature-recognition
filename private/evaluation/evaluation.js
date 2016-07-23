@@ -4,17 +4,35 @@ const q 											= require('q')
 const dtw_evaluation 					= require(__dirname + "/dtw_evaluation.js")
 const dtw_slicing_evaluation 	= require(__dirname + "/dtw_slicing_evaluation.js")
 const featurizer 							= require(__dirname + "/featurizer.js")
-
-const CERTAINITY_THRESHOLD = 0.85
-
-var neural_network = require("./neural_network_wrapper.js")
+const neural_network 					= require("./neural_network_wrapper.js")
 console.log(__dirname)
 console.log("other: ", neural_network)
+
+// Configutation parameters
+const CERTAINITY_THRESHOLD = 0.85
+const DTW_NORMAL = computeDTWResultNormal
+const DTW_FILTERED = computeDTWResultFiltered
+const DTW_SLICING = computeDTWResultSlicing
 
 module.exports = {
 	compare: compare,
 	getCertainity: getCertainity // for testing purposes
 }
+
+// DTW functions
+function computeDTWResultNormal(normalizedNew, normalizedSaved) {
+	return dtw_evaluation.computeDTWResultNormal(normalizedNew, normalizedSaved)
+}
+
+function computeDTWResultFiltered(normalizedNew, normalizedSaved) {
+	return dtw_evaluation.computeDTWResultFiltered(normalizedNew, normalizedSaved)
+}
+
+function computeDTWResultSlicing(normalizedNew, normalizedSaved) {
+	return dtw_slicing_evaluation.computeDTWResult(normalizedNew, normalizedSaved)
+}
+
+// Helper functions
 
 function averageOfArray(arr) {
     var sum = 0
@@ -23,6 +41,19 @@ function averageOfArray(arr) {
     }
     return sum / arr.length
 }
+
+function normalize(array) {
+  var normalized = array
+  normalized[0] = normalized[0] ? normalized[0] : 0
+
+  return normalized
+}
+
+function computeDTWResult(func, args) {
+	return func.apply(this, args)
+}
+
+// Comparison logic
 
 function compare(newSignature, savedSignatures) {
   	const deferred = q.defer()
@@ -47,23 +78,23 @@ function compare(newSignature, savedSignatures) {
 function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {
         console.log()
         console.log("-------------------------  x  --------------------------------")
-        var xCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), false)
+        var xCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), DTW_NORMAL)
         console.log()
         console.log()
         console.log("-------------------------  x slicing --------------------------------")
-    		var xSlicingCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), true)
+    		var xSlicingCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), DTW_SLICING)
         console.log()
         console.log()
         console.log("-------------------------  y  --------------------------------")
-      	var yCertainity = getCertainity(newFeatures.y, savedFeatures.map(function(o){return o.y}), false)
+      	var yCertainity = getCertainity(newFeatures.y, savedFeatures.map(function(o){return o.y}), DTW_NORMAL)
         console.log()
         console.log()
         console.log("-------------------------  y slicing  --------------------------------")
-        var ySlicingCertainity = getCertainity(newFeatures.y, savedFeatures.map(function(o){return o.y}), true)
+        var ySlicingCertainity = getCertainity(newFeatures.y, savedFeatures.map(function(o){return o.y}), DTW_SLICING)
         console.log()
         console.log()
         console.log("-------------------------  force  --------------------------------")
-        var forceDTWCertainity = getCertainity(newFeatures.force, savedFeatures.map(function(o){return o.force}), false)
+        var forceDTWCertainity = getCertainity(newFeatures.force, savedFeatures.map(function(o){return o.force}), DTW_NORMAL)
         console.log()
         console.log()
         console.log("-------------------------  force min/max  --------------------------------")
@@ -71,7 +102,7 @@ function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {
         console.log()
         console.log()
         console.log("-------------------------  acceleration  --------------------------------")
-        var accelerationDTWCertainity = getCertainity(newFeatures.acceleration, savedFeatures.map(function(o){return o.acceleration}), false)
+        var accelerationDTWCertainity = getCertainity(newFeatures.acceleration, savedFeatures.map(function(o){return o.acceleration}), DTW_NORMAL)
         console.log()
         console.log()
         console.log("-------------------------  acceleration min/max  --------------------------------")
@@ -79,19 +110,19 @@ function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {
         console.log()
         console.log()
         console.log("-------------------------  orientation  --------------------------------")
-        var orientationCertainity = getCertainity(newFeatures.gyroscope, savedFeatures.map(function(o){return o.orientation}), false)
+        var orientationCertainity = getCertainity(newFeatures.gyroscope, savedFeatures.map(function(o){return o.orientation}), DTW_NORMAL)
         console.log()
         console.log()
         console.log("-------------------------  width  --------------------------------")
-        var widthCertainity = getCertainity(newFeatures.width, savedFeatures.map(function(o){return o.width}), false)
+        var widthCertainity = getCertainity(newFeatures.width, savedFeatures.map(function(o){return o.width}))
         console.log()
         console.log()
         console.log("-------------------------  height  --------------------------------")
-        var heightCertainity = getCertainity(newFeatures.height, savedFeatures.map(function(o){return o.height}), false)
+        var heightCertainity = getCertainity(newFeatures.height, savedFeatures.map(function(o){return o.height}))
         console.log()
         console.log()
         console.log("-------------------------  duration  --------------------------------")
-        var durationCertainity = getCertainity(newFeatures.duration, savedFeatures.map(function(o){return o.duration}), false)
+        var durationCertainity = getCertainity(newFeatures.duration, savedFeatures.map(function(o){return o.duration}))
         console.log()
         console.log()
         console.log("-------------------------  numStrokes  --------------------------------")
@@ -124,11 +155,14 @@ function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {
         return result
 }
 
-function getCertainity(newValues, savedValues, enableSlicing) {
+function getCertainity(newValues, savedValues, dtwFunction) {
     var overallDiff = 0
     var numberOfComparisons = 0
     var maxDiff = 0
     var newDiff = 0
+		if (dtwFunction == undefined) {
+			dtwFunction = DTW_NORMAL
+		}
 
     if (Array.isArray(newValues)) {
         // compare array of values (x, y, force, acceleration, ...)
@@ -138,7 +172,7 @@ function getCertainity(newValues, savedValues, enableSlicing) {
                 if (i <= j) {
                     continue
                 }
-                var diff = compareValues(savedValues[i], savedValues, enableSlicing)
+                var diff = compareValues(savedValues[i], savedValues, dtwFunction)
                 if (!diff) {
                     continue
                 }
@@ -147,7 +181,7 @@ function getCertainity(newValues, savedValues, enableSlicing) {
                 numberOfComparisons++
             }
         }
-				newDiff = compareValues(newValues, savedValues, enableSlicing)
+				newDiff = compareValues(newValues, savedValues, dtwFunction)
         console.log("new Diff:\t\t\t\t" + newDiff)
     } else {
         // compare numbers (width, height, duration, ...)
@@ -190,17 +224,13 @@ function getCertainity(newValues, savedValues, enableSlicing) {
     return resultingCertainity
 }
 
-function compareValues(newValues, savedValues, enableSlicing) {
+function compareValues(newValues, savedValues, dtwFunction) {
 	var score = 0;
   var normalizedNew = normalize(newValues)
 	for (var i = 0; i < savedValues.length; i++) {
     var normalizedSaved = normalize(savedValues[i])
 		var result
-		if (enableSlicing) {
-			result = dtw_slicing_evaluation.computeDTWResult(normalizedNew, normalizedSaved)
-		} else {
-			result = dtw_evaluation.computeDTWResult(normalizedNew, normalizedSaved)
-		}
+		result = computeDTWResult(dtwFunction, [normalizedNew, normalizedSaved])
 		if (!result) {
 			return false
 		}
@@ -208,13 +238,6 @@ function compareValues(newValues, savedValues, enableSlicing) {
 	}
 
 	return score/savedValues.length
-}
-
-function normalize(array) {
-  var normalized = array
-  normalized[0] = normalized[0] ? normalized[0] : 0
-
-  return normalized
 }
 
 function compareNumber(newValue, savedValues, includesSelf) {
