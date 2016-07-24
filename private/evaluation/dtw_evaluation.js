@@ -14,7 +14,7 @@ function computeDTWResultNormal(normalizedNew, normalizedSaved) {
 		result = dtw.compute(normalizedNew, normalizedSaved)
 	}
 	catch(err) {
-		console.log(err)
+		console.log('Normal:', err)
 		return false;
 	}
 
@@ -29,7 +29,7 @@ function computeDTWResultFiltered(normalizedNew, normalizedSaved) {
 		result = dtw.compute(normalizedNew, normalizedSaved)
 	}
 	catch(err) {
-		console.log(err)
+		console.log('Filtered:', err)
 		return false;
 	}
 

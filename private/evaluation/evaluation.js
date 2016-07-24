@@ -192,7 +192,7 @@ function getCertainity(newValues, savedValues, dtwFunction) {
             }
         }
 				newDiff = compareValues(newValues, savedValues, dtwFunction)
-        console.log("new Diff:\t\t\t\t" + newDiff)
+        // console.log("new Diff:\t\t\t\t" + newDiff)
     } else {
         // compare numbers (width, height, duration, ...)
 

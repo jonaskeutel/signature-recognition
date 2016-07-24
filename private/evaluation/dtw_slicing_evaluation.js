@@ -1,6 +1,6 @@
 'use strict'
 
-const INDEX_MAX_THRESHOLD = 50
+const INDEX_MAX_THRESHOLD = 40
 const INDEX_MIN_THRESHOLD = 3
 const EXTREMA_GRANULARITY = '1'
 
@@ -20,7 +20,7 @@ function computeDTWResult(normalizedNew, normalizedSaved) {
 		return result
   }
   catch(err) {
-    console.log(err)
+    console.log('Slicing:', err)
     return false;
   }
 }
@@ -264,69 +264,68 @@ function prepare_slicing(values) {
 }
 
 function map_extrema_lists(list_s, list_t) {
-	if (list_s.length > 0 && list_t.length > 0) {
+	if (list_s.length > 1 && list_t.length > 1) {
 		var cost_intervals = dtw.compute(list_s, list_t);
 	  var path = dtw.path();
-	  var new_list_s = [list_s[0]];
-	  var new_list_t = [list_t[0]];
+	  var new_list_s = [];
+	  var new_list_t = [];
 	  if (list_s.length <= list_t.length) {
-	    for (var i = 1; i < path.length; i++) {
-	      if (i > 0 && (path[i][0] !== path[i-1][0])) {
-	        if (i < path.length-1 && path[i][0] == path[i+1][0]) {
-	          var indices = []
-	          for (var j = i; j < path.length; j++) {
-	            if (path[i][0] == path[j][0]) {
-	              indices.push(path[j][1]);
-	            }
-	          }
-	          var distances = []
-	          for (var k = 0; k < indices.length; k++) {
-	            var local_distance = Math.abs(list_s[path[i][0]] - list_t[indices[k]]);
-	            distances.push(local_distance);
-	          }
-	          var min = arrayMin(distances);
-	          var index = indices[distances.indexOf(min)];
+	    for (var i = 0; i < path.length; i++) {
+        if (i < path.length-1 && path[i][0] == path[i+1][0]) {
+          var indices = []
+          for (var j = i; j < path.length; j++) {
+            if (path[i][0] == path[j][0]) {
+              indices.push(path[j][1]);
+            }
+          }
+          var distances = []
+          for (var k = 0; k < indices.length; k++) {
+            var local_distance = Math.abs(list_s[path[i][0]] - list_t[indices[k]]);
+            distances.push(local_distance);
+          }
+          var min = arrayMin(distances);
+          var index = indices[distances.indexOf(min)];
 
-	          new_list_s.push(list_s[path[index][0]]);
-	          new_list_t.push(list_t[path[index][1]]);
-	          i = i + indices.length
-	        } else {
-	          new_list_s.push(list_s[path[i][0]]);
-	          new_list_t.push(list_t[path[i][1]]);
-	        }
-	      }
+          new_list_s.push(list_s[path[index][0]]);
+          new_list_t.push(list_t[path[index][1]]);
+          i = i + indices.length
+        } else {
+          new_list_s.push(list_s[path[i][0]]);
+          new_list_t.push(list_t[path[i][1]]);
+        }
 	    }
 	  } else if (list_t.length < list_s.length) {
-	    for (var i = 1; i < path.length; i++) {
-	      if (i > 0 && (path[i][1] !== path[i-1][1])) {
-	        if (i < path.length-1 && path[i][1] == path[i+1][1]) {
-	          var indices = []
-	          for (var j = i; j < path.length; j++) {
-	            if (path[i][1] == path[j][1]) {
-	              indices.push(path[j][0]);
-	            }
-	          }
-	          var distances = []
-	          for (var k = 0; k < indices.length; k++) {
-	            var local_distance = Math.abs(list_s[indices[k]] - list_t[path[i][1]]);
-	            distances.push(local_distance);
-	          }
-	          var min = arrayMin(distances);
-	          var index = indices[distances.indexOf(min)];
+	    for (var i = 0; i < path.length; i++) {
+        if (i < path.length-1 && path[i][1] == path[i+1][1]) {
+          var indices = []
+          for (var j = i; j < path.length; j++) {
+            if (path[i][1] == path[j][1]) {
+              indices.push(path[j][0]);
+            }
+          }
+          var distances = []
+          for (var k = 0; k < indices.length; k++) {
+            var local_distance = Math.abs(list_s[indices[k]] - list_t[path[i][1]]);
+            distances.push(local_distance);
+          }
+          var min = arrayMin(distances);
+          var index = indices[distances.indexOf(min)];
 
-	          new_list_s.push(list_s[path[index][0]]);
-	          new_list_t.push(list_t[path[index][1]]);
-	          i = i + indices.length
-	        } else {
-	          new_list_s.push(list_s[path[i][0]]);
-	          new_list_t.push(list_t[path[i][1]]);
-	        }
-	      }
-	    }
+          new_list_s.push(list_s[path[index][0]]);
+          new_list_t.push(list_t[path[index][1]]);
+          i = i + indices.length
+        } else {
+          new_list_s.push(list_s[path[i][0]]);
+          new_list_t.push(list_t[path[i][1]]);
+        }
+      }
 	  }
 	  return [new_list_s, new_list_t]
+	} else if (list_s.length == 1 && list_t.length == 1) {
+		return [[list_s[0]], list_t[0]]
+	} else {
+		return [[],[]]
 	}
-	return [[],[]]
 }
 
 function clean_up_lists(list_s, list_t) {
