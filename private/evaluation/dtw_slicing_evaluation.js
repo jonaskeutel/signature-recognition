@@ -49,7 +49,7 @@ function getCertainity(newValues, savedValues) {
                 continue
             }
             var diff = compareValues(savedValues[i], savedValues)
-            // console.log("Comparison between " + i + " and " + j + " --> " + diff)
+            // // console.log("Comparison between " + i + " and " + j + " --> " + diff)
             if (!diff) {
                 continue
             }
@@ -60,7 +60,7 @@ function getCertainity(newValues, savedValues) {
     }
 
     newDiff = compareValues(newValues, savedValues)
-    console.log("new Diff:\t\t\t\t" + newDiff)
+    // console.log("new Diff:\t\t\t\t" + newDiff)
 
     if (numberOfComparisons === 0) {
         return false
@@ -69,11 +69,11 @@ function getCertainity(newValues, savedValues) {
     var avgCertainity = newDiff < averageDiff ? 1 : averageDiff / newDiff
     var maxCertainity = newDiff < maxDiff ? 1 : maxDiff / newDiff
     var resultingCertainity = (avgCertainity + maxCertainity) / 2
-    console.log("Average diff:\t\t\t	 " + averageDiff)
-    console.log("Average certainity:\t\t\t " + avgCertainity)
-    console.log("Max diff:\t\t\t\t " + maxDiff)
-    console.log("Max certainity:\t\t\t\t " + maxCertainity)
-    console.log("resulting certainity:\t\t\t " + resultingCertainity)
+    // console.log("Average diff:\t\t\t	 " + averageDiff)
+    // console.log("Average certainity:\t\t\t " + avgCertainity)
+    // console.log("Max diff:\t\t\t\t " + maxDiff)
+    // console.log("Max certainity:\t\t\t\t " + maxCertainity)
+    // console.log("resulting certainity:\t\t\t " + resultingCertainity)
 
     return resultingCertainity
 }
@@ -92,19 +92,19 @@ function compareValues(newValues, savedValues) {
 // }
 
 function compute_slicing_result(s, t) {
-	// console.log('Elements in s:', s.length);
-	// console.log('Elements in t:', t.length);
+	// // console.log('Elements in s:', s.length);
+	// // console.log('Elements in t:', t.length);
 	s = s.filter(function(n){ return n != undefined })
 	t = t.filter(function(n){ return n != undefined })
-  // console.log("filter successful")
-	// console.log('Numeric elements in s:', s.length);
-	// console.log('Numeric elements in t:', t.length);
+  // // console.log("filter successful")
+	// // console.log('Numeric elements in s:', s.length);
+	// // console.log('Numeric elements in t:', t.length);
 
 	var extrema_s = prepare_slicing(s)
 	var extrema_t = prepare_slicing(t)
-  // console.log("prepare slicing successful")
-	// console.log(extrema_s);
-	// console.log(extrema_t);
+  // // console.log("prepare slicing successful")
+	// // console.log(extrema_s);
+	// // console.log(extrema_t);
 
 	var mapped_extrema_minlists = map_extrema_lists(extrema_s.minlist, extrema_t.minlist)
 	extrema_s.minlist = mapped_extrema_minlists[0]
@@ -112,36 +112,36 @@ function compute_slicing_result(s, t) {
 	var mapped_extrema_maxlists = map_extrema_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = mapped_extrema_maxlists[0]
   extrema_t.maxlist = mapped_extrema_maxlists[1]
-  // console.log("mapping extrema successful")
-	// console.log('dtw mapped minlists:');
-  // console.log(extrema_s.minlist);
-  // console.log(extrema_t.minlist);
-	// console.log('dtw mapped maxlists:');
-	// console.log(extrema_s.maxlist);
-  // console.log(extrema_t.maxlist);
+  // // console.log("mapping extrema successful")
+	// // console.log('dtw mapped minlists:');
+  // // console.log(extrema_s.minlist);
+  // // console.log(extrema_t.minlist);
+	// // console.log('dtw mapped maxlists:');
+	// // console.log(extrema_s.maxlist);
+  // // console.log(extrema_t.maxlist);
 	var cleaned_extrema_minlists = clean_up_lists(extrema_s.minlist, extrema_t.minlist)
 	extrema_s.minlist = cleaned_extrema_minlists[0]
 	extrema_t.minlist = cleaned_extrema_minlists[1]
 	var cleaned_extrema_maxlists = clean_up_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = cleaned_extrema_maxlists[0]
 	extrema_t.maxlist = cleaned_extrema_maxlists[1]
-  // console.log("cleaned extrema successful")
-	// console.log('dtw mapped minlists cleaned:');
-	// console.log(extrema_s.minlist);
-	// console.log(extrema_t.minlist);
-	// console.log('dtw mapped maxlists cleaned:');
-	// console.log(extrema_s.maxlist);
-	// console.log(extrema_t.maxlist);
+  // // console.log("cleaned extrema successful")
+	// // console.log('dtw mapped minlists cleaned:');
+	// // console.log(extrema_s.minlist);
+	// // console.log(extrema_t.minlist);
+	// // console.log('dtw mapped maxlists cleaned:');
+	// // console.log(extrema_s.maxlist);
+	// // console.log(extrema_t.maxlist);
 	var cutting_points = determine_cutting_points(extrema_s, extrema_t)
-  // console.log("getting cutting points successful")
-	// console.log('cutting points:');
-	// console.log(cutting_points[0]);
-	// console.log(cutting_points[1]);
+  // // console.log("getting cutting points successful")
+	// // console.log('cutting points:');
+	// // console.log(cutting_points[0]);
+	// // console.log(cutting_points[1]);
 	var costs = calculate_costs(s, t, cutting_points)
-  // console.log("calculate costs (part 1) successful")
+  // // console.log("calculate costs (part 1) successful")
 	var costs_all = dtw.compute(s, t)
-  // console.log("calculate costs (part 2) successful")
-	// console.log('Costs all:', costs_all);
+  // // console.log("calculate costs (part 2) successful")
+	// // console.log('Costs all:', costs_all);
 
 	return costs
 }
@@ -408,8 +408,8 @@ function calculate_costs(s, t, cutting_points) {
 	  var t_slice = t.slice(cutting_points[1][i], cutting_points[1][i+1])
 	  costs = dtw.compute(s_slice, t_slice)
 	  sum = sum + costs
-	//   console.log('Costs slice_' + (i + 1) + ':', costs)
+	//   // console.log('Costs slice_' + (i + 1) + ':', costs)
 	}
-	// console.log('Costs sum slices: ' + sum)
+	// // console.log('Costs sum slices: ' + sum)
 	return sum
 }

@@ -20,7 +20,7 @@ function compare(newSignature, savedSignatures, callback) {
   	for (var i = savedSignatures.length - 1; i >= 0; i--) {
   		oldFeatures.push(featurizer.featurize(savedSignatures[i]))
   	}
-    console.log("everything featurized")
+    // console.log("everything featurized")
 
     var result = calculateCertainitiesFromFeatures(newFeatures, oldFeatures)
 
@@ -28,64 +28,64 @@ function compare(newSignature, savedSignatures, callback) {
 }
 
 function calculateCertainitiesFromFeatures(newFeatures, oldFeatures) {
-        console.log()
-        console.log("-------------------------  x  --------------------------------")
+        // // console.log()
+        // // console.log("-------------------------  x  --------------------------------")
         var xCertainity = getCertainity(newFeatures.x, oldFeatures.map(function(o){return o.x}))
-        console.log()
-        console.log()
-        console.log("-------------------------  x slicing --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  x slicing --------------------------------")
     	var xSlicingCertainity = dtw_slicing.getCertainity(newFeatures.x, oldFeatures.map(function(o){return o.x}))
-        console.log()
-        console.log()
-        console.log("-------------------------  y  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  y  --------------------------------")
       	var yCertainity = getCertainity(newFeatures.y, oldFeatures.map(function(o){return o.y}))
-        console.log()
-        console.log()
-        console.log("-------------------------  y slicing  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  y slicing  --------------------------------")
         var ySlicingCertainity = dtw_slicing.getCertainity(newFeatures.y, oldFeatures.map(function(o){return o.y}))
-        console.log()
-        console.log()
-        console.log("-------------------------  force  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  force  --------------------------------")
         var forceDTWCertainity = getCertainity(newFeatures.force, oldFeatures.map(function(o){return o.force}))
-        console.log()
-        console.log()
-        console.log("-------------------------  force min/max  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  force min/max  --------------------------------")
         var forceMinMaxCertainity = getMinMaxCertainity(newFeatures.minForce, newFeatures.maxForce, oldFeatures.map(function(o){return o.minForce}), oldFeatures.map(function(o){return o.maxForce}))
-        console.log()
-        console.log()
-        console.log("-------------------------  acceleration  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  acceleration  --------------------------------")
         var accelerationDTWCertainity = getCertainity(newFeatures.acceleration, oldFeatures.map(function(o){return o.acceleration}))
-        console.log()
-        console.log()
-        console.log("-------------------------  acceleration min/max  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  acceleration min/max  --------------------------------")
         var accelerationMinMaxCertainity = getMinMaxCertainity(newFeatures.minAcceleration, newFeatures.maxAcceleration, oldFeatures.map(function(o){return o.minAcceleration}), oldFeatures.map(function(o){return o.maxAcceleration}))
-        console.log()
-        console.log()
-        console.log("-------------------------  orientation  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  orientation  --------------------------------")
         var orientationCertainity = getCertainity(newFeatures.gyroscope, oldFeatures.map(function(o){return o.orientation}))
-        console.log()
-        console.log()
-        console.log("-------------------------  width  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  width  --------------------------------")
         var widthCertainity = getCertainity(newFeatures.width, oldFeatures.map(function(o){return o.width}))
-        console.log()
-        console.log()
-        console.log("-------------------------  height  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  height  --------------------------------")
         var heightCertainity = getCertainity(newFeatures.height, oldFeatures.map(function(o){return o.height}))
-        console.log()
-        console.log()
-        console.log("-------------------------  duration  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  duration  --------------------------------")
         var durationCertainity = getCertainity(newFeatures.duration, oldFeatures.map(function(o){return o.duration}))
-        console.log()
-        console.log()
-        console.log("-------------------------  numStrokes  --------------------------------")
+        // // console.log()
+        // // console.log()
+        // // console.log("-------------------------  numStrokes  --------------------------------")
         var numStrokesCertainity = getNumStrokesCertainity(newFeatures.numStrokes, oldFeatures.map(function(o){return o.numStrokes}))
-        console.log()
-        console.log()
-        // console.log("Got all certainities")
+        // // console.log()
+        // // console.log()
+        // // console.log("Got all certainities")
         var combinedCertainity = combineCertainities(xCertainity, xSlicingCertainity, yCertainity, ySlicingCertainity, forceDTWCertainity, accelerationDTWCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity)
-        console.log("combinedCertainity: ", combinedCertainity)
-        console.log()
-        console.log()
+        // // console.log("combinedCertainity: ", combinedCertainity)
+        // // console.log()
+        // // console.log()
         var certainitySuccess = combinedCertainity >= CERTAINITY_THRESHOLD ? true : false
 
       	var result = {
@@ -103,7 +103,7 @@ function calculateCertainitiesFromFeatures(newFeatures, oldFeatures) {
             durationCertainity: durationCertainity,
             numStrokesCertainity: numStrokesCertainity,
       	}
-        console.log("Result: " + result)
+        // // console.log("Result: " + result)
         return result
 }
 
@@ -142,7 +142,7 @@ function getCertainity(newValues, savedValues) {
             }
         }
         newDiff = compareValues(newValues, savedValues)
-        console.log("new Diff:\t\t\t\t" + newDiff)
+        // console.log("new Diff:\t\t\t\t" + newDiff)
     } else {
         // compare numbers (width, height, duration, ...)
 
@@ -158,11 +158,11 @@ function getCertainity(newValues, savedValues) {
             }
         }
         newDiff = compareNumber(newValues, savedValues, false)
-        console.log("new Diff:\t\t\t\t " + newDiff)
+        // console.log("new Diff:\t\t\t\t " + newDiff)
         var averageValue = averageOfArray(savedValues)
         var deviationFromAverageCertainity = 1 - (newDiff / averageValue)
-        console.log("average Value:\t\t\t\t " + averageValue)
-        console.log("deviationFromAverageCertainity:\t\t " + deviationFromAverageCertainity)
+        // console.log("average Value:\t\t\t\t " + averageValue)
+        // console.log("deviationFromAverageCertainity:\t\t " + deviationFromAverageCertainity)
     }
     if (numberOfComparisons === 0) {
         return false
@@ -171,14 +171,14 @@ function getCertainity(newValues, savedValues) {
     var avgCertainity = newDiff < averageDiff ? 1 : averageDiff / newDiff
     var maxCertainity = newDiff < maxDiff ? 1 : maxDiff / newDiff
     var resultingCertainity = (avgCertainity + maxCertainity) / 2
-    console.log("Average diff:\t\t\t	 " + averageDiff)
-    console.log("Average certainity:\t\t\t " + avgCertainity)
-    console.log("Max diff:\t\t\t\t " + maxDiff)
-    console.log("Max certainity:\t\t\t\t " + maxCertainity)
-    console.log("resulting certainity:\t\t\t " + ((avgCertainity + maxCertainity) / 2))
+    // console.log("Average diff:\t\t\t	 " + averageDiff)
+    // console.log("Average certainity:\t\t\t " + avgCertainity)
+    // console.log("Max diff:\t\t\t\t " + maxDiff)
+    // console.log("Max certainity:\t\t\t\t " + maxCertainity)
+    // console.log("resulting certainity:\t\t\t " + ((avgCertainity + maxCertainity) / 2))
     if (deviationFromAverageCertainity) {
         var weightedCertainityFromDeviation = (deviationFromAverageCertainity + resultingCertainity) / 2
-        console.log("weightedCertainityFromDeviation:\t " + weightedCertainityFromDeviation)
+        // console.log("weightedCertainityFromDeviation:\t " + weightedCertainityFromDeviation)
         return weightedCertainityFromDeviation
     }
     return resultingCertainity
@@ -193,7 +193,7 @@ function averageOfArray(arr) {
 }
 
 function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitude) {
-    // console.log("Compare " + newValues + " with " + savedValues)
+    // // console.log("Compare " + newValues + " with " + savedValues)
 	var score = 0;
     // newValues = normalize(JSON.parse(newValues), normalizeLength, normalizeMagnitude)
     var normalizedNew = normalize(newValues, normalizeLength, normalizeMagnitude)
@@ -204,10 +204,10 @@ function compareValues(newValues, savedValues, normalizeLength, normalizeMagnitu
             result = dtw.compute(normalizedNew, normalizedOld) / normalizedNew.length;
         }
         catch(err) {
-            console.log(err)
+            // console.log(err)
             return false;
         }
-        // console.log(i, result)
+        // // console.log(i, result)
 		score = score + result
 	}
 
@@ -225,12 +225,12 @@ function getNumStrokesCertainity(numStrokes, savedNumStrokes) {
     var minCertainity = numStrokes <= min ? numStrokes / min : 1 / (numStrokes / min)
     var maxCertainity = numStrokes <= max ? numStrokes / max : 1 / (numStrokes / max)
     var resultingCertainity = (minCertainity + maxCertainity) / 2
-    console.log("numStrokes: \t\t\t\t" + numStrokes)
-    console.log("min: \t\t\t\t\t" + min)
-    console.log("max: \t\t\t\t\t" + max)
-    console.log("minCertainity: \t\t\t\t" + minCertainity)
-    console.log("maxCertainity: \t\t\t\t" + maxCertainity)
-    console.log("resultingCertainity: \t\t\t" + resultingCertainity)
+    // console.log("numStrokes: \t\t\t\t" + numStrokes)
+    // console.log("min: \t\t\t\t\t" + min)
+    // console.log("max: \t\t\t\t\t" + max)
+    // console.log("minCertainity: \t\t\t\t" + minCertainity)
+    // console.log("maxCertainity: \t\t\t\t" + maxCertainity)
+    // console.log("resultingCertainity: \t\t\t" + resultingCertainity)
     if (numStrokes >= min && numStrokes <= max) {
         return 1
     }
@@ -243,17 +243,17 @@ function getMinMaxCertainity(newMin, newMax, savedMin, savedMax) {
     newMax += delta
     savedMin = Math.min.apply(null, savedMin) + delta
     savedMax = Math.max.apply(null, savedMax) + delta
-    console.log(newMin, newMax, savedMin, savedMax)
+    // console.log(newMin, newMax, savedMin, savedMax)
     var minCertainity = newMin <= savedMin ? newMin / savedMin : 1 / (newMin / savedMin)
     var maxCertainity = newMax <= savedMax ? newMax / savedMax : 1 / (newMax / savedMax)
-    console.log("minCertainity: \t\t\t\t" + minCertainity)
-    console.log("maxCertainity: \t\t\t\t" + maxCertainity)
+    // console.log("minCertainity: \t\t\t\t" + minCertainity)
+    // console.log("maxCertainity: \t\t\t\t" + maxCertainity)
     if (!minCertainity || !maxCertainity) {
         return false
     }
 
     var resultingCertainity = (minCertainity + maxCertainity) / 2
-    console.log("resultingCertainity: \t" + resultingCertainity)
+    // console.log("resultingCertainity: \t" + resultingCertainity)
     return resultingCertainity
 }
 
