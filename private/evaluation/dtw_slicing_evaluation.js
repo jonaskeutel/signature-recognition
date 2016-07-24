@@ -15,16 +15,14 @@ var dtw = new DTW()
 function arrayMin(arr) { return Math.min.apply(Math, arr); };
 
 function computeDTWResult(normalizedNew, normalizedSaved) {
-	var result
   try {
-  	result = compute_slicing_result(normalizedNew, normalizedSaved)
+  	var result = compute_slicing_result(normalizedNew, normalizedSaved)
+		return result
   }
   catch(err) {
     console.log(err)
     return false;
   }
-
-	return result
 }
 
 function compute_slicing_result(s, t) {
@@ -41,6 +39,10 @@ function compute_slicing_result(s, t) {
   // console.log("prepare slicing successful")
 	// console.log(extrema_s);
 	// console.log(extrema_t);
+	if (extrema_s.minlist.length == 0 && extrema_s.maxlist.length == 0 &&
+		extrema_t.minlist.length == 0 && extrema_t.maxlist.length == 0) {
+		return false
+	}
 
 	var mapped_extrema_minlists = map_extrema_lists(extrema_s.minlist, extrema_t.minlist)
 	extrema_s.minlist = mapped_extrema_minlists[0]
@@ -128,6 +130,11 @@ function compute_slicing_result(s, t) {
 	// });
 	// var data = [trace1, trace2];
 	// var graphOptions = {filename: "basic-line", fileopt: "overwrite"};
+	// plotly.plot(data, graphOptions, function (err, msg) {
+	// 		console.log(msg);
+	// });
+	// var data = [trace1, trace2];
+	// var graphOptions = {filename: "force", fileopt: "overwrite"};
 	// plotly.plot(data, graphOptions, function (err, msg) {
 	// 		console.log(msg);
 	// });
