@@ -1,17 +1,16 @@
 'use strict'
-const SCORE_THRESHOLD = 200
+
 const INDEX_MAX_THRESHOLD = 50
-const INDEX_MIN_THRESHOLD = 5
+const INDEX_MIN_THRESHOLD = 3
 const EXTREMA_GRANULARITY = '1'
-function arrayMin(arr) { return Math.min.apply(Math, arr); };
 
 module.exports = {
-	compare: compare,
-	getCertainity: getCertainity
+	computeDTWResult: computeDTWResult
 }
 
 var DTW = require('dtw')
 var dtw = new DTW()
+// var plotly = require('plotly')("user", "key")
 
 function compare(newSignature, savedSignatures, callback) {
 	var savedX = []
@@ -78,18 +77,20 @@ function getCertainity(newValues, savedValues) {
     return resultingCertainity
 }
 
-function compareValues(newValues, savedValues) {
-	var score = 0;
-	for (var i = 0; i < savedValues.length; i++) {
-		var result = compute_slicing_result(newValues, savedValues[i]);
-		score = score + result
-	}
-	return score/savedValues.length
-}
+function arrayMin(arr) { return Math.min.apply(Math, arr); };
 
-// function combineScores(xScore, yScore) {
-// 	return (xScore + yScore) / 2
-// }
+function computeDTWResult(normalizedNew, normalizedSaved) {
+	var result
+  try {
+  	result = compute_slicing_result(normalizedNew, normalizedSaved)
+  }
+  catch(err) {
+    console.log(err)
+    return false;
+  }
+
+	return result
+}
 
 function compute_slicing_result(s, t) {
 	// // console.log('Elements in s:', s.length);
@@ -140,8 +141,61 @@ function compute_slicing_result(s, t) {
 	var costs = calculate_costs(s, t, cutting_points)
   // // console.log("calculate costs (part 1) successful")
 	var costs_all = dtw.compute(s, t)
-  // // console.log("calculate costs (part 2) successful")
-	// // console.log('Costs all:', costs_all);
+	// console.log('path:', dtw.path());
+  // console.log("calculate costs (part 2) successful")
+	// console.log('Costs all:', costs_all);
+
+	// var trace1 = {
+	// 	x: Array.apply(null, {length: s.length}).map(Number.call, Number),
+	// 	y: s,
+	// 	type: "scatter"
+	// };
+	// var trace2 = {
+	// 	x: Array.apply(null, {length: t.length}).map(Number.call, Number),
+	// 	y: t,
+	// 	// yaxis: "y2",
+	// 	type: "scatter"
+	// };
+	// var y_axis_0 = cutting_points[0].map(function(point) {
+  // 	return s[point];
+	// });
+	// var concat_extrema_s = extrema_s.minlist.concat(extrema_s.maxlist);
+	// var y_axis_2 = concat_extrema_s.map(function(point) {
+  // 	return s[point];
+	// });
+	// var trace5 = {
+	// 	x: concat_extrema_s,
+	// 	y: y_axis_2,
+	// 	mode: "markers",
+	// 	type: "scatter"
+	// };
+	// var concat_extrema_t = extrema_t.minlist.concat(extrema_t.maxlist);
+	// var y_axis_3 = concat_extrema_t.map(function(point) {
+  // 	return t[point];
+	// });
+	// var trace6= {
+	// 	x: concat_extrema_t,
+	// 	y: y_axis_3,
+	// 	// yaxis: "y2",
+	// 	mode: "markers",
+	// 	type: "scatter"
+	// };
+	// var data_plotly = [trace1, trace2, trace5, trace6];
+	// var layout = {
+	//   yaxis: {domain: [0, 0.5]},
+	//   yaxis2: {domain: [0.5, 1]},
+	// };
+	// var graphOptions = {layout: layout, fileopt : "overwrite", filename : "simple-node-example"};
+	//
+	// plotly.plot(data_plotly, graphOptions, function (err, msg) {
+	// 	if (err) return console.log(err);
+	// 	console.log(msg);
+	// });
+	// var data = [trace1, trace2];
+	// var graphOptions = {filename: "basic-line", fileopt: "overwrite"};
+	// plotly.plot(data, graphOptions, function (err, msg) {
+	// 		console.log(msg);
+	// });
 
 	return costs
 }
@@ -372,8 +426,8 @@ function cutting_points_for_lists(list_s1, list_s2, list_t1, list_t2) {
 		points_t.push(list_t1[0])
 	}
 	if (list_s2.length > 0 && list_t2.length > 0 &&
-		(Math.abs(list_s1[i] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
-		(Math.abs(list_t1[i] - points_s[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
+		(Math.abs(list_s2[0] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
+		(Math.abs(list_t2[0] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
 		points_s.push(list_s2[0])
 		points_t.push(list_t2[0])
 	}
@@ -383,18 +437,38 @@ function cutting_points_for_lists(list_s1, list_s2, list_t1, list_t2) {
 				(list_s1[i] > points_s[points_s.length - 1]) &&
 				(list_t1[i] > points_t[points_t.length - 1]) &&
 				(Math.abs(list_s1[i] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
-				(Math.abs(list_t1[i] - points_s[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
+				(Math.abs(list_t1[i] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
 					points_s.push(list_s1[i])
 					points_t.push(list_t1[i])
+		} else if ((list_s1[i + 1] != undefined) &&
+				(list_t1[i + 1] != undefined) &&
+				(list_s1[i + 1] > points_s[points_s.length - 1]) &&
+				(list_t1[i + 1] > points_t[points_t.length - 1]) &&
+				(Math.abs(list_s1[i + 1] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
+				(Math.abs(list_t1[i + 1] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD) &&
+				(list_s1[i + 1] < list_s2[i]) &&
+				(list_t1[i + 1] < list_t2[i])) {
+					points_s.push(list_s1[i + 1])
+					points_t.push(list_t1[i + 1])
 		}
 		if ((list_s2[i] != undefined) &&
 				(list_t2[i] != undefined) &&
 				(list_s2[i] > points_s[points_s.length - 1]) &&
 				(list_t2[i] > points_t[points_t.length - 1]) &&
 				(Math.abs(list_s2[i] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
-				(Math.abs(list_t2[i] - points_s[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
+				(Math.abs(list_t2[i] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD)) {
 					points_s.push(list_s2[i])
 					points_t.push(list_t2[i])
+		} else if ((list_s2[i + 1] != undefined) &&
+				(list_t2[i + 1] != undefined) &&
+				(list_s2[i + 1] > points_s[points_s.length - 1]) &&
+				(list_t2[i + 1] > points_t[points_t.length - 1]) &&
+				(Math.abs(list_s2[i + 1] - points_s[points_s.length - 1]) > INDEX_MIN_THRESHOLD) &&
+				(Math.abs(list_t2[i + 1] - points_t[points_t.length - 1]) > INDEX_MIN_THRESHOLD) &&
+				(list_s2[i + 1] < list_s1[i]) &&
+				(list_t2[i + 1] < list_t1[i])) {
+					points_s.push(list_s2[i + 1])
+					points_t.push(list_t2[i + 1])
 		}
 	}
 	return [points_s, points_t]
@@ -408,7 +482,7 @@ function calculate_costs(s, t, cutting_points) {
 	  var t_slice = t.slice(cutting_points[1][i], cutting_points[1][i+1])
 	  costs = dtw.compute(s_slice, t_slice)
 	  sum = sum + costs
-	//   // console.log('Costs slice_' + (i + 1) + ':', costs)
+	  // console.log('Costs slice_' + (i + 1) + ':', cutting_points[0][i], cutting_points[0][i+1], costs)
 	}
 	// // console.log('Costs sum slices: ' + sum)
 	return sum

@@ -1,13 +1,8 @@
 'use strict'
 
-const CERTAINITY_THRESHOLD = 0.85
-const LENGTH = 1000
-
-const dtw_slicing = require(__dirname + "/dtw_slicing_evaluation.js")
-const featurizer = require(__dirname + "/featurizer.js")
-
 module.exports = {
-	compare: compare
+	computeDTWResultNormal: computeDTWResultNormal,
+	computeDTWResultFiltered: computeDTWResultFiltered
 }
 
 var DTW = require('dtw')
@@ -312,9 +307,30 @@ function combineCertainities(xCertainity, xSlicingCertainity, yCertainity, ySlic
     return certainity / numberOfCertainities
 }
 
-function normalize(array, normalizeLength, normalizeMagnitude) {
-    var normalized = array
-    normalized[0] = normalized[0] ? normalized[0] : 0
+function computeDTWResultNormal(normalizedNew, normalizedSaved) {
+	var result
+	try {
+		result = dtw.compute(normalizedNew, normalizedSaved)
+	}
+	catch(err) {
+		console.log(err)
+		return false;
+	}
 
-    return normalized
+	return result
+}
+
+function computeDTWResultFiltered(normalizedNew, normalizedSaved) {
+	var result
+	try {
+		normalizedNew = normalizedNew.filter(function(n){ return n != undefined })
+		normalizedSaved = normalizedSaved.filter(function(n){ return n != undefined })
+		result = dtw.compute(normalizedNew, normalizedSaved)
+	}
+	catch(err) {
+		console.log(err)
+		return false;
+	}
+
+	return result
 }
