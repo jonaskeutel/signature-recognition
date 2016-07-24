@@ -12,7 +12,7 @@ module.exports = {
     numAccelerationSpikes
  */
 function featurize(signature) {
-    var force = JSON.parse(signature.x)
+    var force = JSON.parse(signature.force)
     var minForce = Math.min.apply(null, force)
     var maxForce = Math.max.apply(null, force)
 

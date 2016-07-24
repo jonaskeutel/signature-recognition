@@ -239,8 +239,7 @@ function compareValues(newValues, savedValues, dtwFunction) {
   var normalizedNew = normalize(newValues)
 	for (var i = 0; i < savedValues.length; i++) {
     var normalizedSaved = normalize(savedValues[i])
-		var result
-		result = computeDTWResult(dtwFunction, [normalizedNew, normalizedSaved])
+		var result = computeDTWResult(dtwFunction, [normalizedNew, normalizedSaved])
 		if (typeof(result) == "boolean" && !result) {
 			return false
 		}
