@@ -12,71 +12,6 @@ var DTW = require('dtw')
 var dtw = new DTW()
 // var plotly = require('plotly')("user", "key")
 
-function compare(newSignature, savedSignatures, callback) {
-	var savedX = []
-	var savedY = []
-
-	for (var i = savedSignatures.length - 1; i >= 0; i--) {
-		savedX.push(savedSignatures[i].x)
-		savedY.push(savedSignatures[i].y)
-	}
-
-	var xResult = compareValues(newSignature.x, savedX)
-	var yResult = compareValues(newSignature.y, savedY)
-
-	var combinedScore = combineScores(xResult, yResult)
-	var success = combinedScore < SCORE_THRESHOLD ? true : false
-	var result = {
-		success: success,
-		combinedScore: combinedScore,
-		x: xResult,
-		y: yResult
-	}
-
-	callback(result)
-}
-
-function getCertainity(newValues, savedValues) {
-    var overallDiff = 0
-    var numberOfComparisons = 0
-    var maxDiff = 0
-    var newDiff = 0
-    // compare array of values (x, y, force, acceleration, ...)
-    for (var i = 0; i < savedValues.length; i++) {
-        for (var j = 0; j < savedValues.length; j++) {
-            if (i <= j) {
-                continue
-            }
-            var diff = compareValues(savedValues[i], savedValues)
-            // // console.log("Comparison between " + i + " and " + j + " --> " + diff)
-            if (!diff) {
-                continue
-            }
-            overallDiff += diff
-            maxDiff = diff > maxDiff ? diff : maxDiff
-            numberOfComparisons++
-        }
-    }
-
-    newDiff = compareValues(newValues, savedValues)
-    // console.log("new Diff:\t\t\t\t" + newDiff)
-
-    if (numberOfComparisons === 0) {
-        return false
-    }
-    var averageDiff = overallDiff / numberOfComparisons
-    var avgCertainity = newDiff < averageDiff ? 1 : averageDiff / newDiff
-    var maxCertainity = newDiff < maxDiff ? 1 : maxDiff / newDiff
-    var resultingCertainity = (avgCertainity + maxCertainity) / 2
-    // console.log("Average diff:\t\t\t	 " + averageDiff)
-    // console.log("Average certainity:\t\t\t " + avgCertainity)
-    // console.log("Max diff:\t\t\t\t " + maxDiff)
-    // console.log("Max certainity:\t\t\t\t " + maxCertainity)
-    // console.log("resulting certainity:\t\t\t " + resultingCertainity)
-
-    return resultingCertainity
-}
-
 function arrayMin(arr) { return Math.min.apply(Math, arr); };
 
 function computeDTWResult(normalizedNew, normalizedSaved) {
@@ -93,19 +28,19 @@ function computeDTWResult(normalizedNew, normalizedSaved) {
 }
 
 function compute_slicing_result(s, t) {
-	// // console.log('Elements in s:', s.length);
-	// // console.log('Elements in t:', t.length);
+	// console.log('Elements in s:', s.length);
+	// console.log('Elements in t:', t.length);
 	s = s.filter(function(n){ return n != undefined })
 	t = t.filter(function(n){ return n != undefined })
-  // // console.log("filter successful")
-	// // console.log('Numeric elements in s:', s.length);
-	// // console.log('Numeric elements in t:', t.length);
+  // console.log("filter successful")
+	// console.log('Numeric elements in s:', s.length);
+	// console.log('Numeric elements in t:', t.length);
 
 	var extrema_s = prepare_slicing(s)
 	var extrema_t = prepare_slicing(t)
-  // // console.log("prepare slicing successful")
-	// // console.log(extrema_s);
-	// // console.log(extrema_t);
+  // console.log("prepare slicing successful")
+	// console.log(extrema_s);
+	// console.log(extrema_t);
 
 	var mapped_extrema_minlists = map_extrema_lists(extrema_s.minlist, extrema_t.minlist)
 	extrema_s.minlist = mapped_extrema_minlists[0]
@@ -113,33 +48,33 @@ function compute_slicing_result(s, t) {
 	var mapped_extrema_maxlists = map_extrema_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = mapped_extrema_maxlists[0]
   extrema_t.maxlist = mapped_extrema_maxlists[1]
-  // // console.log("mapping extrema successful")
-	// // console.log('dtw mapped minlists:');
-  // // console.log(extrema_s.minlist);
-  // // console.log(extrema_t.minlist);
-	// // console.log('dtw mapped maxlists:');
-	// // console.log(extrema_s.maxlist);
-  // // console.log(extrema_t.maxlist);
+  // console.log("mapping extrema successful")
+	// console.log('dtw mapped minlists:');
+  // console.log(extrema_s.minlist);
+  // console.log(extrema_t.minlist);
+	// console.log('dtw mapped maxlists:');
+	// console.log(extrema_s.maxlist);
+  // console.log(extrema_t.maxlist);
 	var cleaned_extrema_minlists = clean_up_lists(extrema_s.minlist, extrema_t.minlist)
 	extrema_s.minlist = cleaned_extrema_minlists[0]
 	extrema_t.minlist = cleaned_extrema_minlists[1]
 	var cleaned_extrema_maxlists = clean_up_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = cleaned_extrema_maxlists[0]
 	extrema_t.maxlist = cleaned_extrema_maxlists[1]
-  // // console.log("cleaned extrema successful")
-	// // console.log('dtw mapped minlists cleaned:');
-	// // console.log(extrema_s.minlist);
-	// // console.log(extrema_t.minlist);
-	// // console.log('dtw mapped maxlists cleaned:');
-	// // console.log(extrema_s.maxlist);
-	// // console.log(extrema_t.maxlist);
+  // console.log("cleaned extrema successful")
+	// console.log('dtw mapped minlists cleaned:');
+	// console.log(extrema_s.minlist);
+	// console.log(extrema_t.minlist);
+	// console.log('dtw mapped maxlists cleaned:');
+	// console.log(extrema_s.maxlist);
+	// console.log(extrema_t.maxlist);
 	var cutting_points = determine_cutting_points(extrema_s, extrema_t)
-  // // console.log("getting cutting points successful")
-	// // console.log('cutting points:');
-	// // console.log(cutting_points[0]);
-	// // console.log(cutting_points[1]);
+  // console.log("getting cutting points successful")
+	// console.log('cutting points:');
+	// console.log(cutting_points[0]);
+	// console.log(cutting_points[1]);
 	var costs = calculate_costs(s, t, cutting_points)
-  // // console.log("calculate costs (part 1) successful")
+  // console.log("calculate costs (part 1) successful")
 	var costs_all = dtw.compute(s, t)
 	// console.log('path:', dtw.path());
   // console.log("calculate costs (part 2) successful")
@@ -484,6 +419,6 @@ function calculate_costs(s, t, cutting_points) {
 	  sum = sum + costs
 	  // console.log('Costs slice_' + (i + 1) + ':', cutting_points[0][i], cutting_points[0][i+1], costs)
 	}
-	// // console.log('Costs sum slices: ' + sum)
+	// console.log('Costs sum slices: ' + sum)
 	return sum
 }
