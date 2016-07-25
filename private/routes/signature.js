@@ -69,11 +69,19 @@ function checkSignature(req, res) {
 
                       if (result) {
                         var neural = neural_network.testSignature(req.body)
-                        console.log(neural)
+                        // console.log(neural)
+                        // console.log(result)
                         var prob = (1 * result.dtw.combinedCertainity + 1 * neural[user_index] ) / 2;
-                        console.log(prob, user_index)
+
+                        console.log("Try for User at index: " + user_index + " --------------------------------")
+                        console.log("Prob: \t" + prob)
+                        console.log("Neural: \t" + neural[user_index])
+                        console.log("DTW: \t" + result.dtw.combinedCertainity)
+
                         return res.json({
-                          probability: prob
+                          probability: prob,
+                          dtw: result.dtw.combinedCertainity,
+                          neural: neural[user_index]
                         })
                       } else {
                         return res.json({"status": "error", "message": "signature check not successful"})
