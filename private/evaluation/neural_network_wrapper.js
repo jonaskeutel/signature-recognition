@@ -122,9 +122,25 @@ function featurize_signature(signature, dtw_result){
   //     var key = Object.keys( signature )[i]
   //     tmp_sign.push(signature[key])
   // }
+
+  tmp_sign.push(signature.height / signature.width)
+  tmp_sign.push(signature.duration / 100000)
+  tmp_sign.push(array_average(signature.force))
+
   return tmp_sign
 }
 
+function array_average(arr){
+  var sum = 0;
+  var elems = 0;
+  for(var i=0; i<arr.length; i++){
+    if(arr[i] != null){
+      sum += arr[i]
+      elems++;
+    }
+  }
+  return sum / Math.max(elems, 1)
+}
 
 
 function drawSignature(signature){

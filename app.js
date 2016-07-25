@@ -27,7 +27,7 @@ require('./private/routes.js')(app)
 
 // Database initialization
 dbInit.init()
-  .then(neural_network.init)
+//   .then(neural_network.init)
   .then(function(){
        // --- server and https setup
       // app.listen(port)
