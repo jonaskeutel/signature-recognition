@@ -105,10 +105,10 @@ export class ApiService {
               data => {
                         var result = JSON.parse(data['_body']);
                         var resString = "Authentication was ";
-                        if (!result.certainitySuccess) {
+                        if (result.dtw < 0.85) {
                             resString += "not "
                         }
-                        resString += "successful. Certainity was " + Math.round(result.combinedCertainity * 100) + "%; the threshold is 85%.\n";
+                        resString += "successful. Certainity was " + Math.round(result.dtw * 100) + "%; the threshold is 85%.\n";
                         resString += "DTW: \t " + result.dtw + "\n"
                         resString += "Neural: \t " + result.neural + "\n"
                         resString += "Avg: \t" + result.probability + "\n"
