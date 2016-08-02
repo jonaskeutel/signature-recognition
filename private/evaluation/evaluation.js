@@ -58,21 +58,18 @@ function computeDTWResult(func, args) {
 function compare(newSignature, savedSignatures) {
   	const deferred = q.defer()
 
-		var newFeatures = featurizer.featurize(newSignature)
+	var newFeatures = featurizer.featurize(newSignature)
     var savedFeatures = []
 
   	for (var i = savedSignatures.length - 1; i >= 0; i--) {
   		savedFeatures.push(featurizer.featurize(savedSignatures[i]))
   	}
-    // console.log("everything featurized")
-
     var result = calculateCertainitiesFromFeatures(newFeatures, savedFeatures)
+	deferred.resolve({
+		dtw: result
+	})
 
-		deferred.resolve({
-			dtw: result
-		})
-
-		return deferred.promise
+	return deferred.promise
 }
 
 function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {

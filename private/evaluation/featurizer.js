@@ -5,6 +5,7 @@ module.exports = {
     featuresToArray: featuresToArray
 }
 
+const dtw_slicing_evaluation = require(__dirname + "/dtw_slicing_evaluation.js")
 /*
   TODO:
     rasterize
@@ -15,10 +16,12 @@ function featurize(signature) {
     var force = JSON.parse(signature.force)
     var minForce = Math.min.apply(null, force)
     var maxForce = Math.max.apply(null, force)
+    var forceExtrema = getNumberOfPeakes(force)
 
     var acceleration = JSON.parse(signature.acceleration)
     var minAcceleration = Math.min.apply(null, acceleration)
     var maxAcceleration = Math.max.apply(null, acceleration)
+    var accelerationExtrema = getNumberOfPeakes(acceleration)
 
     var orientation = JSON.parse(signature.gyroscope)
     var minOrientation = Math.min.apply(null, orientation)
@@ -28,9 +31,13 @@ function featurize(signature) {
         x: JSON.parse(signature.x),
         y: JSON.parse(signature.y),
         force: force,
+        forceMinPeakes: forceExtrema.min,
+        forceMinPeakes: forceExtrema.min,
         minForce: minForce,
         maxForce, maxForce,
         acceleration: acceleration,
+        accelerationMinPeakes: accelerationExtrema.min,
+        accelerationMaxPeakes: accelerationExtrema.max,
         minAcceleration: minAcceleration,
         maxAcceleration: maxAcceleration,
         orientation: orientation,
@@ -60,4 +67,22 @@ function featuresToArray(features) {
         }
     }
     return temp
+}
+
+function getNumberOfPeakes(arr) {
+    arr = arr.filter(function(n){ return n != undefined })
+    if (arr.length === 0) {
+        return {
+            min: 0,
+            max: 0
+        }
+    }
+    var arrNew = arr.map(function(n){
+       return n*100;
+    })
+    var min_max_lists = dtw_slicing_evaluation.getExtrema(arrNew)
+    return {
+        min: min_max_lists.minlist.length,
+        max: min_max_lists.maxlist.length
+    }
 }

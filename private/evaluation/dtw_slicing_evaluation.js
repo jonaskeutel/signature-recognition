@@ -5,7 +5,8 @@ const INDEX_MIN_THRESHOLD = 3
 const EXTREMA_GRANULARITY = '1'
 
 module.exports = {
-	computeDTWResult: computeDTWResult
+	computeDTWResult: computeDTWResult,
+    getExtrema: prepare_slicing
 }
 
 var DTW = require('dtw')
