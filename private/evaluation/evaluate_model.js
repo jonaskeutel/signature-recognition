@@ -5,10 +5,11 @@ var q               = require('q')
 
 
 db.init()
-  .then(neural_network.init)
+  // .then(neural_network.init)
   .then(db.getAllUser)
   .then(function(user){
-    evaluate_model(user)
+    evaluate_model_neural_each(user)
+    // evaluate_model(user)
   })
 
 function evaluate_model(user){
@@ -21,6 +22,32 @@ function evaluate_model(user){
   function process(){
     console.log("Evaluating user " + user[index].id)
     evaluate_user(user[index], index)
+      .then(() =>{
+        index += 1
+        if(index < user.length){
+          console.log("--------------------------------------------------------")
+          process()
+        }
+      })
+  }
+  process()
+
+  return deferred.promise
+}
+
+function evaluate_model_neural_each(user){
+  console.log("----------------- Evaluation with following user -------------------")
+  console.log(user)
+
+  var deferred = q.defer()
+  var index = 0
+
+  function process(){
+    console.log("Evaluating user " + user[index].id)
+    neural_network.initFor(user[index])
+      .then( (_) => {
+        return evaluate_user(user[index], 0)
+      })
       .then(() =>{
         index += 1
         if(index < user.length){

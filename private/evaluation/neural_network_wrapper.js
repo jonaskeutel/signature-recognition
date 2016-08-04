@@ -32,6 +32,24 @@ module.exports = {
     // })
 
     return deferred.promise
+  },
+  initFor: function(user){
+    const deferred = q.defer()
+    console.log(" -----  INIT NEURAL NETWORK FOR USER "+user.id+"-----")
+    // db.init()
+    //   .then( () => {
+
+    // db.getUser(userid)
+    //   .then( (user) => {
+        train_all([user])
+          .then(deferred.resolve)
+        
+      //   deferred.resolve()
+      // })
+
+    // })
+
+    return deferred.promise
   }
 }
 
@@ -58,7 +76,7 @@ function train_all(user){
   q.all(promises)
     .then( (result) => {
       var all = []
-
+      
       for(var i=0; i<result.length; i++){
         var user_signs = []
         for(var j=0; j<result[i].length; j++){
@@ -68,14 +86,14 @@ function train_all(user){
         }
         all.push(user_signs)
       }
-
+      console.log("Train network!")
       network = neural_network.create_all(all)
       // var check_sign = featurize_signature( result[0][0], null )
 
       // for(var u=0; u<all.length;u++){
       //   console.log(u + '. User: ' + network.activate( all[u][0]) )
       // }
-      fs.writeFile(__dirname + '/network.json', JSON.stringify( network.toJSON() ) );
+      // fs.writeFile(__dirname + '/network.json', JSON.stringify( network.toJSON() ) );
       deferred.resolve(network)
     })
     .catch(console.log)
