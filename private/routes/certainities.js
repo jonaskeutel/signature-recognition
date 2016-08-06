@@ -13,7 +13,7 @@ function newCertainities(req, res) {
     if (!true) {
         return res.json({"status": "error", "message": "missing a parameter"})
     } else {
-    	var newCertainities = [] // TODO
+    	var newCertainities = []
     	db.newCertainities(newCertainities)
         .then(function() {
           return res.json({"status": "success", "message": "signature successfully created"})
@@ -27,7 +27,7 @@ function getCertainities(req, res) {
   if(!req.userid) {
     return res.json({"status": "error", "message": "missing parameter 'personID'"})
   } else {
-    db.getSignatures(req.userid) //TODO
+    db.getSignatures(req.userid)
       .then(function(result) {
         return res.json(result)
       }, function(err) {

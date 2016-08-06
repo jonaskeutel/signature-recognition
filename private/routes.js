@@ -8,7 +8,7 @@ module.exports = function(app) {
 
   // parameter middleware that will run before the next routes
   app.param('userid', function(req, res, next, userid) {
-      // save name to the request
+      // save userid to the request
       req.userid = userid;
 
       next();
