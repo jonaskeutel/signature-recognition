@@ -108,7 +108,7 @@ function newNetworkAll(all_signatures){
   try{
   var network = new Architect.Perceptron(trainingSet[0].input.length, 10 ,all_signatures.length)
   var trainer = new Trainer(network)
-  
+  console.log("Train now!")
   trainer.train(trainingSet, {
     rate: .003,
     iteration: 1000,

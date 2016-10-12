@@ -1,9 +1,10 @@
-var neural_network  = require('./neural_network.js')
-var db              = require('../database/dbInterface.js')
-var fs              = require('fs')
-var Canvas          = require('canvas')
-var evaluation      = require('./evaluation.js')
-var q               = require('q')
+const neural_network  = require('./neural_network.js')
+const db              = require('../database/dbInterface.js')
+const fs              = require('fs')
+const Canvas          = require('canvas')
+const evaluation      = require('./evaluation.js')
+const q               = require('q')
+const featurizer 			= require(__dirname + "/featurizer.js")
 
 var network = null;
 
@@ -26,7 +27,7 @@ module.exports = {
           .then(deferred.resolve)
         // network = neural_network.existing()
         
-        deferred.resolve()
+        // deferred.resolve()
       })
 
     // })
@@ -79,14 +80,14 @@ function train_all(user){
       
       for(var i=0; i<result.length; i++){
         var user_signs = []
-        for(var j=0; j<result[i].length; j++){
+        for(var j=1; j<result[i].length; j++){
 
           user_signs.push( featurize_signature( result[i][j] , null) )
 
         }
         all.push(user_signs)
       }
-      console.log("Train network!")
+      console.log("Train network! with " + all.length)
       network = neural_network.create_all(all)
       // var check_sign = featurize_signature( result[0][0], null )
 
@@ -136,14 +137,15 @@ function featurize_signature(signature, dtw_result){
   //   dtw_result.force
   // ])
 
-  // for(var i=6; i< Object.keys( signature ).length; i++){
-  //     var key = Object.keys( signature )[i]
-  //     tmp_sign.push(signature[key])
-  // }
+  // var features = featurizer.featurize(signature)
 
   tmp_sign.push(signature.height / signature.width)
-  tmp_sign.push(signature.duration / 100000)
-  tmp_sign.push(array_average(signature.force))
+  // tmp_sign.push(signature.duration / 100000)
+  // tmp_sign.push(array_average(signature.force))
+  // tmp_sign.push(features.forceMinPeakes)
+  // tmp_sign.push(features.forceMaxPeakes)
+  // tmp_sign.push(features.accelerationMinPeakes)
+  // tmp_sign.push(features.accelerationMaxPeakes)
 
   return tmp_sign
 }

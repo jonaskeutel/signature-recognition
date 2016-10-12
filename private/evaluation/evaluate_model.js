@@ -5,11 +5,11 @@ var q               = require('q')
 
 
 db.init()
-  // .then(neural_network.init)
+  .then(neural_network.init)
   .then(db.getAllUser)
   .then(function(user){
-    evaluate_model_neural_each(user)
-    // evaluate_model(user)
+    // evaluate_model_neural_each(user)
+    evaluate_model(user)
   })
 
 function evaluate_model(user){
@@ -68,7 +68,8 @@ function evaluate_user(user, index){
   db.getSignatures(user.id)
     .then( (signatures) => {
       if(signatures.length == 4){
-        for(var i=0; i<signatures.length; i++){
+        // for(var i=0; i<signatures.length; i++){
+        for(var i=0; i<1; i++){
           var other_signatures = []
           for(var j=0; j<signatures.length; j++){
             other_signatures.push(signatures[j])

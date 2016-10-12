@@ -13,12 +13,14 @@ const dtw_slicing_evaluation = require(__dirname + "/dtw_slicing_evaluation.js")
     numAccelerationSpikes
  */
 function featurize(signature) {
-    var force = JSON.parse(signature.force)
+    var force = typeof signature.force == 'object' ? signature.force : JSON.parse(signature.force)
+    force = force.map(function(elem){return elem != null})
     var minForce = Math.min.apply(null, force)
     var maxForce = Math.max.apply(null, force)
     var forceExtrema = getNumberOfPeakes(force)
 
     var acceleration = JSON.parse(signature.acceleration)
+    acceleration = acceleration.map(function(elem){return elem != null})
     var minAcceleration = Math.min.apply(null, acceleration)
     var maxAcceleration = Math.max.apply(null, acceleration)
     var accelerationExtrema = getNumberOfPeakes(acceleration)
@@ -28,16 +30,16 @@ function featurize(signature) {
     var maxOrientation = Math.max.apply(null, orientation)
 
     return {
-        x: JSON.parse(signature.x),
-        y: JSON.parse(signature.y),
+        x: typeof signature.x == 'object' ? signature.x : JSON.parse(signature.x),
+        y: typeof signature.y == 'object' ? signature.y : JSON.parse(signature.y),
         force: force,
-        forceMinPeakes: forceExtrema.min,
-        forceMinPeakes: forceExtrema.min,
+        forceMinPeakes: forceExtrema.min != null ? forceExtrema.min : 0,
+        forceMaxPeakes: forceExtrema.max != null ? forceExtrema.max : 0,
         minForce: minForce,
-        maxForce, maxForce,
+        maxForce: maxForce,
         acceleration: acceleration,
-        accelerationMinPeakes: accelerationExtrema.min,
-        accelerationMaxPeakes: accelerationExtrema.max,
+        accelerationMinPeakes: accelerationExtrema.min != null ? accelerationExtrema.min : 0,
+        accelerationMaxPeakes: accelerationExtrema.max != null ? accelerationExtrema.max : 0,
         minAcceleration: minAcceleration,
         maxAcceleration: maxAcceleration,
         orientation: orientation,
