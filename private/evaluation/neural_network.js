@@ -1,3 +1,8 @@
+/**
+ * Takes care of the neural network and the training of it
+ * Then returns an instance of the network.
+ */
+
 const synaptic = require('synaptic'); // this line is not needed in the browser
 const q        = require('q')
 
@@ -14,38 +19,8 @@ module.exports = {
   existing: getExistingNetwork
 }
 
-function newNetwork(signatures){
-  var trainingSet = []
-  for(var i=0; i<signatures.length; i++){
-    trainingSet.push( {
-      "input": signatures[i],
-      "output": [1]
-    })
-  }
- 
-  console.log("Training set " + trainingSet.length)
-  try{
-  var network = new Architect.Perceptron(trainingSet[0].input.length, 10 ,1)
-  var trainer = new Trainer(network)
-  
-  trainer.train(trainingSet, {
-    rate: .00003,
-    iteration: 100000,
-    log: 100,
-    schedule: {
-      every: 10000,
-      do: function(data){
-        console.log("error ", data.error)
-      }
-      }
-    })
-  
-}catch(err){
-    console.log(err)
-  }
-
-  return network
-}
+const errorRate = .003
+const iterations = 100000
 
 function getExistingNetwork(){
   console.log("here")
@@ -80,8 +55,8 @@ function newNetworkAll(all_signatures){
     
     // Train network with the set error rate and iterations
     trainer.train(trainingSet, {
-      rate: .003,
-      iteration: 1000,
+      rate: errorRate,
+      iteration: iterations,
       log: 100,
       schedule: {
         every: 10000,
@@ -97,6 +72,38 @@ function newNetworkAll(all_signatures){
   return network
 }
 
+function newNetwork(signatures){
+  var trainingSet = []
+  for(var i=0; i<signatures.length; i++){
+    trainingSet.push( {
+      "input": signatures[i],
+      "output": [1]
+    })
+  }
+ 
+  console.log("Training set " + trainingSet.length)
+  try{
+    var network = new Architect.Perceptron(trainingSet[0].input.length, 10 ,1)
+    var trainer = new Trainer(network)
+    
+    trainer.train(trainingSet, {
+      rate: errorRate,
+      iteration: iterations,
+      log: 100,
+      schedule: {
+        every: 10000,
+        do: function(data){
+          console.log("error ", data.error)
+        }
+        }
+      })
+  
+  }catch(err){
+    console.log(err)
+  }
+
+  return network
+}
 
 function array_of_length(length, val){
   var arr = []

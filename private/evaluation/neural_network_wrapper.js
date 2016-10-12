@@ -1,3 +1,9 @@
+/**
+ * This file wraps the processes to prepare the data that are passed to the neural network
+ * It featurizes the signatures and initiates the training
+ * It further more manages the created instance and offers an api to test a signature against the network
+ */
+
 const neural_network  = require('./neural_network.js')
 const db              = require('../database/dbInterface.js')
 const fs              = require('fs')
