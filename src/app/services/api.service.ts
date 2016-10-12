@@ -1,6 +1,5 @@
 import {Http, Headers} from '@angular/http';
 import {Injectable} from '@angular/core';
-import {Sample} from '../model/sample';
 // import {Observable} from 'rxjs/Observable';
 
 

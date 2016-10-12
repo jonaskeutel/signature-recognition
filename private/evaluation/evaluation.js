@@ -73,72 +73,39 @@ function compare(newSignature, savedSignatures) {
 }
 
 function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {
-        // console.log()
-        // console.log("-------------------------  x  --------------------------------")
+
         var xCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), DTW_NORMAL)
-        // console.log()
-        // console.log()
-				// console.log("-------------------------  x filtered  --------------------------------")
+
         var xFilteredCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), DTW_FILTERED)
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  x slicing --------------------------------")
-    		var xSlicingCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), DTW_SLICING)
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  y  --------------------------------")
+
+        var xSlicingCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), DTW_SLICING)
+
       	var yCertainity = getCertainity(newFeatures.y, savedFeatures.map(function(o){return o.y}), DTW_NORMAL)
-        // console.log()
-        // console.log()
-				// console.log("-------------------------  y filtered  --------------------------------")
+
         var yFilteredCertainity = getCertainity(newFeatures.y, savedFeatures.map(function(o){return o.y}), DTW_FILTERED)
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  y slicing  --------------------------------")
+
         var ySlicingCertainity = getCertainity(newFeatures.y, savedFeatures.map(function(o){return o.y}), DTW_SLICING)
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  force  --------------------------------")
+
         var forceDTWCertainity = getCertainity(newFeatures.force, savedFeatures.map(function(o){return o.force}), DTW_NORMAL)
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  force min/max  --------------------------------")
+
         var forceMinMaxCertainity = getMinMaxCertainity(newFeatures.minForce, newFeatures.maxForce, savedFeatures.map(function(o){return o.minForce}), savedFeatures.map(function(o){return o.maxForce}))
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  acceleration  --------------------------------")
+
         var accelerationDTWCertainity = getCertainity(newFeatures.acceleration, savedFeatures.map(function(o){return o.acceleration}), DTW_NORMAL)
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  acceleration min/max  --------------------------------")
+
         var accelerationMinMaxCertainity = getMinMaxCertainity(newFeatures.minAcceleration, newFeatures.maxAcceleration, savedFeatures.map(function(o){return o.minAcceleration}), savedFeatures.map(function(o){return o.maxAcceleration}))
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  orientation  --------------------------------")
+
         var orientationCertainity = getCertainity(newFeatures.gyroscope, savedFeatures.map(function(o){return o.orientation}), DTW_NORMAL)
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  width  --------------------------------")
+
         var widthCertainity = getCertainity(newFeatures.width, savedFeatures.map(function(o){return o.width}))
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  height  --------------------------------")
+
         var heightCertainity = getCertainity(newFeatures.height, savedFeatures.map(function(o){return o.height}))
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  duration  --------------------------------")
+
         var durationCertainity = getCertainity(newFeatures.duration, savedFeatures.map(function(o){return o.duration}))
-        // console.log()
-        // console.log()
-        // console.log("-------------------------  numStrokes  --------------------------------")
+
         var numStrokesCertainity = getNumStrokesCertainity(newFeatures.numStrokes, savedFeatures.map(function(o){return o.numStrokes}))
-        // console.log()
-        // console.log()
-        // console.log("Got all certainities")
+
         var combinedCertainity = combineCertainities(xCertainity, xFilteredCertainity, xSlicingCertainity, yCertainity, yFilteredCertainity, ySlicingCertainity, forceDTWCertainity, accelerationDTWCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity)
-        // console.log("combinedCertainity: ", combinedCertainity)
-        // console.log()
-        // console.log()
+
         var certainitySuccess = combinedCertainity >= CERTAINITY_THRESHOLD ? true : false
 
       	var result = {

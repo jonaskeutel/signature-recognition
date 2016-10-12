@@ -35,17 +35,6 @@ function connect() {
   return deferred.promise
 }
 
-// function createUserTable(){
-//   const deferred = q.defer()
-
-//   postgres.query('CREATE TABLE IF NOT EXISTS testUser (id int);')
-
-//   deferred.resolve()
-
-//   return deferred.promise
-// }
-
-
 function setupDatabase () {
   return connect()
 

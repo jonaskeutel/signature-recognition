@@ -13,48 +13,30 @@ module.exports = {
   init: function(){
     const deferred = q.defer()
     console.log(" -----  INIT NEURAL NETWORK -----")
-    // db.init()
-    //   .then( () => {
 
     db.getAllUser()
       .then( (user) => {
         console.log(user)
-        // db.getSignatures(66)
-        //   .then( (signatures) => {
-        //     featurizeSignatures(signatures)
-        //   })
+
         train_all(user)
           .then(deferred.resolve)
-        // network = neural_network.existing()
-        
-        // deferred.resolve()
-      })
 
-    // })
+      })
 
     return deferred.promise
   },
   initFor: function(user){
     const deferred = q.defer()
     console.log(" -----  INIT NEURAL NETWORK FOR USER "+user.id+"-----")
-    // db.init()
-    //   .then( () => {
 
-    // db.getUser(userid)
-    //   .then( (user) => {
-        train_all([user])
-          .then(deferred.resolve)
-        
-      //   deferred.resolve()
-      // })
-
-    // })
+    train_all([user])
+      .then(deferred.resolve)
 
     return deferred.promise
   }
 }
 
-
+// Takes a signature and tests it against the existing signature
 function testSign(signature){
     signature.width = parseInt(signature.width)
     signature.height = parseInt(signature.height)
@@ -89,12 +71,7 @@ function train_all(user){
       }
       console.log("Train network! with " + all.length)
       network = neural_network.create_all(all)
-      // var check_sign = featurize_signature( result[0][0], null )
 
-      // for(var u=0; u<all.length;u++){
-      //   console.log(u + '. User: ' + network.activate( all[u][0]) )
-      // }
-      // fs.writeFile(__dirname + '/network.json', JSON.stringify( network.toJSON() ) );
       deferred.resolve(network)
     })
     .catch(console.log)
@@ -110,9 +87,9 @@ function check_signature(user_id, signature, network){
       .then( (signatures) => {
         evaluation.compare(signature, signatures)
           .then( (dtw_result) => {
-            // console.log("passed eval", dtw_result)
+
             var check_sign = featurize_signature( signature, dtw_result )
-            // console.log(check_sign)
+
             console.log(network.activate(check_sign))
           })
           .catch(console.log)
@@ -124,28 +101,13 @@ function check_signature(user_id, signature, network){
 function featurize_signature(signature, dtw_result){
   var tmp_sign = []
 
-  // printSignature(signature)
   //Rasterize signature to pixel_density
   var c = drawSignature(signature)
   var rasterised = blackDensity(c, signature)
 
   tmp_sign = tmp_sign.concat(rasterised)
-  // tmp_sign = tmp_sign.concat( [
-  //   dtw_result.combinedScore, 
-  //   dtw_result.x, 
-  //   dtw_result.y,
-  //   dtw_result.force
-  // ])
-
-  // var features = featurizer.featurize(signature)
 
   tmp_sign.push(signature.height / signature.width)
-  // tmp_sign.push(signature.duration / 100000)
-  // tmp_sign.push(array_average(signature.force))
-  // tmp_sign.push(features.forceMinPeakes)
-  // tmp_sign.push(features.forceMaxPeakes)
-  // tmp_sign.push(features.accelerationMinPeakes)
-  // tmp_sign.push(features.accelerationMaxPeakes)
 
   return tmp_sign
 }
@@ -162,7 +124,7 @@ function array_average(arr){
   return sum / Math.max(elems, 1)
 }
 
-
+// Uses node canvas to create an image of the existing signature data
 function drawSignature(signature){
   try{
   canvas = new Canvas(signature.width, signature.height)
@@ -189,7 +151,7 @@ function drawSignature(signature){
       }
   }
   }catch(err){console.log(err)}
-  // fs.writeFile('out.svg', canvas.toBuffer());
+
   return canvas
 }
 
@@ -198,6 +160,7 @@ function thickness(force, thickness){thickness = thickness != null ? thickness :
 const raster_width = 25
 const raster_height = 25
 
+// Takes the image of a signature and calculates the density of black pixels in a set Grid
 function blackDensity(canvas, signature){
   
   try{
@@ -208,12 +171,10 @@ function blackDensity(canvas, signature){
   grid.splice(0,1)
   var image_data = canvas.getContext('2d').getImageData(0,0,signature.width, signature.height);
   
-  // var densities = []
   var width = signature.width
   var height = signature.height
   var pixel_index = 0;
-  // console.log(canvas.width, canvas.height, height_step, width_step)
-  // console.log(grid)
+
   var y_coord = 0;
   var x_coord = 0;
   var densities = []
@@ -253,7 +214,7 @@ function blackDensity(canvas, signature){
       result.push(densities[row][col])
     }
   }
-  // console.log(densities.length + " / " + densities[1].length ," Result: " + result.length)
+
   return result
 }
 
@@ -296,99 +257,10 @@ function create_grid(width, height){
   return [vert].concat(grid)
 }
 
-// console.log( create_grid(282, 107) )
-
 function array_of_length(length, val){
   var arr = []
   for(var i=0; i<length; i++){
     arr.push(val)
   }
   return arr
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// deprecated +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-function featurizeSignatures(signatures){
-  var newSignatures = []
-
-  evaluation.compare(signatures[0], signatures)
-    .then( dtw_result => {
-            // console.log(dtw_result)
-        //Put according vectors into one array to be passed
-        for(var j=0; j<signatures.length-1; j++){
-          newSignatures.push( featurize_signature(signatures[j], dtw_result) )
-          console.log("After sign " + j + " / " + signatures.length)
-        }
-
-        var network = neural_network.create(newSignatures)
-        // check_signature(66, signatures[signatures.length -1], network)
-        var check_sign = featurize_signature( signatures[signatures.length -1], dtw_result )
-            // console.log(check_sign)
-            console.log('First: ' + network.activate(check_sign))
-
-        db.getSignatures(67)
-            .then( (signatures) => {
-              console.log("check signature")
-              check_signature(66, signatures[0], network)
-            })
-            .catch(console.log)
-    })
-  
-}
-
-function printSignature(signature){
-  canvas = new Canvas(signature.width, signature.height, 'svg')
-  ctx = canvas.getContext('2d');
-  signature.x = JSON.parse(signature.x)
-  signature.y = JSON.parse(signature.y)
-  signature.force = JSON.parse(signature.force)
-  
-  var currTouch = signature
-  for(var i=0; i<signature.x.length; i++){
-      if(i==0 && currTouch.x[i] != null || currTouch.x[i] != null && currTouch.x[i-1] == null){
-          ctx.beginPath();
-          ctx.arc(currTouch.x[i], currTouch.y[i], thickness(currTouch.force[i], 10) , 0, 2 * Math.PI, false);  // a circle at the start
-          ctx.fillStyle = 'black';
-          ctx.fill();
-          ctx.stroke();
-      }else if(currTouch.x[i] != null ){
-          ctx.beginPath();
-          ctx.moveTo(currTouch.x[i-1], currTouch.y[i-1]);
-          ctx.lineTo(currTouch.x[i], currTouch.y[i]);
-          ctx.lineWidth = thickness(currTouch.force[i], null);
-          ctx.strokeStyle = 'black';
-          ctx.stroke();
-      }
-  }
-  fs.writeFile(Math.random()+'out.svg', canvas.toBuffer());
 }

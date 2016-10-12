@@ -68,7 +68,6 @@ function evaluate_user(user, index){
   db.getSignatures(user.id)
     .then( (signatures) => {
       if(signatures.length == 4){
-        // for(var i=0; i<signatures.length; i++){
         for(var i=0; i<1; i++){
           var other_signatures = []
           for(var j=0; j<signatures.length; j++){
@@ -78,7 +77,6 @@ function evaluate_user(user, index){
           promises.push(evaluate_signature(signatures[i], other_signatures, index, i))
         }
       }
-        // console.log("user with id " + user.id + " has " + signatures.length + " signatures")
     })
 
   setTimeout( () => {
@@ -107,7 +105,6 @@ function evaluate_signature(signature, other_signatures, index, local_index){
   evaluation.compare(signature, other_signatures)
     .done(function(result) {
             var neural = neural_network.testSignature(signature)
-            // console.log('Neural: \t' + neural)
             
             console.log('[ ' + index + ' ]' +  '[ ' + local_index + ' ]' + 'DTW: \t' + result.dtw.combinedCertainity + '\t Neural: \t' + neural[index] )
 
@@ -119,17 +116,3 @@ function evaluate_signature(signature, other_signatures, index, local_index){
 
   return deferred.promise
 }
-
-// evaluation.compare(req.body, savedSignatures).done(function(result) {
-                      
-//     if (result) {
-//       console.log(result.dtw.combinedCertainity)
-//       var neural = neural_network.testSignature(req.body)
-//       console.log(neural)
-//       var prob = (1 * result.dtw.combinedCertainity + 1 * neural[user_index] ) / 2;
-//       console.log(prob, user_index)
-//       return res.json({
-//         probability: prob
-//       })
-//     }
-// })

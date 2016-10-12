@@ -27,6 +27,7 @@
     "angular2-in-memory-web-api": "0.0.7",
     "body-parser": "^1.15.1",
     "bootstrap": "^3.3.6",
+    "canvas": "^1.5.0",
     "cookie-parser": "^1.4.1",
     "dtw": "0.0.3",
     "es6-promise": "^3.2.1",

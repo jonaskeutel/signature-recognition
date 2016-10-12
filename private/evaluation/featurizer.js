@@ -6,12 +6,8 @@ module.exports = {
 }
 
 const dtw_slicing_evaluation = require(__dirname + "/dtw_slicing_evaluation.js")
-/*
-  TODO:
-    rasterize
-    numForceSpikes
-    numAccelerationSpikes
- */
+
+// Takes a signature and transforms it to a consistent format and further more only keeps relevant features
 function featurize(signature) {
     var force = typeof signature.force == 'object' ? signature.force : JSON.parse(signature.force)
     force = force.map(function(elem){return elem != null})
@@ -53,7 +49,6 @@ function featurize(signature) {
 }
 
 function featuresToArray(features) {
-    //TODO: rasterize
     // if we don't want to skip the data series for x, y, force, acceleration, orientation just delete these lines
     var skip = ['x', 'y', 'force', 'acceleration', 'orientation']
     var temp = []

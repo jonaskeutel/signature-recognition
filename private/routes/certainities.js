@@ -7,9 +7,6 @@ module.exports = {
 }
 
 function newCertainities(req, res) {
-    console.log(req.body)
-    // if(!req.body.personid || !req.body.x || !req.body.y || !req.body.force ||
-    // !req.body.acceleration || !req.body.gyroscope || !req.body.duration || !req.body.width || !req.body.height) {
     if (!true) {
         return res.json({"status": "error", "message": "missing a parameter"})
     } else {
