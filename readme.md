@@ -21,6 +21,8 @@ The whole application is served by a node.js serer running the express module fo
 
 **After starting the application, the neural network is being trained at first. This may take a while. You might want to take a coffee brake now.**
 
+After training you can access the application at [http://localhost:7070](http://localhost:7070). Signatures can only be signed on mobile devices.
+
 #### Problems?
 > Installing may cause Problems with the **canvas** npm module. Look [Here](https://github.com/Automattic/node-canvas/wiki/Installation---OSX) for help
 
