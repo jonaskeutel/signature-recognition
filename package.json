@@ -1,7 +1,7 @@
 {
-  "name": "artiverse-platform",
+  "name": "signature-recognition",
   "version": "1.0.0",
-  "description": "An online Platform that connects artists and followers",
+  "description": "",
   "engines": {
     "node": "4.2.6"
   },

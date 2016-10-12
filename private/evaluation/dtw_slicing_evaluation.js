@@ -6,14 +6,13 @@ const EXTREMA_GRANULARITY = '1'
 
 module.exports = {
 	computeDTWResult: computeDTWResult,
-    getExtrema: prepare_slicing
+  getExtrema: prepare_slicing
 }
 
 var DTW = require('dtw')
 var dtw = new DTW()
-// var plotly = require('plotly')("user", "key")
 
-function arrayMin(arr) { return Math.min.apply(Math, arr); };
+function arrayMin(arr) { return Math.min.apply(Math, arr) }
 
 function computeDTWResult(normalizedNew, normalizedSaved) {
   try {
@@ -21,25 +20,16 @@ function computeDTWResult(normalizedNew, normalizedSaved) {
 		return result
   }
   catch(err) {
-    console.log('Slicing:', err)
-    return false;
+    return false
   }
 }
 
 function compute_slicing_result(s, t) {
-	// console.log('Elements in s:', s.length);
-	// console.log('Elements in t:', t.length);
 	s = s.filter(function(n){ return n != undefined })
 	t = t.filter(function(n){ return n != undefined })
-  // console.log("filter successful")
-	// console.log('Numeric elements in s:', s.length);
-	// console.log('Numeric elements in t:', t.length);
 
 	var extrema_s = prepare_slicing(s)
 	var extrema_t = prepare_slicing(t)
-  // console.log("prepare slicing successful")
-	// console.log(extrema_s);
-	// console.log(extrema_t);
 	if (extrema_s.minlist.length == 0 && extrema_s.maxlist.length == 0 &&
 		extrema_t.minlist.length == 0 && extrema_t.maxlist.length == 0) {
 		return false
@@ -51,100 +41,22 @@ function compute_slicing_result(s, t) {
 	var mapped_extrema_maxlists = map_extrema_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = mapped_extrema_maxlists[0]
   extrema_t.maxlist = mapped_extrema_maxlists[1]
-  // console.log("mapping extrema successful")
-	// console.log('dtw mapped minlists:');
-  // console.log(extrema_s.minlist);
-  // console.log(extrema_t.minlist);
-	// console.log('dtw mapped maxlists:');
-	// console.log(extrema_s.maxlist);
-  // console.log(extrema_t.maxlist);
 	var cleaned_extrema_minlists = clean_up_lists(extrema_s.minlist, extrema_t.minlist)
 	extrema_s.minlist = cleaned_extrema_minlists[0]
 	extrema_t.minlist = cleaned_extrema_minlists[1]
 	var cleaned_extrema_maxlists = clean_up_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = cleaned_extrema_maxlists[0]
 	extrema_t.maxlist = cleaned_extrema_maxlists[1]
-  // console.log("cleaned extrema successful")
-	// console.log('dtw mapped minlists cleaned:');
-	// console.log(extrema_s.minlist);
-	// console.log(extrema_t.minlist);
-	// console.log('dtw mapped maxlists cleaned:');
-	// console.log(extrema_s.maxlist);
-	// console.log(extrema_t.maxlist);
 	var cutting_points = determine_cutting_points(extrema_s, extrema_t)
-  // console.log("getting cutting points successful")
-	// console.log('cutting points:');
-	// console.log(cutting_points[0]);
-	// console.log(cutting_points[1]);
-	var costs = calculate_costs(s, t, cutting_points)
-  // console.log("calculate costs (part 1) successful")
-	var costs_all = dtw.compute(s, t)
-	// console.log('path:', dtw.path());
-  // console.log("calculate costs (part 2) successful")
-	// console.log('Costs all:', costs_all);
 
-	// var trace1 = {
-	// 	x: Array.apply(null, {length: s.length}).map(Number.call, Number),
-	// 	y: s,
-	// 	type: "scatter"
-	// };
-	// var trace2 = {
-	// 	x: Array.apply(null, {length: t.length}).map(Number.call, Number),
-	// 	y: t,
-	// 	// yaxis: "y2",
-	// 	type: "scatter"
-	// };
-	// var y_axis_0 = cutting_points[0].map(function(point) {
-  // 	return s[point];
-	// });
-	// var concat_extrema_s = extrema_s.minlist.concat(extrema_s.maxlist);
-	// var y_axis_2 = concat_extrema_s.map(function(point) {
-  // 	return s[point];
-	// });
-	// var trace5 = {
-	// 	x: concat_extrema_s,
-	// 	y: y_axis_2,
-	// 	mode: "markers",
-	// 	type: "scatter"
-	// };
-	// var concat_extrema_t = extrema_t.minlist.concat(extrema_t.maxlist);
-	// var y_axis_3 = concat_extrema_t.map(function(point) {
-  // 	return t[point];
-	// });
-	// var trace6= {
-	// 	x: concat_extrema_t,
-	// 	y: y_axis_3,
-	// 	// yaxis: "y2",
-	// 	mode: "markers",
-	// 	type: "scatter"
-	// };
-	// var data_plotly = [trace1, trace2, trace5, trace6];
-	// var layout = {
-	//   yaxis: {domain: [0, 0.5]},
-	//   yaxis2: {domain: [0.5, 1]},
-	// };
-	// var graphOptions = {layout: layout, fileopt : "overwrite", filename : "simple-node-example"};
-	//
-	// plotly.plot(data_plotly, graphOptions, function (err, msg) {
-	// 	if (err) return console.log(err);
-	// 	console.log(msg);
-	// });
-	// var data = [trace1, trace2];
-	// var graphOptions = {filename: "basic-line", fileopt: "overwrite"};
-	// plotly.plot(data, graphOptions, function (err, msg) {
-	// 		console.log(msg);
-	// });
-	// var data = [trace1, trace2];
-	// var graphOptions = {filename: "force", fileopt: "overwrite"};
-	// plotly.plot(data, graphOptions, function (err, msg) {
-	// 		console.log(msg);
-	// });
+	var costs = calculate_costs(s, t, cutting_points)
+	var costs_all = dtw.compute(s, t)
 
 	return costs
 }
 
 function prepare_slicing(values) {
-	// ### Extrema function ###
+	// Extrema function
 
 	var extrema = function(values, eps) {
 	    // make y enumerated and define x = 1, 2, 3, ...
@@ -424,8 +336,7 @@ function calculate_costs(s, t, cutting_points) {
 	  var t_slice = t.slice(cutting_points[1][i], cutting_points[1][i+1])
 	  costs = dtw.compute(s_slice, t_slice)
 	  sum = sum + costs
-	  // console.log('Costs slice_' + (i + 1) + ':', cutting_points[0][i], cutting_points[0][i+1], costs)
 	}
-	// console.log('Costs sum slices: ' + sum)
+
 	return sum
 }
