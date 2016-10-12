@@ -7,11 +7,11 @@
   },
   "main": "index.js",
   "scripts": {
-    "tsc": "tsc -p src -w",
+    "compile": "node_modules/.bin/tsc -p src",
     "tsc:w": "tsc -p src -w",
     "stylusCompile:watch": "stylus -w -u nib src/assets/styles/main.styl",
-    "start": "tsc && node app.js",
-    "clean": "rm src/app/**/*.js",
+    "start": "node app.js",
+    "clean": "rm src/app/*.js && rm src/app/*.js.map && rm src/app/services/*.js && rm src/app/services/*.js.map && rm src/app/pipes/*.js && rm src/app/pipes/*.js.map",
     "dev": "concurrent \"npm run tsc:w\" \"npm run stylusCompile:watch\" \"nodemon app.js\""
   },
   "dependencies": {

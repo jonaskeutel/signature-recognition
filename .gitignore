@@ -39,6 +39,9 @@ jspm_packages
 .vscode
 *.svg
 
+app/src/*/*/*.js
+app/src/*/*/*.js.map
+
 private/evaluation/network.js
 private/evaluation/network.json
 private/.DS_Store

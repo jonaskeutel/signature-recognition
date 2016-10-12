@@ -9,10 +9,16 @@ The whole application is served by a node.js serer running the express module fo
 
 ## Deployment on MacOS
 
-```
+```js
   npm install
+
+  // This command will output some errors, 
+  // those errors are fine and do not need to be fixed.
+  npm run compile
+  
   npm start
 ```
+
 **After starting the application, the neural network is being trained at first. This may take a while. You might want to take a coffee brake now.**
 
 #### Problems?
