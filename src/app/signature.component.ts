@@ -1,4 +1,10 @@
 'use strict'
+/**
+ * Component that allows signing within the browser on a Canvas
+ * It receives all touches with their respective x,y coordinates and eventually the pressure
+ * it stores the values and normalizes them. 
+ */
+
 import {Directive, HostListener, Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChild, ElementRef} from '@angular/core';
 
 var normalizedTouches = []
@@ -7,9 +13,6 @@ var normalizedTouches = []
   selector: 'canvas[drawable]'
 })
 
-// angular.element($window).bind('orientationchange', function () {
-//  console.log(window.orientation)
-// })
 
 class CanvasDrawer {
   public startTime = null
@@ -29,10 +32,8 @@ class CanvasDrawer {
   public normalizedAcceleration = []
 
   constructor(el: ElementRef) {
-       this.canvas = el;
-       console.log("Construced")
-      //  console.log(JSON.parse(JSON.stringify(el.nativeElement)) )
-      console.log(el,  el.nativeElement.clientWidth)
+      this.canvas = el;
+
       setTimeout(function(){
         el.nativeElement.width = el.nativeElement.clientWidth
       },200)
@@ -54,8 +55,7 @@ class CanvasDrawer {
 
     var touches = event.changedTouches;
 
-    // TODO: Decide, if we want to use more than one finger
-    for (var i = 0; i < 1; i++) { // for now, only use first
+    for (var i = 0; i < 1; i++) { 
       var x = touches[i].pageX - event.srcElement.offsetLeft
       var y = touches[i].pageY - canvas.offsetTop
       var force = touches[i].force;
@@ -65,8 +65,7 @@ class CanvasDrawer {
         y: y,
         pressure: force
       }, Date.now() )
-    //   console.log(touches[i])
-    //   console.log(touches[i].identifier)
+
       this.currentTouch.push( { id: touches[i].identifier, x: x, y: y })
 
       context.beginPath();
@@ -86,10 +85,7 @@ class CanvasDrawer {
 
     var touches = event.changedTouches;
 
-    // console.log(event)
-
-
-    for (var i = 0; i < 1; i++) { //see above
+    for (var i = 0; i < 1; i++) { 
       var x = touches[i].pageX - event.srcElement.offsetLeft
       var y = touches[i].pageY - canvas.offsetTop
       var force = touches[i].force;
@@ -107,17 +103,12 @@ class CanvasDrawer {
         }
         return false
       })
-    //   console.log(touch.length)
-      // context.beginPath();
-      // context.arc(x, y, 4 * touches[i].force, 0, 2 * Math.PI, false);  // a circle at the start
-      // context.fillStyle = 'blue';
-      // context.fill();
 
       if(touch.length == 1){
         context.beginPath();
-        // log("context.moveTo(" + ongoingTouches[idx].pageX + ", " + ongoingTouches[idx].pageY + ");");
+
         context.moveTo(touch[0].x, touch[0].y);
-        // log("context.lineTo(" + touches[i].pageX + ", " + touches[i].pageY + ");");
+
         context.lineTo(x, y);
         context.lineWidth = this.thickness(touches[i].force, null);
         context.strokeStyle = 'blue';
@@ -140,8 +131,6 @@ class CanvasDrawer {
     var touches = event.changedTouches;
 
     var index = this.getIndexForTimestamp(this.lastEnd)
-    // console.log(event)
-
 
     for (var i = 0; i < touches.length; i++) {
       var ind = -1
@@ -157,13 +146,12 @@ class CanvasDrawer {
         this.currentTouch.splice(ind, 1)
 
     }
-    // this.numStrokes--;
+
     var  thing = this;
 
   }
 
   addTouchPoint(touchpoint, timestamp){
-    // this.touchesOverTime.push(touchpoint);
     var index = this.getIndexForTimestamp(timestamp)
     this.addEntryToArrayAtIndex(touchpoint, this.normalizedTouches, index)
   }
@@ -175,7 +163,6 @@ class CanvasDrawer {
   }
 
   addEntryToArrayAtIndex(entry, array, index, filler = null) {
-    // console.log("trying to add " + entry + " to " + array + " at " + index);
     if (array[index]) {
         return;
     }
@@ -257,7 +244,6 @@ export class SignatureComponent implements OnInit, AfterViewInit{
     var that = this;
 
     window.addEventListener('deviceorientation', function(event) {
-    //   var entry = Math.sqrt(event.alpha*event.alpha + event.beta*event.beta + event.gamma*event.gamma)
       var entry = event.alpha
       that.drawable.lastOrientation = entry
       var index = that.drawable.getIndexForTimestamp(Date.now())
@@ -272,11 +258,6 @@ export class SignatureComponent implements OnInit, AfterViewInit{
         var index = that.drawable.getIndexForTimestamp(Date.now())
         if (index) {
             that.drawable.addEntryToArrayAtIndex(entry, that.drawable.normalizedAcceleration, index)
-        }
-        if (that.drawable.normalizedAcceleration.length === 0) {
-            // console.log("Still empty")
-        } else {
-            // console.log("Not anymore...")
         }
     })
  }

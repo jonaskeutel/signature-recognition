@@ -10,10 +10,10 @@
     "tsc": "tsc -p src -w",
     "tsc:w": "tsc -p src -w",
     "stylusCompile:watch": "stylus -w -u nib src/assets/styles/main.styl",
-    "start": "node app.js",
+    "start": "tsc && node app.js",
+    "clean": "rm src/app/**/*.js",
     "dev": "concurrent \"npm run tsc:w\" \"npm run stylusCompile:watch\" \"nodemon app.js\""
   },
-  "homepage": "lunch.time",
   "dependencies": {
     "@angular/common": "2.0.0-rc.1",
     "@angular/compiler": "2.0.0-rc.1",

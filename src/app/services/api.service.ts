@@ -1,6 +1,5 @@
 import {Http, Headers} from '@angular/http';
 import {Injectable} from '@angular/core';
-// import {Observable} from 'rxjs/Observable';
 
 
 @Injectable()
@@ -149,27 +148,24 @@ export class ApiService {
       if( i < Object.keys(body).length-1 )
         converted += '&'
     }
-    // console.log(converted)
+
     return converted
   }
 
   normalizeSignature(signature){
     var dataPoints = signature.x.length;
-    // var width = Math.max.apply(Math, signature.x) - Math.min.apply(Math, signature.x.filter(function(elem){return elem != null}))
-    // var height = Math.max.apply(Math, signature.y) - Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
     var minX = Math.min.apply(Math, signature.x.filter(function(elem){return elem != null}))
     var minY = Math.min.apply(Math, signature.y.filter(function(elem){return elem != null}))
 
     var newX = [], newY = []
-    // console.log(signature)
+
     for(var i=0; i<dataPoints; i++){
       newX.push( signature.x[i] ? signature.x[i] - minX : null )
       newY.push( signature.x[i] ? signature.y[i] - minY : null)
     }
     signature.x = newX
     signature.y = newY
-    // signature.width = width
-    // signature.height = height
+
     console.log("normalized")
     return signature
   }
