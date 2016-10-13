@@ -1,3 +1,11 @@
+/**
+ * Computes the three dtw approaches:
+ * normal (without preprocessing),
+ * filtered (with preprocessing: remove NULL values from series),
+ * slicing (slicing approach)
+ * Returns the result (certainities) of the three approaches.
+ */
+
 'use strict'
 
 const q 											= require('q')
@@ -5,8 +13,6 @@ const dtw_evaluation 					= require(__dirname + "/dtw_evaluation.js")
 const dtw_slicing_evaluation 	= require(__dirname + "/dtw_slicing_evaluation.js")
 const featurizer 							= require(__dirname + "/featurizer.js")
 const neural_network 					= require("./neural_network_wrapper.js")
-// console.log(__dirname)
-// console.log("other: ", neural_network)
 
 // Configutation parameters
 const CERTAINITY_THRESHOLD = 0.85
@@ -15,8 +21,7 @@ const DTW_FILTERED = computeDTWResultFiltered
 const DTW_SLICING = computeDTWResultSlicing
 
 module.exports = {
-	compare: compare,
-	getCertainity: getCertainity // for testing purposes
+	compare: compare
 }
 
 // DTW functions
@@ -73,6 +78,11 @@ function compare(newSignature, savedSignatures) {
 }
 
 function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {
+				/**
+				 * Compute the certainities for the three approaches (DTW_NORMAL, DTW_FILTERED, DTW_SLICING) for the
+				 * dynamic features (x, y, force, acceleration, orientation), the certainities for the other features
+				 * (number of strokes, width, height, duration), the combined Certainity and a passed/fail flag
+				 */
 
         var xCertainity = getCertainity(newFeatures.x, savedFeatures.map(function(o){return o.x}), DTW_NORMAL)
 
@@ -125,7 +135,6 @@ function calculateCertainitiesFromFeatures(newFeatures, savedFeatures) {
             durationCertainity: durationCertainity,
             numStrokesCertainity: numStrokesCertainity,
       	}
-        // console.log("Result: " + result)
         return result
 }
 
@@ -139,27 +148,33 @@ function getCertainity(newValues, savedValues, dtwFunction) {
 		}
 
     if (Array.isArray(newValues)) {
-        // compare array of values (x, y, force, acceleration, ...)
+        // Compare array of values (x, y, force, acceleration, ...)
 
-        for (var i = 0; i < savedValues.length; i++) {
+				// Compare already existing series (signatures) to determine the variance
+				for (var i = 0; i < savedValues.length; i++) {
             for (var j = 0; j < savedValues.length; j++) {
                 if (i <= j) {
                     continue
                 }
                 var diff = compareValues(savedValues[i], savedValues, dtwFunction)
                 if (!diff) {
+										// An error occured while comparing the values
                     continue
                 }
+								// Sum up the differences for the two compared series of a feature
                 overallDiff += diff
+								// Determine the maximum difference between the saved series
                 maxDiff = diff > maxDiff ? diff : maxDiff
                 numberOfComparisons++
             }
         }
-				newDiff = compareValues(newValues, savedValues, dtwFunction)
-        // console.log("new Diff:\t\t\t\t" + newDiff)
-    } else {
-        // compare numbers (width, height, duration, ...)
 
+				// Compare new signature values with the existing values
+				newDiff = compareValues(newValues, savedValues, dtwFunction)
+    } else {
+        // Compare numbers (width, height, duration, ...)
+
+				// Analogue to array comparison above
         for (var i = 0; i < savedValues.length; i++) {
             for (var j = 0; j < savedValues.length; j++) {
                 if (i <= j) {
@@ -172,27 +187,21 @@ function getCertainity(newValues, savedValues, dtwFunction) {
             }
         }
         newDiff = compareNumber(newValues, savedValues, false)
-        // console.log("new Diff:\t\t\t\t " + newDiff)
+				// Compute average of saved values in order to determine the deviation of the new values to the existing values
         var averageValue = averageOfArray(savedValues)
         var deviationFromAverageCertainity = 1 - (newDiff / averageValue)
-        // console.log("average Value:\t\t\t\t " + averageValue)
-        // console.log("deviationFromAverageCertainity:\t\t " + deviationFromAverageCertainity)
     }
     if (numberOfComparisons === 0) {
         return false
     }
+		// Compute the average difference between the series and compute a certainity from the new and the average differences
     var averageDiff = overallDiff / numberOfComparisons
     var avgCertainity = newDiff < averageDiff ? 1 : averageDiff / newDiff
     var maxCertainity = newDiff < maxDiff ? 1 : maxDiff / newDiff
     var resultingCertainity = (avgCertainity + maxCertainity) / 2
-    // console.log("Average diff:\t\t\t	 " + averageDiff)
-    // console.log("Average certainity:\t\t\t " + avgCertainity)
-    // console.log("Max diff:\t\t\t\t " + maxDiff)
-    // console.log("Max certainity:\t\t\t\t " + maxCertainity)
-    // console.log("resulting certainity:\t\t\t " + ((avgCertainity + maxCertainity) / 2))
+		// Take the deviation from the average certainity into account (retrieve weighted certainity)
     if (deviationFromAverageCertainity) {
         var weightedCertainityFromDeviation = (deviationFromAverageCertainity + resultingCertainity) / 2
-        // console.log("weightedCertainityFromDeviation:\t " + weightedCertainityFromDeviation)
         return weightedCertainityFromDeviation
     }
     return resultingCertainity
@@ -200,20 +209,24 @@ function getCertainity(newValues, savedValues, dtwFunction) {
 
 function compareValues(newValues, savedValues, dtwFunction) {
 	var score = 0;
+	// Normalize the new values
   var normalizedNew = normalize(newValues)
 	for (var i = 0; i < savedValues.length; i++) {
+		// Normalize each existing series of the feature and apply dtw
     var normalizedSaved = normalize(savedValues[i])
 		var result = computeDTWResult(dtwFunction, [normalizedNew, normalizedSaved])
 		if (typeof(result) == "boolean" && !result) {
+			// An error occured while applying dtw
 			return false
 		}
+		// Sum up single dtw results and calculate the average
 		score = score + result
 	}
-
-	return score/savedValues.length
+	return score / savedValues.length
 }
 
 function compareNumber(newValue, savedValues, includesSelf) {
+		// Sum up single differences and calculate the average
     var diff = 0
     for (var i = 0; i < savedValues.length; i++) {
         diff += Math.abs(savedValues[i] - newValue)
@@ -225,6 +238,7 @@ function compareNumber(newValue, savedValues, includesSelf) {
 }
 
 function getNumStrokesCertainity(numStrokes, savedNumStrokes) {
+		// Determine certainity for number of strokes
     var min = Infinity
     var max = 0
     for (var i = 0; i < savedNumStrokes.length; i++) {
@@ -235,12 +249,6 @@ function getNumStrokesCertainity(numStrokes, savedNumStrokes) {
     var minCertainity = numStrokes <= min ? numStrokes / min : 1 / (numStrokes / min)
     var maxCertainity = numStrokes <= max ? numStrokes / max : 1 / (numStrokes / max)
     var resultingCertainity = (minCertainity + maxCertainity) / 2
-    // console.log("numStrokes: \t\t\t\t" + numStrokes)
-    // console.log("min: \t\t\t\t\t" + min)
-    // console.log("max: \t\t\t\t\t" + max)
-    // console.log("minCertainity: \t\t\t\t" + minCertainity)
-    // console.log("maxCertainity: \t\t\t\t" + maxCertainity)
-    // console.log("resultingCertainity: \t\t\t" + resultingCertainity)
     if (numStrokes >= min && numStrokes <= max) {
         return 1
     }
@@ -248,27 +256,28 @@ function getNumStrokesCertainity(numStrokes, savedNumStrokes) {
 }
 
 function getMinMaxCertainity(newMin, newMax, savedMin, savedMax) {
-    var delta = 0.0000000001 //to avoid division by 0
+		// Calculate certainity for the minimum and the maximum of the acceleration values
+    var delta = 0.0000000001 // to avoid division by 0
     newMin += delta
     newMax += delta
     savedMin = Math.min.apply(null, savedMin) + delta
     savedMax = Math.max.apply(null, savedMax) + delta
-    // console.log(newMin, newMax, savedMin, savedMax)
     var minCertainity = newMin <= savedMin ? newMin / savedMin : 1 / (newMin / savedMin)
     var maxCertainity = newMax <= savedMax ? newMax / savedMax : 1 / (newMax / savedMax)
-    // console.log("minCertainity: \t\t\t\t" + minCertainity)
-    // console.log("maxCertainity: \t\t\t\t" + maxCertainity)
     if (!minCertainity || !maxCertainity) {
         return false
     }
 
     var resultingCertainity = (minCertainity + maxCertainity) / 2
-    // console.log("resultingCertainity: \t" + resultingCertainity)
     return resultingCertainity
 }
 
 function combineCertainities(xCertainity, xFilteredCertainity, xSlicingCertainity, yCertainity, yFilteredCertainity, ySlicingCertainity, forceCertainity, accelerationCertainity, orientationCertainity, widthCertainity, heightCertainity, durationCertainity, numStrokesCertainity) {
-    var certainity = 0
+		/**
+		 * Sum up certainities of all features (for all saved series) and calulate final certainity
+		 * weighting some features, e.g. force (*5) and acceleration (*2)
+		 */
+		var certainity = 0
     var numberOfCertainities = 0
     var i = 0
 
