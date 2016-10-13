@@ -1,9 +1,9 @@
 /**
- * Computes the three dtw approaches:
+ * Encapsulates the three dtw approaches:
  * normal (without preprocessing),
- * filtered (with preprocessing: remove NULL values from series),
- * slicing (slicing approach)
- * Returns the result (certainities) of the three approaches.
+ * filtered (with preprocessing: remove NULL/undefined values from the series),
+ * slicing (presented slicing approach)
+ * Returns the computed result (certainities) of the three dtw approaches.
  */
 
 'use strict'
@@ -15,16 +15,19 @@ const featurizer 							= require(__dirname + "/featurizer.js")
 const neural_network 					= require("./neural_network_wrapper.js")
 
 // Configutation parameters
+// Threshold for the certainity determining if a signature with a certainity is accepted (if above CERTAINITY_THRESHOLD) or rejected (below CERTAINITY_THRESHOLD)
 const CERTAINITY_THRESHOLD = 0.85
+// Assign methods (to be called) to the according constants
 const DTW_NORMAL = computeDTWResultNormal
 const DTW_FILTERED = computeDTWResultFiltered
 const DTW_SLICING = computeDTWResultSlicing
 
 module.exports = {
-	compare: compare
+	compare: compare,
+	getCertainity: getCertainity // only exported for testing the evaluation with the test_evaluation.js, not needed for the frontend
 }
 
-// DTW functions
+// Make DTW functions available inside this file (assigned to constants which are declared above)
 function computeDTWResultNormal(normalizedNew, normalizedSaved) {
 	return dtw_evaluation.computeDTWResultNormal(normalizedNew, normalizedSaved)
 }
@@ -39,6 +42,11 @@ function computeDTWResultSlicing(normalizedNew, normalizedSaved) {
 
 // Helper functions
 
+// Call according function determined by the constant
+function computeDTWResult(func, args) {
+	return func.apply(this, args)
+}
+
 function averageOfArray(arr) {
     var sum = 0
     for (var i = 0; i < arr.length; i++) {
@@ -52,10 +60,6 @@ function normalize(array) {
   normalized[0] = normalized[0] ? normalized[0] : 0
 
   return normalized
-}
-
-function computeDTWResult(func, args) {
-	return func.apply(this, args)
 }
 
 // Comparison logic

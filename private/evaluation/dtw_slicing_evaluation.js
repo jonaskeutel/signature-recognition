@@ -1,12 +1,21 @@
+/**
+ * This file encapsulates the dtw slicing approach.
+ * It exports the according methods to be called from the evaluation.js file.
+ * It applies slicing to the (normalized) values of a feature
+ * and applies dtw on these slices.
+ * It returns a final distance value for the two compared series.
+ */
+
 'use strict'
 
+// Configutation parameters
 const INDEX_MAX_THRESHOLD = 40
 const INDEX_MIN_THRESHOLD = 3
 const EXTREMA_GRANULARITY = '1'
 
 module.exports = {
 	computeDTWResult: computeDTWResult,
-  getExtrema: prepare_slicing
+  getExtrema: prepare_slicing // only exported for testing the dtw slicing algorithm with the test_evaluation.js, not needed for the frontend
 }
 
 var DTW = require('dtw')
@@ -25,32 +34,38 @@ function computeDTWResult(normalizedNew, normalizedSaved) {
 }
 
 function compute_slicing_result(s, t) {
+	// Remove 'undefined' values because they would deliver wrong results
 	s = s.filter(function(n){ return n != undefined })
 	t = t.filter(function(n){ return n != undefined })
 
+	// Determine extrema for both series s & t
 	var extrema_s = prepare_slicing(s)
 	var extrema_t = prepare_slicing(t)
 	if (extrema_s.minlist.length == 0 && extrema_s.maxlist.length == 0 &&
 		extrema_t.minlist.length == 0 && extrema_t.maxlist.length == 0) {
+			// Return false if extrema could not be determined
 		return false
 	}
 
+	// Map extrema to each other (first minumum to minimum, then maximum to maximum) and only keep the mapped extrema, reject the other extrema.
 	var mapped_extrema_minlists = map_extrema_lists(extrema_s.minlist, extrema_t.minlist)
 	extrema_s.minlist = mapped_extrema_minlists[0]
 	extrema_t.minlist = mapped_extrema_minlists[1]
 	var mapped_extrema_maxlists = map_extrema_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = mapped_extrema_maxlists[0]
   extrema_t.maxlist = mapped_extrema_maxlists[1]
+	// Check if the extrema appear in a predefined distance to each other (INDEX_MAX_THRESHOLD, INDEX_MIN_THRESHOLD), clean up if not.
 	var cleaned_extrema_minlists = clean_up_lists(extrema_s.minlist, extrema_t.minlist)
 	extrema_s.minlist = cleaned_extrema_minlists[0]
 	extrema_t.minlist = cleaned_extrema_minlists[1]
 	var cleaned_extrema_maxlists = clean_up_lists(extrema_s.maxlist, extrema_t.maxlist)
 	extrema_s.maxlist = cleaned_extrema_maxlists[0]
 	extrema_t.maxlist = cleaned_extrema_maxlists[1]
+	// Determine the cutting points for obtaining the slices. Check if the extrema appear in chronological order (to determine correct slices), clean up if not.
 	var cutting_points = determine_cutting_points(extrema_s, extrema_t)
 
+	// Calculate and return the costs for the series considering/comparing the slices (apply dtw to slices)
 	var costs = calculate_costs(s, t, cutting_points)
-	var costs_all = dtw.compute(s, t)
 
 	return costs
 }
@@ -59,11 +74,11 @@ function prepare_slicing(values) {
 	// Extrema function
 
 	var extrema = function(values, eps) {
-	    // make y enumerated and define x = 1, 2, 3, ...
+	    // Make y enumerated and define x = 1, 2, 3, ...
 	    var x, y;
 	    y = enumerate(values);
 	    x = Object.keys(y).map(Math.floor);
-	    // call extremaXY version
+	    // Call extremaXY version
 	    var res = extremaXY(x, y, eps);
 	    res.minlist = res.minlist.map(function(val) {
 	        var index = Math.floor((val[1] + val[0]) / 2);
@@ -78,9 +93,9 @@ function prepare_slicing(values) {
 	}
 
 	var extremaXY = function(x, y, eps) {
-	        // declare local vars
+	        // Declare local variables
 	        var n, s, m, M, maxlist, minlist, i, j;
-	        // define x & y enumerated arrays
+	        // Define x & y enumerated arrays
 	        var enumerate = function(obj) {
 	            var arr = [];
 	            var keys = Object.keys(obj);
@@ -91,7 +106,7 @@ function prepare_slicing(values) {
 	        }
 	        y = enumerate(y);
 	        x = enumerate(x);
-	        // set initial values
+	        // Set initial values
 	        n = y.length;
 	        s = 0;
 	        m = y[0];
@@ -102,7 +117,7 @@ function prepare_slicing(values) {
 	        if (typeof eps == "undefined") {
 	            eps = 0.1;
 	        }
-	        // the algorithm
+	        // The algorithm for finding extrema
 	        while (i < n) {
 	            if (s == 0) {
 	                if (!(M - eps <= y[i] && y[i] <= m + eps)) {
@@ -154,7 +169,7 @@ function prepare_slicing(values) {
 	        return {minlist: minlist, maxlist: maxlist};
 	    }
 
-	    // helper to make an array or object an enumerated array
+	    // Helper to make an array or object an enumerated array
 	    var enumerate = function(obj) {
 	        var arr = [];
 	        var keys = Object.keys(obj);

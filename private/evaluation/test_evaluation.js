@@ -1,3 +1,8 @@
+/**
+ * Test file for testing the dtw computation for the three approaches.
+ * Can be only called from the command line, not included in/needed for the frontend.
+ */
+
 const evaluation              = require('./evaluation.js')
 const dtw_evaluation 					= require(__dirname + "/dtw_evaluation.js")
 const dtw_slicing_evaluation 	= require(__dirname + "/dtw_slicing_evaluation.js")
