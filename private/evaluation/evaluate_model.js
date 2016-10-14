@@ -1,3 +1,6 @@
+/**
+ * Evaluation script that tests our model
+ */
 var neural_network  = require('./neural_network_wrapper.js')
 var db              = require('../database/dbInterface.js')
 var evaluation      = require('./evaluation.js')

@@ -50,8 +50,11 @@ function testSign(signature){
     signature.strokes = parseInt(signature.strokes)
 
     signature = featurize_signature( signature , null)
-
-    return network.activate(signature)
+    
+    if(network)
+      return network.activate(signature)
+    else
+      return null
   }
 
 function train_all(user){
